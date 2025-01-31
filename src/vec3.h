@@ -30,6 +30,7 @@ typedef struct s_vec3
 		double	z;
 		double	b;
 	};
+	double	_; // TODO check if ymm is actually used in campus machines
 }	t_vec3;
 
 t_vec3	vec3_add(t_vec3 v1, t_vec3 v2);
