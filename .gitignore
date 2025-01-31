@@ -1,0 +1,6 @@
+miniRT
+build
+MLX42
+libft/*.o
+libft/libft.a
+*.swp
