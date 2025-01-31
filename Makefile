@@ -6,12 +6,13 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/01/31 13:06:00 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/01/31 16:08:57 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = miniRT
-SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c
+SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c parser.c get_next_line.c \
+	get_next_line_utils.c
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
 
