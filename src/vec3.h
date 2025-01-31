@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 12:42:23 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 13:45:29 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 14:51:37 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,21 @@
 
 typedef struct s_vec3
 {
-	double	x;
-	double	y;
-	double	z;
+	union
+	{
+		double	x;
+		double	r;
+	};
+	union
+	{
+		double	y;
+		double	g;
+	};
+	union
+	{
+		double	z;
+		double	b;
+	};
 }	t_vec3;
 
 t_vec3	vec3_add(t_vec3 v1, t_vec3 v2);
