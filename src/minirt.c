@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 13:41:31 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 17:25:05 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void	mrt_destroy(t_minirt *mrt)
 	if (mrt->mlx != NULL && mrt->img != NULL)
 		mlx_delete_image(mrt->mlx, mrt->img);
 	free(mrt->mlx);
+	free(mrt->line);
 }
 
 void	mrt_exit(t_minirt *mrt, int status)

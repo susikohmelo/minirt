@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 17:17:57 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 17:23:58 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-// TODO with normalized vectors, check if their value equal to 1.
+// TODO with normalized vectors, check if their value equal to 1.0. If not,
+// normalize with warning.
 
 double	str_to_f(const char *str)
 {
@@ -73,27 +74,26 @@ static void	parse_line(t_minirt *mrt, bool found[128], const char *line)
 		parse_plane(mrt, line + ft_strlen("pl "));
 	else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
 		parse_cylinder(mrt, line + ft_strlen("cy "));
-	mrt_assert(mrt, false, "Invalid file");
+	mrt_assert(mrt, false, "Invalid line in input file");
 }
 
 void	parse_input(t_minirt *mrt, const char *path)
 {
 	int			fd;
-	char		*line;
 	static bool	found[128];
 
 	fd = open(path, O_RDONLY);
 	mrt_assert(mrt, fd != -1, path);
 	while (true)
 	{
-		line = get_next_line(fd);
+		mrt->line = get_next_line(fd);
 		if (line == NULL)
 			break;
-		while (ft_isspace(line[ft_strlen(line) - 1]))
-			line[ft_strlen(line) - 1] = '\0';
-		if (line[0] != '\0')
-			parse_line(mrt, found, line);
-		free(line);
+		while (ft_isspace(mrt->line[ft_strlen(mrt->line) - 1]))
+			mrt->line[ft_strlen(line) - 1] = '\0';
+		if (mrt->line[0] != '\0')
+			parse_line(mrt, found, mrt->line);
+		free(mrt->line);
 	}
 	mrt_assert(mrt, found['A'], "No ambient light specified");
 	mrt_assert(mrt, found['C'], "No camera specified");

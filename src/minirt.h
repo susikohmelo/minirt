@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 16:03:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 17:24:34 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ typedef struct s_minirt
 	double		camera_field_of_view;
 	t_shape		*shapes;
 	size_t		shapes_length;
+	char		*line;
 }	t_minirt;
 
 void	mrt_init(t_minirt *mrt);
