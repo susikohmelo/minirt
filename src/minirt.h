@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 15:01:33 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 15:07:46 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # define INIT_WIDTH 512
 # define INIT_HEIGHT 512
 
-typedef struct s_minirt
+typedef struct s_minirt // comment!
 {
 	mlx_t		*mlx;
 	mlx_image_t	*img;
