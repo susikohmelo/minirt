@@ -6,12 +6,19 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 12:42:23 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 14:51:37 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 19:06:58 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VEC3_H
 # define VEC3_H
+
+
+typedef struct s_vec2
+{
+	double	x;
+	double	y;
+}	t_vec2;
 
 typedef struct s_vec3
 {
@@ -38,6 +45,10 @@ t_vec3	vec3_sub(t_vec3 v1, t_vec3 v2);
 double	vec3_dot(t_vec3 v1, t_vec3 v2);
 t_vec3	vec3_cross(t_vec3 v1, t_vec3 v2);
 double	vec3_length(t_vec3 v);
+
+t_vec3	vec3_normalize(t_vec3 v);
+
+t_vec3	vec3_rotate_to_camera(t_vec3 v);
 
 t_vec3	vec3_adds(t_vec3 v, double s);
 t_vec3	vec3_subs(t_vec3 v, double s);

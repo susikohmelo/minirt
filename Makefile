@@ -6,17 +6,17 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/01/31 13:06:00 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/01/31 20:36:31 by ljylhank         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = miniRT
-SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c
+SRCS = main.c minirt.c hooks.c raycast.c vec3.c vec3_normalize.c vec3_scalar.c
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -Iinclude
+CFLAGS = -Iinclude
 LFLAGS = -lm -ldl -lglfw -lpthread
 
 MAKEFLAGS += -j6
