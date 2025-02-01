@@ -72,6 +72,8 @@ typedef struct s_minirt
 	t_vec3		camera_coords;
 	t_vec3		camera_orientation;
 	double		camera_field_of_view;
+	t_vec3		light_coords;
+	double		light_ratio;
 	t_shape		*shapes;
 	size_t		shapes_length;
 	char		*line;
@@ -83,6 +85,12 @@ void	mrt_exit(t_minirt *mrt, int status);
 bool	mrt_assert(t_minirt *mrt, bool condition, const char *msg);
 
 void	parse_input(t_minirt *mrt, const char *path);
+bool	parse_ambient_light(t_minirt *mrt, const char *line);
+bool	parse_camera(t_minirt *mrt, const char *line);
+bool	parse_light(t_minirt *mrt, const char *line);
+char	*parse_float(t_minirt *mrt, double *f, const char *line, char sep);
+bool	assert_range(t_minirt *mrt, t_vec3 inputs, const char *name);
+double	str_to_f(const char *str);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

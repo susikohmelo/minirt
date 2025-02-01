@@ -21,7 +21,7 @@ int	main(int argc, char **argv)
 		&& ft_strcmp(argv[1] + ft_strlen(argv[1]) - 3, ".rt") == 0, \
 		"You must pass a file with `.rt` file extension");
 	mrt_init(&mrt);
-	mrt_parse_input(&mrt, argv[1]);
+	parse_input(&mrt, argv[1]);
 	mlx_loop(mrt.mlx);
 	mrt_destroy(&mrt);
 }

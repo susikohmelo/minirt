@@ -48,7 +48,7 @@ double	str_to_f(const char *str)
 	return (sign * (integer + (double)fraction / fraction_power));
 }
 
-const char	*parse_float(t_minirt *mrt, double *f, const char *line, char sep)
+char	*parse_float(t_minirt *mrt, double *f, const char *line, char separator)
 {
 	bool	digit_found;
 
@@ -63,18 +63,30 @@ const char	*parse_float(t_minirt *mrt, double *f, const char *line, char sep)
 	while (ft_isdigit(*line))
 		digit_found = ++line;
 	mrt_assert(mrt, digit_found, "Invalid numerical value");
-	if (sep == ' ')
+	if (separator == ' ')
 		mrt_assert(mrt, ft_isspace(*line), "Invalid numerical value");
 	else
-		mrt_assert(mrt, *line == sep, "Invalid numerical value");
-	return (line + sizeof sep);
+		mrt_assert(mrt, *line == separator, "Invalid numerical value");
+	return ((char *)line + sizeof separator);
 }
 
-static bool	parse_ambient_light(t_minirt *mrt, const char *line)
+bool	assert_range(t_minirt *mrt, t_vec3 inputs, const char *name)
 {
-	while (ft_isspace(*line))
-		++line;
+	char	msg[256];
+	char	buf[16];
+	double	min;
+	double	max;
 
+	min = inputs.y;
+	max = inputs.z;
+	ft_strlcpy(msg, name, sizeof msg);
+	ft_strlcat(msg, " not in range [", sizeof msg);
+	ft_strlcat(msg, ft_i_to_str(buf, min), sizeof msg);
+	ft_strlcat(msg, ",", sizeof msg);
+	ft_strlcat(msg, ft_i_to_str(buf, max), sizeof msg);
+	ft_strlcat(msg, "]", sizeof msg);
+	mrt_assert(mrt, min <= inputs.x && inputs.x <= max, msg);
+	return (true);
 }
 
 static void	parse_line(t_minirt *mrt, bool found[128], const char *line)
@@ -84,12 +96,12 @@ static void	parse_line(t_minirt *mrt, bool found[128], const char *line)
 	if (line[0] == 'A' && ft_isspace(line[1])
 		&& mrt_assert(mrt, !found['A'], "Multiple ambient lights"))
 		found['A'] = parse_ambient_light(mrt, line + ft_strlen("A "));
-	// else if (line[0] == 'C' && ft_isspace(line[1])
-	// 	&& mrt_assert(mrt, !found['C'], "Multiple cameras"))
-	// 	found['C'] = parse_camera(mrt, line + ft_strlen("C "));
-	// else if (line[0] == 'L' && ft_isspace(line[1])
-	// 	&& mrt_assert(mrt, !found['L'], "Multiple lights"))
-	// 	found['L'] = parse_ligth(mrt, line + ft_strlen("L "));
+	else if (line[0] == 'C' && ft_isspace(line[1])
+		&& mrt_assert(mrt, !found['C'], "Multiple cameras"))
+		found['C'] = parse_camera(mrt, line + ft_strlen("C "));
+	else if (line[0] == 'L' && ft_isspace(line[1])
+		&& mrt_assert(mrt, !found['L'], "Multiple lights"))
+		found['L'] = parse_light(mrt, line + ft_strlen("L "));
 	// else if (line[0] == 's' && line[1] == 'p' && ft_isspace(line[2]))
 	// 	parse_sphere(mrt, line + ft_strlen("sp "));
 	// else if (line[0] == 'p' && line[1] == 'l' && ft_isspace(line[2]))

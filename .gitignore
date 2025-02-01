@@ -4,3 +4,4 @@ MLX42
 libft/*.o
 libft/libft.a
 *.swp
+compile_flags.txt

@@ -26,7 +26,7 @@ MAKEFLAGS += -j6
 
 all: release
 
-release: CFLAGS += -O3 -march=native -ffast-math
+release: CFLAGS += -O3 -march=native -ffast-math -flto
 release: $(NAME)
 
 libft/libft.a:
