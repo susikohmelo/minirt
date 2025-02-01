@@ -16,33 +16,33 @@
 #include <errno.h>
 #include <string.h>
 
-void	mrt_init(t_minirt *mrt)
+void	mrt_init(t_minirt *m)
 {
-	mrt->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
-	mrt_assert(mrt, mrt->mlx != NULL, "mlx_init() failed");
-	mrt->img = mlx_new_image(mrt->mlx, INIT_WIDTH, INIT_HEIGHT);
-	mrt_assert(mrt, mrt->img != NULL, "mlx_new_image() failed");
-	mrt_assert(mrt, mlx_image_to_window(mrt->mlx, mrt->img, 0, 0) != -1, \
+	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
+	mrt_assert(m, m->mlx != NULL, "mlx_init() failed");
+	m->img = mlx_new_image(m->mlx, INIT_WIDTH, INIT_HEIGHT);
+	mrt_assert(m, m->img != NULL, "mlx_new_image() failed");
+	mrt_assert(m, mlx_image_to_window(m->mlx, m->img, 0, 0) != -1, \
 		"mlx_image_to_window() failed");
-	mlx_key_hook(mrt->mlx, key_hook, mrt);
-	mlx_resize_hook(mrt->mlx, resize_hook, mrt);
+	mlx_key_hook(m->mlx, key_hook, m);
+	mlx_resize_hook(m->mlx, resize_hook, m);
 }
 
-void	mrt_destroy(t_minirt *mrt)
+void	mrt_destroy(t_minirt *m)
 {
-	if (mrt->mlx != NULL && mrt->img != NULL)
-		mlx_delete_image(mrt->mlx, mrt->img);
-	free(mrt->mlx);
-	free(mrt->line);
+	if (m->mlx != NULL && m->img != NULL)
+		mlx_delete_image(m->mlx, m->img);
+	free(m->mlx);
+	free(m->line);
 }
 
-void	mrt_exit(t_minirt *mrt, int status)
+void	mrt_exit(t_minirt *m, int status)
 {
-	mrt_destroy(mrt);
+	mrt_destroy(m);
 	exit(status);
 }
 
-bool	mrt_assert(t_minirt *mrt, bool condition, const char *msg)
+bool	mrt_assert(t_minirt *m, bool condition, const char *msg)
 {
 	int	errno_value;
 
@@ -60,6 +60,6 @@ bool	mrt_assert(t_minirt *mrt, bool condition, const char *msg)
 			ft_putstr_fd(msg, STDERR_FILENO);
 		ft_putstr_fd("\n", STDERR_FILENO);
 	}
-	mrt_exit(mrt, EXIT_FAILURE);
+	mrt_exit(m, EXIT_FAILURE);
 	return (false);
 }

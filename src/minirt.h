@@ -79,17 +79,20 @@ typedef struct s_minirt
 	char		*line;
 }	t_minirt;
 
-void	mrt_init(t_minirt *mrt);
-void	mrt_destroy(t_minirt *mrt);
-void	mrt_exit(t_minirt *mrt, int status);
-bool	mrt_assert(t_minirt *mrt, bool condition, const char *msg);
+void	mrt_init(t_minirt *m);
+void	mrt_destroy(t_minirt *m);
+void	mrt_exit(t_minirt *m, int status);
+bool	mrt_assert(t_minirt *m, bool condition, const char *msg);
 
-void	parse_input(t_minirt *mrt, const char *path);
-bool	parse_ambient_light(t_minirt *mrt, const char *line);
-bool	parse_camera(t_minirt *mrt, const char *line);
-bool	parse_light(t_minirt *mrt, const char *line);
-char	*parse_float(t_minirt *mrt, double *f, const char *line, char sep);
-bool	assert_range(t_minirt *mrt, t_vec3 inputs, const char *name);
+void	parse_input(t_minirt *m, const char *path);
+bool	parse_ambient_light(t_minirt *m, const char *line);
+bool	parse_camera(t_minirt *m, const char *line);
+bool	parse_light(t_minirt *m, const char *line);
+void	parse_sphere(t_minirt *m, const char *line);
+void	parse_plane(t_minirt *m, const char *line);
+void	parse_cylinder(t_minirt *m, const char *line);
+char	*parse_float(t_minirt *m, double *f, const char *line, char sep);
+bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name);
 double	str_to_f(const char *str);
 
 void	key_hook(mlx_key_data_t key, void *minirt);

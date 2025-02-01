@@ -48,7 +48,7 @@ double	str_to_f(const char *str)
 	return (sign * (integer + (double)fraction / fraction_power));
 }
 
-char	*parse_float(t_minirt *mrt, double *f, const char *line, char separator)
+char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 {
 	bool	digit_found;
 
@@ -62,15 +62,16 @@ char	*parse_float(t_minirt *mrt, double *f, const char *line, char separator)
 		++line;
 	while (ft_isdigit(*line))
 		digit_found = ++line;
-	mrt_assert(mrt, digit_found, "Invalid numerical value");
-	if (separator == ' ')
-		mrt_assert(mrt, ft_isspace(*line), "Invalid numerical value");
+	mrt_assert(m, digit_found, "Invalid number");
+	if (separator == ' ' && mrt_assert(m, ft_isspace(*line), "Invalid number"))
+		while (ft_isspace(*line))
+			++line;
 	else
-		mrt_assert(mrt, *line == separator, "Invalid numerical value");
+		mrt_assert(m, *line == separator, "Invalid numerical value");
 	return ((char *)line + sizeof separator);
 }
 
-bool	assert_range(t_minirt *mrt, t_vec3 inputs, const char *name)
+bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name)
 {
 	char	msg[256];
 	char	buf[16];
@@ -85,51 +86,51 @@ bool	assert_range(t_minirt *mrt, t_vec3 inputs, const char *name)
 	ft_strlcat(msg, ",", sizeof msg);
 	ft_strlcat(msg, ft_i_to_str(buf, max), sizeof msg);
 	ft_strlcat(msg, "]", sizeof msg);
-	mrt_assert(mrt, min <= inputs.x && inputs.x <= max, msg);
+	mrt_assert(m, min <= inputs.x && inputs.x <= max, msg);
 	return (true);
 }
 
-static void	parse_line(t_minirt *mrt, bool found[128], const char *line)
+static void	parse_line(t_minirt *m, bool found[128], const char *line)
 {
 	while (ft_isspace(*line))
 		++line;
 	if (line[0] == 'A' && ft_isspace(line[1])
-		&& mrt_assert(mrt, !found['A'], "Multiple ambient lights"))
-		found['A'] = parse_ambient_light(mrt, line + ft_strlen("A "));
+		&& mrt_assert(m, !found['A'], "Multiple ambient lights"))
+		found['A'] = parse_ambient_light(m, line + ft_strlen("A "));
 	else if (line[0] == 'C' && ft_isspace(line[1])
-		&& mrt_assert(mrt, !found['C'], "Multiple cameras"))
-		found['C'] = parse_camera(mrt, line + ft_strlen("C "));
+		&& mrt_assert(m, !found['C'], "Multiple cameras"))
+		found['C'] = parse_camera(m, line + ft_strlen("C "));
 	else if (line[0] == 'L' && ft_isspace(line[1])
-		&& mrt_assert(mrt, !found['L'], "Multiple lights"))
-		found['L'] = parse_light(mrt, line + ft_strlen("L "));
-	// else if (line[0] == 's' && line[1] == 'p' && ft_isspace(line[2]))
-	// 	parse_sphere(mrt, line + ft_strlen("sp "));
-	// else if (line[0] == 'p' && line[1] == 'l' && ft_isspace(line[2]))
-	// 	parse_plane(mrt, line + ft_strlen("pl "));
-	// else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
-	// 	parse_cylinder(mrt, line + ft_strlen("cy "));
-	mrt_assert(mrt, false, "Unknown element type");
+		&& mrt_assert(m, !found['L'], "Multiple lights"))
+		found['L'] = parse_light(m, line + ft_strlen("L "));
+	else if (line[0] == 's' && line[1] == 'p' && ft_isspace(line[2]))
+		parse_sphere(m, line + ft_strlen("sp "));
+	else if (line[0] == 'p' && line[1] == 'l' && ft_isspace(line[2]))
+		parse_plane(m, line + ft_strlen("pl "));
+	else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
+		parse_cylinder(m, line + ft_strlen("cy "));
+	mrt_assert(m, false, "Unknown element type");
 }
 
-void	parse_input(t_minirt *mrt, const char *path)
+void	parse_input(t_minirt *m, const char *path)
 {
 	int			fd;
 	static bool	found[128];
 
 	fd = open(path, O_RDONLY);
-	mrt_assert(mrt, fd != -1, path);
+	mrt_assert(m, fd != -1, path);
 	while (true)
 	{
-		mrt->line = get_next_line(fd);
-		if (mrt->line == NULL)
+		m->line = get_next_line(fd);
+		if (m->line == NULL)
 			break;
-		while (ft_isspace(mrt->line[ft_strlen(mrt->line) - 1]))
-			mrt->line[ft_strlen(mrt->line) - 1] = '\0';
-		if (mrt->line[0] != '\0')
-			parse_line(mrt, found, mrt->line);
-		free(mrt->line);
+		while (ft_isspace(m->line[ft_strlen(m->line) - 1]))
+			m->line[ft_strlen(m->line) - 1] = '\0';
+		if (m->line[0] != '\0')
+			parse_line(m, found, m->line);
+		free(m->line);
 	}
-	mrt_assert(mrt, found['A'], "No ambient light specified");
-	mrt_assert(mrt, found['C'], "No camera specified");
-	mrt_assert(mrt, found['L'], "No light specified");
+	mrt_assert(m, found['A'], "No ambient light specified");
+	mrt_assert(m, found['C'], "No camera specified");
+	mrt_assert(m, found['L'], "No light specified");
 }
