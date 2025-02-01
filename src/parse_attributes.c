@@ -47,7 +47,7 @@ bool	parse_camera(t_minirt *m, const char *line)
 	line = parse_float(m, &m->camera_orientation.z, line, ' ');
 	assert_range(m, (t_vec3){m->camera_orientation.z, -1, 1}, \
 		"Camera orientation z component");
-	if (fabs(vec3_length(m->camera_orientation) - 1.) <= .00001)
+	if (fabs(vec3_length(m->camera_orientation) - 1.) >= .001)
 		ft_putendl_fd("Warning\nUnnormalized camera orientation", 2);
 	m->camera_orientation = vec3_normalize(m->camera_orientation);
 	line = parse_float(m, &m->camera_field_of_view, line, '\0');

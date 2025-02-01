@@ -18,9 +18,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-// TODO with normalized vectors, check if their value equal to 1.0. If not,
-// normalize with warning.
-
 double	str_to_f(const char *str)
 {
 	uint64_t	integer;
@@ -32,7 +29,7 @@ double	str_to_f(const char *str)
 	if ((*str == '+' || *str == '-'))
 		sign = 1. - 2 * (*str++ == '-');
 	integer = 0;
-	while ('0' <= *str && *str <= '9' && integer < UINT64_MAX / 10 - 10)
+	while (ft_isdigit(*str) && integer < UINT64_MAX / 10 - 10)
 		integer = integer * 10 + *str++ - '0';
 	if (integer >= UINT64_MAX / 10 - 10)
 		return (sign * INFINITY);
@@ -40,7 +37,7 @@ double	str_to_f(const char *str)
 		++str;
 	fraction = 0;
 	fraction_power = 1;
-	while ('0' <= *str && *str <= '9' && fraction_power < 1000000000)
+	while (ft_isdigit(*str) && fraction < (1llu << 52) - 1)
 	{
 		fraction_power *= 10;
 		fraction = fraction * 10 + *str++ - '0';
@@ -114,9 +111,11 @@ static void	parse_line(t_minirt *m, bool found[128], const char *line)
 
 void	parse_input(t_minirt *m, const char *path)
 {
-	int			fd;
-	static bool	found[128];
+	int		fd;
+	bool	found[128];
+	size_t	line_length;
 
+	ft_memset(found, 0, sizeof found);
 	fd = open(path, O_RDONLY);
 	mrt_assert(m, fd != -1, path);
 	while (true)
@@ -124,8 +123,9 @@ void	parse_input(t_minirt *m, const char *path)
 		m->line = get_next_line(fd);
 		if (m->line == NULL)
 			break;
-		while (ft_isspace(m->line[ft_strlen(m->line) - 1]))
-			m->line[ft_strlen(m->line) - 1] = '\0';
+		line_length = ft_strlen(m->line);
+		while (ft_isspace(m->line[line_length - 1]))
+			m->line[--line_length] = '\0';
 		if (m->line[0] != '\0')
 			parse_line(m, found, m->line);
 		free(m->line);
