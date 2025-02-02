@@ -65,7 +65,7 @@ char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 			++line;
 	else
 		mrt_assert(m, *line == separator, "Invalid numerical value");
-	return ((char *)line + sizeof separator);
+	return ((char *)line + (separator != ' '));
 }
 
 bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name)
@@ -122,7 +122,7 @@ void	parse_input(t_minirt *m, const char *path)
 	{
 		m->line = get_next_line(fd);
 		if (m->line == NULL)
-			break;
+			break ;
 		line_length = ft_strlen(m->line);
 		while (ft_isspace(m->line[line_length - 1]))
 			m->line[--line_length] = '\0';
