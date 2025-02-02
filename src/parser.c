@@ -115,7 +115,7 @@ void	parse_input(t_minirt *m, const char *path)
 	bool	found[128];
 	size_t	line_length;
 
-	ft_memset(found, 0, sizeof found);
+	ft_memset(found, false, sizeof found);
 	fd = open(path, O_RDONLY);
 	mrt_assert(m, fd != -1, path);
 	while (true)
