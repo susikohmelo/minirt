@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:28:44 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 14:14:38 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/01/31 20:40:02 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@ int	main(int argc, char **argv)
 	mrt_assert(&m, ft_strlen(argv[1]) >= ft_strlen(".rt") \
 		&& ft_strcmp(argv[1] + ft_strlen(argv[1]) - 3, ".rt") == 0, \
 		"You must pass a file with `.rt` file extension");
-	mrt_init(&m, argv[1]);
+  mrt_init(&m, argv[1]);
+	mlx_loop_hook(m.mlx, render_frame, &m);
+	mlx_image_to_window(m.mlx, m.img, 0, 0);
 	mlx_loop(m.mlx);
 	mrt_destroy(&m);
 }
