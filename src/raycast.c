@@ -6,11 +6,11 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/03 17:32:39 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/03 17:54:33 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "raycast.h"
+#include "ray.h"
 #include "minirt.h"
 #include <math.h>
 #include <stdio.h>
@@ -25,8 +25,6 @@ static inline t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
 	return (rval);
 }
 
-// TODO if fov is 0 this will segfault
-// TODO fov has to be under 180
 /*
 	multiplying by 0.01745 converts degrees to radians
 */
