@@ -1,18 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse_shapes.c                                     :+:      :+:    :+:   */
+/*   shapes.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 13:14:02 by lfiestas         ###   ########.fr       */
+/*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
+/*   Updated: 2025/02/03 13:03:27 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minirt.h"
-#include <math.h>
+#ifndef SHAPES_H
+# define SHAPES_H
 
-void	parse_sphere(t_minirt *m, const char *line);
-void	parse_plane(t_minirt *m, const char *line);
-void	parse_cylinder(t_minirt *m, const char *line);
+# include "vec3.h"
+
+typedef struct s_sphere
+{
+	t_vec3	coords;
+	double	diameter;
+	t_vec3	color;
+}	t_sphere;
+
+typedef struct s_plane
+{
+	t_vec3	coords;
+	t_vec3	normal;
+	t_vec3	color;
+}	t_plane;
+
+typedef struct s_cylinder
+{
+	t_vec3	coords;
+	t_vec3	axis;
+	double	diameter;
+	double	height;
+	t_vec3	color;
+}	t_cylinder;
+
+#endif

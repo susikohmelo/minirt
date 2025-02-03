@@ -6,14 +6,14 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 17:24:34 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 13:08:46 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
 
-# include "vec3.h"
+# include "array.h"
 # include <.MLX42.h>
 # include <libft.h>
 # include <stdbool.h>
@@ -21,47 +21,6 @@
 
 # define INIT_WIDTH 512
 # define INIT_HEIGHT 512
-
-typedef struct s_sphere
-{
-	t_vec3	coords;
-	double	diameter;
-	t_vec3	color;
-}	t_sphere;
-
-typedef struct s_plane
-{
-	t_vec3	coords;
-	t_vec3	normal;
-	t_vec3	color;
-}	t_plane;
-
-typedef struct s_cylinder
-{
-	t_vec3	coords;
-	t_vec3	axis;
-	double	diameter;
-	double	height;
-	t_vec3	color;
-}	t_cylinder;
-
-typedef enum e_shape_type
-{
-	SHAPE_SPHERE,
-	SHAPE_PLANE,
-	SHAPE_CYLINDER,
-}	t_shape_type;
-
-typedef struct s_shape
-{
-	union
-	{
-		t_sphere	sphere;
-		t_plane		plane;
-		t_cylinder	cylinder;
-	};
-	t_shape_type	type;
-}	t_shape;
 
 typedef struct s_minirt
 {
@@ -74,8 +33,9 @@ typedef struct s_minirt
 	double		camera_field_of_view;
 	t_vec3		light_coords;
 	double		light_ratio;
-	t_shape		*shapes;
-	size_t		shapes_length;
+	t_array		spheres;
+	t_array		planes;
+	t_array		cylinders;
 	char		*line;
 }	t_minirt;
 
