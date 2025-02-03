@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 09:58:57 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/04 10:10:56 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 12:37:44 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # define PAGE_SIZE 8192
 #endif
 
-void	*ft_malloc(size_t size)
+void	*ft_xmalloc(size_t size)
 {
 	void	*p;
 
@@ -41,9 +41,9 @@ void	*ft_arena_alloc(t_arena *arena, size_t size)
 	{
 		next = *arena;
 		if (aligned_size < block_size)
-			*arena = ft_malloc(PAGE_SIZE);
+			*arena = ft_xmalloc(PAGE_SIZE);
 		else
-			*arena = ft_malloc(sizeof(struct s_arena) + aligned_size);
+			*arena = ft_xmalloc(sizeof(struct s_arena) + aligned_size);
 		(*arena)->next = next;
 		(*arena)->pos = (*arena)->mem;
 	}

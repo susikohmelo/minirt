@@ -11,7 +11,11 @@
 # **************************************************************************** #
 
 NAME = miniRT
-SRCS = main.c minirt.c hooks.c raycast.c vec3.c vec3_normalize.c vec3_scalar.c
+
+SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c \
+	parser.c parse_attributes.c parse_shapes.c \
+	get_next_line.c get_next_line_utils.c \
+  vec3_normalize.c raycast.c
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
 
@@ -25,7 +29,7 @@ MAKEFLAGS += -j6
 
 all: release
 
-release: CFLAGS += -O3 -march=native -ffast-math
+release: CFLAGS += -O3 -march=native -ffast-math -flto
 release: $(NAME)
 
 libft/libft.a:

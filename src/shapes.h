@@ -1,30 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hooks.c                                            :+:      :+:    :+:   */
+/*   shapes.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 13:13:19 by lfiestas         ###   ########.fr       */
+/*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
+/*   Updated: 2025/02/03 13:03:27 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minirt.h"
-#include <stdlib.h>
+#ifndef SHAPES_H
+# define SHAPES_H
 
-void	key_hook(mlx_key_data_t key, void *minirt)
+# include "vec3.h"
+
+typedef struct s_sphere
 {
-	if (key.key == MLX_KEY_ESCAPE)
-		mrt_exit(minirt, EXIT_SUCCESS);
-}
+	t_vec3	coords;
+	double	diameter;
+	t_vec3	color;
+}	t_sphere;
 
-void	resize_hook(int w, int h, void *minirt)
+typedef struct s_plane
 {
-	t_minirt	*m;
+	t_vec3	coords;
+	t_vec3	normal;
+	t_vec3	color;
+}	t_plane;
 
-	m = minirt;
-	(void)m;
-	(void)w;
-	(void)h;
-}
+typedef struct s_cylinder
+{
+	t_vec3	coords;
+	t_vec3	axis;
+	double	diameter;
+	double	height;
+	t_vec3	color;
+}	t_cylinder;
+
+#endif

@@ -14,20 +14,20 @@
 
 t_vec3	vec3_adds(t_vec3 v, double s)
 {
-	return ((t_vec3){v.x + s, v.y + s, v.z + s});
+	return ((t_vec3){.x = v.x + s, .y = v.y + s, .z = v.z + s, ._ = v._ + s});
 }
 
 t_vec3	vec3_subs(t_vec3 v, double s)
 {
-	return ((t_vec3){v.x - s, v.y - s, v.z - s});
+	return ((t_vec3){.x = v.x - s, .y = v.y - s, .z = v.z - s, ._ = v._ - s});
 }
 
 t_vec3	vec3_muls(t_vec3 v, double s)
 {
-	return ((t_vec3){v.x * s, v.y * s, v.z * s});
+	return ((t_vec3){.x = v.x * s, .y = v.y * s, .z = v.z * s, ._ = v._ * s});
 }
 
 t_vec3	vec3_divs(t_vec3 v, double s)
 {
-	return ((t_vec3){v.x / s, v.y / s, v.z / s});
+	return ((t_vec3){.x = v.x / s, .y = v.y / s, .z = v.z / s, ._ = v._ / s});
 }
