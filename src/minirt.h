@@ -6,14 +6,14 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 13:08:46 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 14:27:47 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
 
-# include "array.h"
+# include "shapes.h"
 # include <.MLX42.h>
 # include <libft.h>
 # include <stdbool.h>
@@ -26,6 +26,7 @@ typedef struct s_minirt
 {
 	mlx_t		*mlx;
 	mlx_image_t	*img;
+	t_arena		arena;
 	double		ambient_light_ratio;
 	t_vec3		ambient_light_color;
 	t_vec3		camera_coords;
@@ -33,13 +34,16 @@ typedef struct s_minirt
 	double		camera_field_of_view;
 	t_vec3		light_coords;
 	double		light_ratio;
-	t_array		spheres;
-	t_array		planes;
-	t_array		cylinders;
+	t_sphere	*spheres;
+	size_t		spheres_length;
+	t_plane		*planes;
+	size_t		planes_length;
+	t_cylinder	*cylinders;
+	size_t		cylinders_length;
 	char		*line;
 }	t_minirt;
 
-void	mrt_init(t_minirt *m);
+void	mrt_init(t_minirt *m, const char *path);
 void	mrt_destroy(t_minirt *m);
 void	mrt_exit(t_minirt *m, int status);
 bool	mrt_assert(t_minirt *m, bool condition, const char *msg);

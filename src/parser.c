@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 17:57:57 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 14:20:36 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -130,6 +131,7 @@ void	parse_input(t_minirt *m, const char *path)
 			parse_line(m, found, m->line);
 		free(m->line);
 	}
+	close(fd);
 	mrt_assert(m, found['A'], "No ambient light specified");
 	mrt_assert(m, found['C'], "No camera specified");
 	mrt_assert(m, found['L'], "No light specified");
