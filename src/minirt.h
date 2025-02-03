@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 14:27:47 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 15:41:47 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct s_minirt
 	double		camera_field_of_view;
 	t_vec3		light_coords;
 	double		light_ratio;
+	t_vec3		light_color;
 	t_sphere	*spheres;
 	size_t		spheres_length;
 	t_plane		*planes;

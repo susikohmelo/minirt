@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 15:11:27 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 16:00:59 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,9 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	assert_range(m, vec3(cylinder.axis.y, -1, 1), "Cylinder axis y component");
 	line = parse_float(m, &cylinder.axis.z, line, ' ');
 	assert_range(m, vec3(cylinder.axis.z, -1, 1), "Cylinder axis z component");
-	if (fabs(vec3_length(cylinder.axis) - 1.) <= 0.001)
+	if (fabs(vec3_length(cylinder.axis) - 1.) >= .001)
 		ft_putendl_fd("Warning\nUnnormalized cylinder axis", 2);
+	cylinder.axis = vec3_normalize(cylinder.axis);
 	line = parse_float(m, &cylinder.diameter, line, ' ');
 	line = parse_float(m, &cylinder.height, line, ' ');
 	line = parse_float(m, &cylinder.color.r, line, ',');

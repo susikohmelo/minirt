@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 14:20:36 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 15:26:27 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 		++line;
 	while (ft_isdigit(*line))
 		digit_found = ++line;
-	mrt_assert(m, digit_found, "Invalid number");
+	mrt_assert(m, digit_found, "Number has no digits");
 	if (separator == ' ' && mrt_assert(m, ft_isspace(*line), "Invalid number"))
 		while (ft_isspace(*line))
 			++line;
@@ -107,7 +107,8 @@ static void	parse_line(t_minirt *m, bool found[128], const char *line)
 		parse_plane(m, line + ft_strlen("pl "));
 	else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
 		parse_cylinder(m, line + ft_strlen("cy "));
-	mrt_assert(m, false, "Unknown element type");
+	else
+		mrt_assert(m, false, "Unknown element type");
 }
 
 void	parse_input(t_minirt *m, const char *path)
@@ -125,7 +126,7 @@ void	parse_input(t_minirt *m, const char *path)
 		if (m->line == NULL)
 			break ;
 		line_length = ft_strlen(m->line);
-		while (ft_isspace(m->line[line_length - 1]))
+		while (line_length != 0 && ft_isspace(m->line[line_length - 1]))
 			m->line[--line_length] = '\0';
 		if (m->line[0] != '\0')
 			parse_line(m, found, m->line);

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 14:27:54 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/03 15:55:09 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@
 static void	get_shape_buf_sizes(
 	t_minirt *m, size_t sizes[3], const char* path)
 {
-	int	fd;
+	int		fd;
+	char	*line;
 
 	fd = open(path, O_RDONLY);
 	mrt_assert(m, fd != -1, path);
@@ -32,13 +33,14 @@ static void	get_shape_buf_sizes(
 		m->line = get_next_line(fd);
 		if (m->line == NULL)
 			break ;
-		while (ft_isspace(*m->line))
-			++m->line;
-		if (m->line[0] == 's' && m->line[1] == 'p' && ft_isspace(m->line[2]))
+		line = m->line;
+		while (ft_isspace(*line))
+			++line;
+		if (line[0] == 's' && line[1] == 'p' && ft_isspace(line[2]))
 			sizes[0]++;
-		if (m->line[0] == 'p' && m->line[1] == 'l' && ft_isspace(m->line[2]))
+		else if (line[0] == 'p' && line[1] == 'l' && ft_isspace(line[2]))
 			sizes[1]++;
-		if (m->line[0] == 'c' && m->line[1] == 'y' && ft_isspace(m->line[2]))
+		else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
 			sizes[2]++;
 		free(m->line);
 	}
@@ -49,10 +51,14 @@ void	mrt_init(t_minirt *m, const char *path)
 {
 	size_t	sizes[3];
 
+	ft_memset(sizes, 0, sizeof sizes);
 	get_shape_buf_sizes(m, sizes, path);
 	m->spheres = ft_arena_alloc(&m->arena, sizes[0] * sizeof m->spheres[0]);
+	ft_memset(m->spheres, 0, sizes[0] * sizeof m->spheres[0]);
 	m->planes = ft_arena_alloc(&m->arena, sizes[1] * sizeof m->planes[0]);
+	ft_memset(m->planes, 0, sizes[1] * sizeof m->planes[0]);
 	m->cylinders = ft_arena_alloc(&m->arena, sizes[2] * sizeof m->cylinders[0]);
+	ft_memset(m->cylinders, 0, sizes[2] * sizeof m->cylinders[0]);
 	parse_input(m, path);
 	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
 	mrt_assert(m, m->mlx != NULL, "mlx_init() failed");

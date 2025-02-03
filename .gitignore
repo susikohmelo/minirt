@@ -1,6 +1,7 @@
 miniRT
 build
 MLX42
+scenes
 libft/*.o
 libft/libft.a
 *.swp
