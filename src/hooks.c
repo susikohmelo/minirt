@@ -19,12 +19,12 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 		mrt_exit(minirt, EXIT_SUCCESS);
 }
 
-void	resize_hook(int w, int h, void *_mrt)
+void	resize_hook(int w, int h, void *minirt)
 {
-	t_minirt	*mrt;
+	t_minirt	*m;
 
-	mrt = _mrt;
-	(void)mrt;
+	m = minirt;
+	(void)m;
 	(void)w;
 	(void)h;
 }
