@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 20:55:05 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/03 17:32:05 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-# define INIT_WIDTH 4
-# define INIT_HEIGHT 4
+# define INIT_WIDTH 1512
+# define INIT_HEIGHT 512
 
 typedef struct s_minirt
 {
