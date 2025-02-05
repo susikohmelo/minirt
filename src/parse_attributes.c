@@ -15,20 +15,22 @@
 
 bool	parse_ambient_light(t_minirt *m, const char *line)
 {
+	double	ratio;
+
 	while (ft_isspace(*line))
 		++line;
-	line = parse_float(m, &m->ambient_light_ratio, line, ' ');
-	assert_range(m, vec3(m->ambient_light_ratio, 0., 1.), \
-		"Ambient lighting ratio");
-	line = parse_float(m, &m->ambient_light_color.r, line, ',');
-	assert_range(m, vec3(m->ambient_light_color.r, 0, 255), \
+	line = parse_float(m, &ratio, line, ' ');
+	assert_range(m, vec3(ratio, 0., 1.), "Ambient lighting ratio");
+	line = parse_float(m, &m->ambient_light.r, line, ',');
+	assert_range(m, vec3(m->ambient_light.r, 0, 255), \
 		"Ambient light red component");
-	line = parse_float(m, &m->ambient_light_color.g, line, ',');
-	assert_range(m, vec3(m->ambient_light_color.g, 0, 255), \
+	line = parse_float(m, &m->ambient_light.g, line, ',');
+	assert_range(m, vec3(m->ambient_light.g, 0, 255), \
 		"Ambient light green component");
-	line = parse_float(m, &m->ambient_light_color.b, line, '\0');
-	assert_range(m, vec3(m->ambient_light_color.b, 0, 255), \
+	line = parse_float(m, &m->ambient_light.b, line, '\0');
+	assert_range(m, vec3(m->ambient_light.b, 0, 255), \
 		"Ambient light blue component");
+	m->ambient_light = vec3_muls(m->ambient_light, ratio);
 	return (true);
 }
 

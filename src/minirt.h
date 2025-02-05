@@ -25,28 +25,28 @@
 
 typedef struct s_minirt
 {
-	mlx_t		*mlx;
-	mlx_image_t	*img;
-	t_arena		arena;
-	double		ambient_light_ratio;
-	t_vec3		ambient_light_color;
-	t_vec3		camera_coords;
-	t_vec3		camera_orientation;
-	double		camera_field_of_view;
-	double		aspect_ratio;
+	mlx_t			*mlx;
+	mlx_image_t		*img;
+	t_arena			arena;
+	char			*line;
 
-	double		cam_rot_matrix[3][3];
+	t_vec3			ambient_light;
+	t_vec3			camera_coords;
+	t_vec3			camera_orientation;
+	double			camera_field_of_view;
+	double			cam_rot_matrix[3][3];
+	double			aspect_ratio;
 
-	t_vec3		light_coords;
-	double		light_ratio;
-	t_vec3		light_color;
-	t_sphere	*spheres;
-	size_t		spheres_length;
-	t_plane		*planes;
-	size_t		planes_length;
-	t_cylinder	*cylinders;
-	size_t		cylinders_length;
-	char		*line;
+	t_vec3			light_coords;
+	double			light_ratio;
+	t_vec3			light_color;
+
+	t_sphere		*spheres;
+	size_t			spheres_length;
+	t_plane			*planes;
+	size_t			planes_length;
+	t_cylinder		*cylinders;
+	size_t			cylinders_length;
 }	t_minirt;
 
 void	mrt_init(t_minirt *m, const char *path);
@@ -70,8 +70,8 @@ void	resize_hook(int w, int h, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	cast_rays(t_minirt *minirt);
 
-double	sphere_intersect_dist(t_ray ray, t_sphere sphere);
-double	plane_intersect_dist(t_ray ray, t_plane plane);
-double	cylinder_intersect_dist(t_ray ray, t_cylinder cylinder);
+void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
+void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
+void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
 
 #endif

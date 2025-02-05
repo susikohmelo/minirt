@@ -13,8 +13,6 @@
 #include "ray.h"
 #include "minirt.h"
 #include <math.h>
-// TODO REMOVE STDIO AFTER DEBUG
-#include <stdio.h>
 
 static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 {
@@ -70,8 +68,52 @@ static t_ray	create_ray(t_minirt *minirt, int x, int y)
 	pos_screenspace = pix_to_scrspace(minirt, (double) x, (double) y);
 	pos_screenspace.z = scr_dist_from_cmr;
 	new_ray.dir = vec3_normalize(pos_screenspace);
-	new_ray.len = 9999;
+	new_ray.length = INFINITY;
 	return (new_ray);
+}
+
+static t_vec3	phong(
+	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
+{
+	// const double	specular_reflection = 1.0;
+	// const double	diffuse_reflection = 1.0;
+	// const double	alpha = 1.0;
+	t_vec3			surface;
+	t_vec3			light;
+	t_vec3			reflection;
+	size_t			i;
+
+	surface = (t_vec3){};
+	i = (size_t) - 1;
+	while (++i < 1)
+	{
+		light = m->light_coords; // TODO actual
+		reflection = vec3_sub( \
+			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
+			light);
+		// TODO why is light intensity ignored??
+		vec3_add(surface, vec3_add( \
+			vec3_muls(shape->color, vec3_dot(light, normal)), \
+			vec3_muls(m->light_color, vec3_dot(reflection, ray))));
+	}
+	return (vec3_add(m->ambient_light, surface));
+}
+
+static t_vec3	surface_color(t_minirt *m, t_ray data)
+{
+	t_vec3	ray;
+	t_vec3	normal;
+
+	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
+	if (data.shape_type == SHAPE_SPHERE)
+		normal = vec3_normalize(vec3_sub(ray, ((t_sphere*)data.shape)->coords));
+	else if (data.shape_type == SHAPE_PLANE)
+		;
+	else if (data.shape_type == SHAPE_CYLINDER)
+		;
+	else
+		normal = (t_vec3){};
+	return phong(m, ray, normal, data.shape);
 }
 
 void	cast_rays(t_minirt *m)
@@ -79,8 +121,8 @@ void	cast_rays(t_minirt *m)
 	t_ray	ray;
 	int		column;
 	int		row;
-	double	dist;
 	size_t	i;
+	t_vec3	color;
 
 	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
 	set_cam_rot_matrix(m);
@@ -92,10 +134,9 @@ void	cast_rays(t_minirt *m)
 		{
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
-			dist = INFINITY;
 			i = (size_t) - 1;
 			while (++i < m->spheres_length)
-				dist = fmin(dist, sphere_intersect_dist(ray, m->spheres[i]));
+				min_sphere_intersect_dist(&ray, &m->spheres[i]);
 			i = (size_t) - 1;
 			// while (++i < m->planes_length)
 			// 	dist = fmin(dist, plane_intersect_dist(ray, m->planes[i]));
@@ -103,11 +144,12 @@ void	cast_rays(t_minirt *m)
 			// while (++i < m->cylinders_length)
 			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
 
+			color = surface_color(m, ray);
 
-			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * dist * dist);
-			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * dist * dist);
-			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * dist * dist);
-			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * dist * dist);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * dist * dist);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * dist * dist);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 		}
 	}
 }

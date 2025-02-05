@@ -13,36 +13,41 @@
 #include "minirt.h"
 #include <math.h>
 
-double	sphere_intersect_dist(t_ray ray, t_sphere sphere)
+void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 {
 	t_vec3	lstart;
-	double	a;
 	double	b;
 	double	c;
 	double	discriminant;
+	double	length;
 
-	lstart = vec3_sub(ray.start, sphere.coords);
-	a = 1;
-	b = 2 * vec3_dot(ray.dir, lstart);
-	c = vec3_dot(lstart, lstart) - sphere.radius * sphere.radius;
-	discriminant = b * b - 4 * a * c;
+	lstart = vec3_sub(ray->start, sphere->coords);
+	b = 2 * vec3_dot(ray->dir, lstart);
+	c = vec3_dot(lstart, lstart) - sphere->radius * sphere->radius;
+	discriminant = b * b - 4 * 1 * c;
 	if (discriminant >= 0.)
-		return ((-b - sqrt(discriminant)) / (2. * a));
-	else
-		return (INFINITY);
+	{
+		length = (-b - sqrt(discriminant)) / (2. * 1);
+		if (length <= ray->length)
+		{
+			ray->length = length;
+			ray->shape = sphere;
+			ray->shape_type = SHAPE_SPHERE;
+		}
+	}
 }
 
-double	plane_intersect_dist(t_ray ray, t_plane plane)
-{
-	(void)ray;
-	(void)plane;
-	return (INFINITY);
-}
-
-double	cylinder_intersect_dist(t_ray ray, t_cylinder cylinder)
-{
-	(void)ray;
-	(void)cylinder;
-	return (INFINITY);
-}
-
+// void	min_plane_intersect_dist(t_ray ray, t_plane plane)
+// {
+// 	(void)ray;
+// 	(void)plane;
+// 	return (INFINITY);
+// }
+//
+// void	min_cylinder_intersect_dist(t_ray ray, t_cylinder cylinder)
+// {
+// 	(void)ray;
+// 	(void)cylinder;
+// 	return (INFINITY);
+// }
+//

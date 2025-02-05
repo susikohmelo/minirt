@@ -13,13 +13,16 @@
 #ifndef RAY_H
 # define RAY_H
 
+# include "shapes.h"
 # include "vec3.h"
 
 typedef struct s_ray
 {
-	t_vec3	start;
-	t_vec3	dir;
-	double	len;
+	t_vec3			start;
+	t_vec3			dir;
+	double			length;
+	const void		*shape;
+	t_shape_type	shape_type;
 }	t_ray;
 
 # endif
