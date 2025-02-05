@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/04 23:18:41 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/05 20:40:13 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,14 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-# define INIT_WIDTH 512
-# define INIT_HEIGHT 512
+# define INIT_WIDTH 1024
+# define INIT_HEIGHT 1024
 
 typedef struct s_minirt
 {
 	mlx_t		*mlx;
 	mlx_image_t	*img;
+	mlx_image_t	*temp;
 	t_arena		arena;
 	double		ambient_light_ratio;
 	t_vec3		ambient_light_color;
@@ -35,7 +36,7 @@ typedef struct s_minirt
 	double		aspect_ratio;
 
 	double		cam_rot_matrix[3][3];
-  
+
 	t_vec3		light_coords;
 	double		light_ratio;
 	t_vec3		light_color;
@@ -63,6 +64,8 @@ void	parse_cylinder(t_minirt *m, const char *line);
 char	*parse_float(t_minirt *m, double *f, const char *line, char sep);
 bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name);
 double	str_to_f(const char *str);
+
+unsigned int get_texture_from_uv(mlx_image_t *img, double u, double v);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

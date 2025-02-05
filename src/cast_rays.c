@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/04 23:15:55 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/05 21:13:40 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	cast_rays(t_minirt *minirt)
 
 	minirt->aspect_ratio = (double) minirt->mlx->width / (double) minirt->mlx->height;
 	set_cam_rot_matrix(minirt);
+
 	row = -1;
 	while (++row < minirt->mlx->height)
 	{
@@ -92,16 +93,32 @@ void	cast_rays(t_minirt *minirt)
 			ray = create_ray(minirt, column, row);
 			ray_to_cam_rot_pos(minirt, minirt->cam_rot_matrix, &ray);
 
-			t_vec3 s_pos = (t_vec3) { 0.75, 0.75, 2 };
+			t_vec3 s_pos = (t_vec3) { 0, 0, 2 };
 			t_vec3 lstart = vec3_sub(ray.start, s_pos);
 
 			double a = vec3_length(ray.dir) * vec3_length(ray.dir);
 			double b = 2 * vec3_dot(ray.dir, lstart);
 			double c = vec3_length(lstart) * vec3_length(lstart) - 1 * 1;
 			double discriminant = b * b - 4 * a * c;
-			if (discriminant >= 0)
-				mlx_put_pixel(minirt->img, column, row, 0XFF0000FF);
-			//printf("x%d y%d: %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
+			if (discriminant < 0)
+			{
+				mlx_put_pixel(minirt->img, column, row, 0X000000FF);
+				continue;
+			}
+
+			double t1 = (-(b) - sqrt(discriminant)) / (2 * a);
+
+			t_vec3 intersect = vec3_normalize(vec3_sub(vec3_muls(ray.dir, t1), s_pos));
+			double two_pi = 6.28318530718;
+			double u = atan2(intersect.x, intersect.z) / two_pi + 0.5;
+			double v = intersect.y * 0.5 + 0.5;
+
+			mlx_put_pixel(minirt->img, column, row, get_texture_from_uv(minirt->temp, u, v));
+		//	
+		//	if ((u < 0.5 && v < 0.5) || (u > 0.5 && v > 0.5))
+		//		mlx_put_pixel(minirt->img, column, row, 0X440000FF);
+		//	else
+		//		mlx_put_pixel(minirt->img, column, row, 0XFF0000FF);
 		}
 	}
 }

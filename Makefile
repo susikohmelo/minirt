@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/04 21:17:30 by ljylhank         ###   ########.fr        #
+#    Updated: 2025/02/05 18:26:54 by ljylhank         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,12 +15,12 @@ NAME = miniRT
 SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c \
 	parser.c parse_attributes.c parse_shapes.c \
 	get_next_line.c get_next_line_utils.c \
-	cast_rays.c render_frame.c
+	cast_rays.c render_frame.c get_texture_from_uv.c
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
 
 CC = cc
-CFLAGS = -Iinclude
+CFLAGS = -Iinclude -g
 LFLAGS = -lm -ldl -lglfw -lpthread
 
 MAKEFLAGS += -j6
