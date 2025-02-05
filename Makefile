@@ -21,7 +21,16 @@ MLX = MLX42/build/libmlx42.a
 
 CC = cc
 CFLAGS = -Iinclude
-LFLAGS = -lm -ldl -lglfw -lpthread
+LFLAGS = -lm -lpthread
+ifeq ($(MSYS_VERSION), 0)
+LFLAGS += -lglfw -ldl
+else
+LFLAGS += -lglfw3
+FIX_MLX = cd MLX42 \
+	&& sed -i '/"\#version 330 core"/d' ./build/mlx_frag_shader.c \
+	&& sed -i '/"\#version 330 core"/d' ./build/mlx_vert_shader.c \
+	&& cmake --build build
+endif
 
 MAKEFLAGS += -j6
 
@@ -39,6 +48,7 @@ $(MLX):
 	git clone https://github.com/codam-coding-college/MLX42.git
 	cd MLX42 && cmake -B build
 	cd MLX42 && cmake --build build -j4
+	$(FIX_MLX)
 
 $(NAME): $(OBJS) libft/libft.a $(MLX)
 	@mkdir -p build
