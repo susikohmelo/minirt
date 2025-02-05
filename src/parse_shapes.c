@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 16:00:59 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/05 13:12:06 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	parse_sphere(t_minirt *m, const char *line)
 	line = parse_float(m, &sphere.coords.x, line, ',');
 	line = parse_float(m, &sphere.coords.y, line, ',');
 	line = parse_float(m, &sphere.coords.z, line, ' ');
-	line = parse_float(m, &sphere.diameter, line, ' ');
+	line = parse_float(m, &sphere.radius, line, ' ');
+	sphere.radius /= 2.;
 	line = parse_float(m, &sphere.color.r, line, ',');
 	assert_range(m, vec3(sphere.color.r, 0, 255), "Sphere red component");
 	line = parse_float(m, &sphere.color.g, line, ',');

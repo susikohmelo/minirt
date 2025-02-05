@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/04 23:15:55 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/05 16:18:11 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,34 +74,40 @@ static t_ray	create_ray(t_minirt *minirt, int x, int y)
 	return (new_ray);
 }
 
-
-void	cast_rays(t_minirt *minirt)
+void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
 	int		column;
 	int		row;
+	double	dist;
+	size_t	i;
 
-	minirt->aspect_ratio = (double) minirt->mlx->width / (double) minirt->mlx->height;
-	set_cam_rot_matrix(minirt);
+	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
+	set_cam_rot_matrix(m);
 	row = -1;
-	while (++row < minirt->mlx->height)
+	while (++row < m->mlx->height)
 	{
 		column = -1;
-		while (++column < minirt->mlx->width)
+		while (++column < m->mlx->width)
 		{
-			ray = create_ray(minirt, column, row);
-			ray_to_cam_rot_pos(minirt, minirt->cam_rot_matrix, &ray);
+			ray = create_ray(m, column, row);
+			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
+			dist = INFINITY;
+			i = (size_t) - 1;
+			while (++i < m->spheres_length)
+				dist = fmin(dist, sphere_intersect_dist(ray, m->spheres[i]));
+			i = (size_t) - 1;
+			// while (++i < m->planes_length)
+			// 	dist = fmin(dist, plane_intersect_dist(ray, m->planes[i]));
+			// i = (size_t) - 1;
+			// while (++i < m->cylinders_length)
+			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
 
-			t_vec3 s_pos = (t_vec3) { 0.75, 0.75, 2 };
-			t_vec3 lstart = vec3_sub(ray.start, s_pos);
 
-			double a = vec3_length(ray.dir) * vec3_length(ray.dir);
-			double b = 2 * vec3_dot(ray.dir, lstart);
-			double c = vec3_length(lstart) * vec3_length(lstart) - 1 * 1;
-			double discriminant = b * b - 4 * a * c;
-			if (discriminant >= 0)
-				mlx_put_pixel(minirt->img, column, row, 0XFF0000FF);
-			//printf("x%d y%d: %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
+			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * dist * dist);
+			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * dist * dist);
+			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * dist * dist);
+			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 		}
 	}
 }

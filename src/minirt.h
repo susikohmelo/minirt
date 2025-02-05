@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/04 23:18:41 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:15:44 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINIRT_H
 
 # include "shapes.h"
+# include "ray.h"
 # include <.MLX42.h>
 # include <libft.h>
 # include <stdbool.h>
@@ -35,7 +36,7 @@ typedef struct s_minirt
 	double		aspect_ratio;
 
 	double		cam_rot_matrix[3][3];
-  
+
 	t_vec3		light_coords;
 	double		light_ratio;
 	t_vec3		light_color;
@@ -68,5 +69,9 @@ void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	cast_rays(t_minirt *minirt);
+
+double	sphere_intersect_dist(t_ray ray, t_sphere sphere);
+double	plane_intersect_dist(t_ray ray, t_plane plane);
+double	cylinder_intersect_dist(t_ray ray, t_cylinder cylinder);
 
 #endif

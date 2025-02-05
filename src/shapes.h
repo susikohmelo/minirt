@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 13:03:27 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/05 13:11:25 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 typedef struct s_sphere
 {
 	t_vec3	coords;
-	double	diameter;
+	double	radius;
 	t_vec3	color;
 }	t_sphere;
 
