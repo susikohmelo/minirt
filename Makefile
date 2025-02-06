@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/05 12:30:59 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/02/06 11:27:34 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,7 +35,7 @@ endif
 
 MAKEFLAGS += -j6
 
-.PHONY: all release debug clean flcean re
+.PHONY: all release debug clean flcean re rebug
 
 all: release
 
@@ -74,3 +74,7 @@ re:
 debug: CFLAGS += -ggdb3 -gdwarf
 debug: CFLAGS += -fsanitize=address -fsanitize=undefined -fsanitize=leak
 debug: $(NAME)
+
+rebug:
+	make clean
+	make debug

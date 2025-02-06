@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/05 12:15:44 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 13:56:31 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ typedef struct s_minirt
 	mlx_image_t		*img;
 	t_arena			arena;
 	char			*line;
+	int32_t			mouse_x;
+	int32_t			mouse_y;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
@@ -67,6 +69,8 @@ double	str_to_f(const char *str);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
+void	cursor_hook(double x, double y, void *minirt);
+void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	cast_rays(t_minirt *minirt);
 

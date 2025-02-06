@@ -6,12 +6,16 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/05 14:48:06 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 12:40:55 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
+
+
+
+#include <stdio.h>
 
 void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 {
@@ -28,13 +32,19 @@ void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 	if (discriminant >= 0.)
 	{
 		length = (-b - sqrt(discriminant)) / (2. * 1);
-		if (length <= ray->length)
+		//ray->length = fmin(ray->length, length);
+		if (length <= ray->length && length >= 0.)
 		{
 			ray->length = length;
 			ray->shape = sphere;
 			ray->shape_type = SHAPE_SPHERE;
 		}
 	}
+	//else
+	//	length = INFINITY;
+	//ray->length = length;
+	// ray->length = fmin(ray->length, length);
+	// printf("%g\n", ray->length);
 }
 
 // void	min_plane_intersect_dist(t_ray ray, t_plane plane)
