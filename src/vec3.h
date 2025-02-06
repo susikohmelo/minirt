@@ -45,6 +45,7 @@ t_vec3	vec3(double x, double y, double z);
 
 t_vec3	vec3_add(t_vec3 v1, t_vec3 v2);
 t_vec3	vec3_sub(t_vec3 v1, t_vec3 v2);
+t_vec3	vec3_mul(t_vec3 v1, t_vec3 v2);
 
 double	vec3_dot(t_vec3 v1, t_vec3 v2);
 t_vec3	vec3_cross(t_vec3 v1, t_vec3 v2);

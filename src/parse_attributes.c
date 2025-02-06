@@ -30,7 +30,7 @@ bool	parse_ambient_light(t_minirt *m, const char *line)
 	line = parse_float(m, &m->ambient_light.b, line, '\0');
 	assert_range(m, vec3(m->ambient_light.b, 0, 255), \
 		"Ambient light blue component");
-	m->ambient_light = vec3_muls(m->ambient_light, ratio);
+	m->ambient_light = vec3_muls(m->ambient_light, ratio / 255);
 	return (true);
 }
 
@@ -74,5 +74,6 @@ bool	parse_light(t_minirt *m, const char *line)
 	assert_range(m, vec3(m->light_color.g, 0, 255), "Light green component");
 	line = parse_float(m, &m->light_color.b, line, '\0');
 	assert_range(m, vec3(m->light_color.b, 0, 255), "Light blue component");
+	m->light_color = vec3_divs(m->light_color, 255);
 	return (true);
 }

@@ -87,16 +87,15 @@ static t_vec3	phong(
 	i = (size_t) - 1;
 	while (++i < 1)
 	{
-		light = m->light_coords; // TODO actual
+		light = vec3_normalize(vec3_sub(m->light_coords, ray));
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		// TODO why is light intensity ignored??
 		vec3_add(surface, vec3_add( \
-			vec3_muls(shape->color, vec3_dot(light, normal)), \
+			vec3_muls(m->light_color, vec3_dot(light, normal)), \
 			vec3_muls(m->light_color, vec3_dot(reflection, ray))));
 	}
-	return (vec3_add(m->ambient_light, surface));
+	return (vec3_mul(vec3_add(m->ambient_light, surface), shape->color));
 }
 
 static t_vec3	surface_color(t_minirt *m, t_ray data)
@@ -145,6 +144,10 @@ void	cast_rays(t_minirt *m)
 			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
 
 			color = surface_color(m, ray);
+			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
+			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
+			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
+			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * dist * dist);
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * dist * dist);
