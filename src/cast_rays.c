@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/05 21:13:40 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 16:20:56 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,11 +114,6 @@ void	cast_rays(t_minirt *minirt)
 			double v = intersect.y * 0.5 + 0.5;
 
 			mlx_put_pixel(minirt->img, column, row, get_texture_from_uv(minirt->temp, u, v));
-		//	
-		//	if ((u < 0.5 && v < 0.5) || (u > 0.5 && v > 0.5))
-		//		mlx_put_pixel(minirt->img, column, row, 0X440000FF);
-		//	else
-		//		mlx_put_pixel(minirt->img, column, row, 0XFF0000FF);
 		}
 	}
 }
