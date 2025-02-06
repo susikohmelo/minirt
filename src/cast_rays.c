@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 20:26:04 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 22:51:47 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,10 @@ static t_vec3	phong(
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		surface = vec3_add(surface, vec3_add(vec3_muls(m->light_color, diffuse_reflection * fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
+		surface = vec3_add(surface, \
+		vec3_add(vec3_muls(m->light_color, diffuse_reflection * \
+		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, \
+		specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }

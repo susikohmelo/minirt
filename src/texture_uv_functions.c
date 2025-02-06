@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 19:06:54 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 22:35:01 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,7 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename)
 {
 	xpm_t		*xpm;
 	mlx_image_t	*img;
-	int			i;
 
-	i = 0;
 	xpm = mlx_load_xpm42(filename);
 	if (!xpm)
 	{
