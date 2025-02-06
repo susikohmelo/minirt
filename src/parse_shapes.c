@@ -31,6 +31,7 @@ void	parse_sphere(t_minirt *m, const char *line)
 	line = parse_float(m, &sphere.color.b, line, '\0');
 	assert_range(m, vec3(sphere.color.b, 0, 255), "Sphere blue component");
 	sphere.color = vec3_divs(sphere.color, 255);
+	sphere.texture = parse_texture(m, line);
 	m->spheres[m->spheres_length++] = sphere;
 }
 
@@ -59,6 +60,7 @@ void	parse_plane(t_minirt *m, const char *line)
 	line = parse_float(m, &plane.color.b, line, '\0');
 	assert_range(m, vec3(plane.color.b, 0, 255), "Plane blue component");
 	plane.color = vec3_divs(plane.color, 255);
+	plane.texture = parse_texture(m, line);
 	m->planes[m->planes_length++] = plane;
 }
 
@@ -89,5 +91,6 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	line = parse_float(m, &cylinder.color.b, line, '\0');
 	assert_range(m, vec3(cylinder.color.b, 0, 255), "Cylinder blue component");
 	cylinder.color = vec3_divs(cylinder.color, 255);
+	cylinder.texture = parse_texture(m, line);
 	m->cylinders[m->cylinders_length++] = cylinder;
 }

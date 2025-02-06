@@ -151,6 +151,7 @@ void	cast_rays(t_minirt *m)
 		"                                                                  \r");
 	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
 	set_cam_rot_matrix(m);
+
 	row = -1;
 	while (++row < m->mlx->height)
 	{
@@ -188,6 +189,15 @@ void	cast_rays(t_minirt *m)
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * ray.length * ray.length);
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * ray.length * ray.length);
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
+
+
+
+			t_vec3 intersect = vec3_normalize(vec3_sub(vec3_muls(ray.dir, t1), s_pos));
+			double two_pi = 6.28318530718;
+			double u = atan2(intersect.x, intersect.z) / two_pi + 0.5;
+			double v = intersect.y * 0.5 + 0.5;
+
+			mlx_put_pixel(minirt->img, column, row, get_texture_from_uv(minirt->temp, u, v));
 		}
 	}
 	fflush(stdout); // TODO get rid of this!

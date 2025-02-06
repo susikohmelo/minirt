@@ -20,8 +20,8 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-# define INIT_WIDTH 512
-# define INIT_HEIGHT 512
+# define INIT_WIDTH 1024
+# define INIT_HEIGHT 1024
 
 typedef struct s_minirt
 {
@@ -52,21 +52,25 @@ typedef struct s_minirt
 	size_t			cylinders_length;
 }	t_minirt;
 
-void	mrt_init(t_minirt *m, const char *path);
-void	mrt_destroy(t_minirt *m);
-void	mrt_exit(t_minirt *m, int status);
-bool	mrt_assert(t_minirt *m, bool condition, const char *msg);
+void		mrt_init(t_minirt *m, const char *path);
+void		mrt_destroy(t_minirt *m);
+void		mrt_exit(t_minirt *m, int status);
+bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
 
-void	parse_input(t_minirt *m, const char *path);
-bool	parse_ambient_light(t_minirt *m, const char *line);
-bool	parse_camera(t_minirt *m, const char *line);
-bool	parse_light(t_minirt *m, const char *line);
-void	parse_sphere(t_minirt *m, const char *line);
-void	parse_plane(t_minirt *m, const char *line);
-void	parse_cylinder(t_minirt *m, const char *line);
-char	*parse_float(t_minirt *m, double *f, const char *line, char sep);
-bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name);
-double	str_to_f(const char *str);
+void		parse_input(t_minirt *m, const char *path);
+bool		parse_ambient_light(t_minirt *m, const char *line);
+bool		parse_camera(t_minirt *m, const char *line);
+bool		parse_light(t_minirt *m, const char *line);
+void		parse_sphere(t_minirt *m, const char *line);
+void		parse_plane(t_minirt *m, const char *line);
+void		parse_cylinder(t_minirt *m, const char *line);
+char		*parse_float(t_minirt *m, double *f, const char *line, char sep);
+bool		assert_range(t_minirt *m, t_vec3 inputs, const char *name);
+double		str_to_f(const char *str);
+
+int			get_texture_from_uv(mlx_image_t *img, double u, double v);
+mlx_image_t	*parse_texture(t_minirt *m, const char *line);
+mlx_image_t	*load_texture(t_minirt *m, char *filename);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

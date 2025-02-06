@@ -15,13 +15,13 @@ NAME = miniRT
 SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c \
 	parser.c parse_attributes.c parse_shapes.c \
 	get_next_line.c get_next_line_utils.c \
-	cast_rays.c render_frame.c intersect_dist.c
+	cast_rays.c render_frame.c intersect_dist.c texture_uv_functions.c parse_texture.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
 MSYS_VERSION = $(if $(findstring Msys, $(shell uname -o)),$(word 1, $(subst ., ,$(shell uname -r))),0)
 CC = cc
-CFLAGS = -Iinclude
+CFLAGS = -Iinclude -Wall -Wextra -Werror
 LFLAGS = -lm -lpthread
 ifeq ($(MSYS_VERSION), 0)
 LFLAGS += -lglfw -ldl
