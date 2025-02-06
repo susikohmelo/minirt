@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 19:35:38 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 20:55:58 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,30 +75,31 @@ void	mrt_init(t_minirt *m, const char *path)
 
 void	free_textures(t_minirt *m)
 {
-	while(m->planes)
+	int	len;
+
+	len = (int) m->planes_length;
+	while(len--)
 	{
-		if((*m->planes).texture)
-			mlx_delete_image(m->mlx, (*m->planes).texture);
-		m->planes= m->planes + 1;
+		if((*(m->planes + len)).texture)
+			mlx_delete_image(m->mlx, (*(m->planes + len)).texture);
 	}
-	while(m->spheres)
+	len = (int)	m->spheres_length;
+	while(len--)
 	{
-		if((*m->spheres).texture)
-			mlx_delete_image(m->mlx, (*m->spheres).texture);
-		m->spheres = m->spheres + 1;
+		if((*(m->spheres + len)).texture)
+			mlx_delete_image(m->mlx, (*(m->spheres + len)).texture);
 	}
-	while(m->cylinders)
+	len = (int) m->cylinders_length;
+	while(len--)
 	{
-		if((*m->cylinders).texture)
-			mlx_delete_image(m->mlx, (*m->cylinders).texture);
-		m->cylinders = m->cylinders + 1;
+		if((*(m->cylinders + len)).texture)
+			mlx_delete_image(m->mlx, (*(m->cylinders + len)).texture);
 	}
 }
 
 void	mrt_destroy(t_minirt *m)
 {
-	if (m->img)
-		free_textures(m);
+	free_textures(m);
 	if (m->mlx != NULL && m->img != NULL)
 		mlx_delete_image(m->mlx, m->img);
 	free(m->mlx);
