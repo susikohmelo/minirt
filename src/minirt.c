@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 15:55:09 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 13:56:05 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,8 @@ void	mrt_init(t_minirt *m, const char *path)
 		"mlx_image_to_window() failed");
 	mlx_key_hook(m->mlx, key_hook, m);
 	mlx_resize_hook(m->mlx, resize_hook, m);
+	mlx_cursor_hook(m->mlx, cursor_hook, m);
+	mlx_mouse_hook(m->mlx, mouse_hook, m);
 }
 
 void	mrt_destroy(t_minirt *m)

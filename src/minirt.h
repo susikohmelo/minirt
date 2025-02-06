@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 16:15:37 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 15:16:51 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINIRT_H
 
 # include "shapes.h"
+# include "ray.h"
 # include <.MLX42.h>
 # include <libft.h>
 # include <stdbool.h>
@@ -24,28 +25,31 @@
 
 typedef struct s_minirt
 {
-	mlx_t		*mlx;
-	mlx_image_t	*img;
-	t_arena		arena;
-	double		ambient_light_ratio;
-	t_vec3		ambient_light_color;
-	t_vec3		camera_coords;
-	t_vec3		camera_orientation;
-	double		camera_field_of_view;
-	double		aspect_ratio;
+	mlx_t			*mlx;
+	mlx_image_t		*img;
+	t_arena			arena;
+	char			*line;
+	int32_t			mouse_x;
+	int32_t			mouse_y;
+	bool			cursor_pointing;
 
-	double		cam_rot_matrix[3][3];
+	t_vec3			ambient_light;
+	t_vec3			camera_coords;
+	t_vec3			camera_orientation;
+	double			camera_field_of_view;
+	double			cam_rot_matrix[3][3];
+	double			aspect_ratio;
 
-	t_vec3		light_coords;
-	double		light_ratio;
-	t_vec3		light_color;
-	t_sphere	*spheres;
-	size_t		spheres_length;
-	t_plane		*planes;
-	size_t		planes_length;
-	t_cylinder	*cylinders;
-	size_t		cylinders_length;
-	char		*line;
+	t_vec3			light_coords;
+	double			light_ratio;
+	t_vec3			light_color;
+
+	t_sphere		*spheres;
+	size_t			spheres_length;
+	t_plane			*planes;
+	size_t			planes_length;
+	t_cylinder		*cylinders;
+	size_t			cylinders_length;
 }	t_minirt;
 
 void		mrt_init(t_minirt *m, const char *path);
@@ -68,9 +72,21 @@ int			get_texture_from_uv(mlx_image_t *img, double u, double v);
 mlx_image_t	*parse_texture(t_minirt *m, const char *line);
 mlx_image_t	*load_texture(t_minirt *m, char *filename);
 
-void		key_hook(mlx_key_data_t key, void *minirt);
-void		resize_hook(int w, int h, void *minirt);
-void		render_frame(void *rt_voidptr);
-void		cast_rays(t_minirt *minirt);
+void	key_hook(mlx_key_data_t key, void *minirt);
+void	resize_hook(int w, int h, void *minirt);
+void	cursor_hook(double x, double y, void *minirt);
+void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
+void	render_frame(void *rt_voidptr);
+void	cast_rays(t_minirt *minirt);
+
+void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
+void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
+void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
+
+void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
+void	mrt_print_double(t_minirt *m, const char *name, double x);
+#define mrt_print(X) _Generic(X, \
+	t_vec3: mrt_print_vec3, \
+	double: mrt_print_double)(m, #X, X)
 
 #endif

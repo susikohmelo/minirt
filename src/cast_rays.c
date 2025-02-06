@@ -6,25 +6,45 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 16:20:56 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 16:19:36 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ray.h"
 #include "minirt.h"
 #include <math.h>
-// TODO REMOVE STDIO AFTER DEBUG
+
+
+
+
 #include <stdio.h>
+
+
+
+
+void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
+{
+	if (!m->cursor_pointing)
+		return ;
+	printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
+}
+
+void	mrt_print_double(t_minirt *m, const char *name, double x)
+{
+	if (!m->cursor_pointing)
+		return ;
+	printf("%s = %g ; ", name, x);
+}
+
+
+
 
 static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 {
-	t_ray	new;
-
-	new.dir.x = r->dir.x * m[0][0] + r->dir.y * m[1][0] + r->dir.z * m[2][0];
-	new.dir.y = r->dir.x * m[0][1] + r->dir.y * m[1][1] + r->dir.z * m[2][1];
-	new.dir.z = r->dir.x * m[0][2] + r->dir.y * m[1][2] + r->dir.z * m[2][2];
-	new.start = minirt->camera_coords;
-	*r = new;
+	r->dir.x = r->dir.x * m[0][0] + r->dir.y * m[1][0] + r->dir.z * m[2][0];
+	r->dir.y = r->dir.x * m[0][1] + r->dir.y * m[1][1] + r->dir.z * m[2][1];
+	r->dir.z = r->dir.x * m[0][2] + r->dir.y * m[1][2] + r->dir.z * m[2][2];
+	r->start = minirt->camera_coords;
 }
 
 static inline void	set_cam_rot_matrix(t_minirt *minirt)
@@ -34,7 +54,7 @@ static inline void	set_cam_rot_matrix(t_minirt *minirt)
 	t_vec3	up;
 
 	forward = minirt->camera_orientation;
-	right = vec3_cross((t_vec3) { 0, 1, 0 }, forward);
+	right = vec3_cross(vec3(0, 1, 0 ), forward);
 	up = vec3_cross(forward, right);
 	minirt->cam_rot_matrix[0][0] = right.x;
 	minirt->cam_rot_matrix[0][1] = right.y;
@@ -60,53 +80,117 @@ static inline t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
 /*
 	multiplying by 0.01745 converts degrees to radians
 */
-static t_ray	create_ray(t_minirt *minirt, int x, int y)
+static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 {
 	t_ray	new_ray;
 	t_vec3	pos_screenspace;
 	double	scr_dist_from_cmr;
 
+	new_ray = (t_ray){};
 	scr_dist_from_cmr = 1 / tan(minirt->camera_field_of_view / 2 * 0.01745);
 	pos_screenspace = pix_to_scrspace(minirt, (double) x, (double) y);
 	pos_screenspace.z = scr_dist_from_cmr;
 	new_ray.dir = vec3_normalize(pos_screenspace);
-	new_ray.len = 9999;
+	new_ray.length = INFINITY;
 	return (new_ray);
 }
 
+static t_vec3	phong(
+	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
+{
+	const double	specular_reflection = 1.5;
+	const double	diffuse_reflection = .75;
+	const double	alpha = 10.0;
+	t_vec3			surface;
+	t_vec3			light;
+	t_vec3			reflection;
+	size_t			i;
 
-void	cast_rays(t_minirt *minirt)
+	surface = (t_vec3){};
+	i = (size_t) - 1;
+	while (++i < 1)
+	{
+		light = vec3_normalize(vec3_sub(m->light_coords, ray));
+		ray = vec3_normalize(ray); // TODO don't recalculate!
+		reflection = vec3_sub( \
+			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
+			light);
+		surface = vec3_add(surface, vec3_add( \
+			vec3_muls(m->light_color, diffuse_reflection * fmax(vec3_dot(light, normal), 0)), \
+			vec3_muls(m->light_color, specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
+	}
+	return (vec3_mul(vec3_add(m->ambient_light, surface), shape->color));
+}
+
+t_vec3	surface_color(t_minirt *m, t_ray data)
+{
+	t_vec3	ray;
+	t_vec3	normal;
+
+	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
+	if (data.shape_type == SHAPE_SPHERE)
+		normal = vec3_normalize(vec3_sub(ray, ((t_sphere*)data.shape)->coords));
+	else if (data.shape_type == SHAPE_PLANE)
+		normal = (t_vec3){};
+	else if (data.shape_type == SHAPE_CYLINDER)
+		normal = (t_vec3){};
+	else
+		return (t_vec3){};
+	return phong(m, ray, normal, data.shape);
+}
+
+void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
-	int		column;
-	int		row;
+	int32_t	column;
+	int32_t	row;
+	size_t	i;
+	t_vec3	color;
 
-	minirt->aspect_ratio = (double) minirt->mlx->width / (double) minirt->mlx->height;
-	set_cam_rot_matrix(minirt);
+	printf("\r                                                                 "
+		"                                                                  \r");
+	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
+	set_cam_rot_matrix(m);
 
 	row = -1;
-	while (++row < minirt->mlx->height)
+	while (++row < m->mlx->height)
 	{
 		column = -1;
-		while (++column < minirt->mlx->width)
+		while (++column < m->mlx->width)
 		{
-			ray = create_ray(minirt, column, row);
-			ray_to_cam_rot_pos(minirt, minirt->cam_rot_matrix, &ray);
+			m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
+			ray = create_ray(m, column, row);
+			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
+			i = (size_t) - 1;
+			while (++i < m->spheres_length)
+				min_sphere_intersect_dist(&ray, &m->spheres[i]);
+			// i = (size_t) - 1;
+			// while (++i < m->planes_length)
+			// 	dist = fmin(dist, plane_intersect_dist(ray, m->planes[i]));
+			// i = (size_t) - 1;
+			// while (++i < m->cylinders_length)
+			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
 
-			t_vec3 s_pos = (t_vec3) { 0, 0, 2 };
-			t_vec3 lstart = vec3_sub(ray.start, s_pos);
+			// double temp = ray.dir.x;
+			// ray.dir.x = -ray.dir.y;
+			// ray.dir.y = -temp;
 
-			double a = vec3_length(ray.dir) * vec3_length(ray.dir);
-			double b = 2 * vec3_dot(ray.dir, lstart);
-			double c = vec3_length(lstart) * vec3_length(lstart) - 1 * 1;
-			double discriminant = b * b - 4 * a * c;
-			if (discriminant < 0)
-			{
-				mlx_put_pixel(minirt->img, column, row, 0X000000FF);
-				continue;
-			}
+			color = surface_color(m, ray);
+			mrt_print(color);
+			color.r = fmin(fmax(color.r, 0), 1);
+			color.g = fmin(fmax(color.g, 0), 1);
+			color.b = fmin(fmax(color.b, 0), 1);
+			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
+			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
+			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
+			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 
-			double t1 = (-(b) - sqrt(discriminant)) / (2 * a);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * ray.length * ray.length);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * ray.length * ray.length);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * ray.length * ray.length);
+			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
+
+
 
 			t_vec3 intersect = vec3_normalize(vec3_sub(vec3_muls(ray.dir, t1), s_pos));
 			double two_pi = 6.28318530718;
@@ -116,4 +200,5 @@ void	cast_rays(t_minirt *minirt)
 			mlx_put_pixel(minirt->img, column, row, get_texture_from_uv(minirt->temp, u, v));
 		}
 	}
+	fflush(stdout); // TODO get rid of this!
 }

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 15:26:27 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 13:17:41 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ static void	parse_line(t_minirt *m, bool found[128], const char *line)
 	else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
 		parse_cylinder(m, line + ft_strlen("cy "));
 	else
-		mrt_assert(m, false, "Unknown element type");
+		mrt_assert(m, line[0] == '#', "Unknown element type");
 }
 
 void	parse_input(t_minirt *m, const char *path)
