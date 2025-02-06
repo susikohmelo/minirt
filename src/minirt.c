@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 13:56:05 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 19:35:38 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ static void	get_shape_buf_sizes(
 	close(fd);
 }
 
+// TODO NOTE made mlx init before the input parsing
 void	mrt_init(t_minirt *m, const char *path)
 {
 	size_t	sizes[3];
@@ -59,8 +60,8 @@ void	mrt_init(t_minirt *m, const char *path)
 	ft_memset(m->planes, 0, sizes[1] * sizeof m->planes[0]);
 	m->cylinders = ft_arena_alloc(&m->arena, sizes[2] * sizeof m->cylinders[0]);
 	ft_memset(m->cylinders, 0, sizes[2] * sizeof m->cylinders[0]);
-	parse_input(m, path);
 	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
+	parse_input(m, path);
 	mrt_assert(m, m->mlx != NULL, "mlx_init() failed");
 	m->img = mlx_new_image(m->mlx, INIT_WIDTH, INIT_HEIGHT);
 	mrt_assert(m, m->img != NULL, "mlx_new_image() failed");
@@ -72,8 +73,32 @@ void	mrt_init(t_minirt *m, const char *path)
 	mlx_mouse_hook(m->mlx, mouse_hook, m);
 }
 
+void	free_textures(t_minirt *m)
+{
+	while(m->planes)
+	{
+		if((*m->planes).texture)
+			mlx_delete_image(m->mlx, (*m->planes).texture);
+		m->planes= m->planes + 1;
+	}
+	while(m->spheres)
+	{
+		if((*m->spheres).texture)
+			mlx_delete_image(m->mlx, (*m->spheres).texture);
+		m->spheres = m->spheres + 1;
+	}
+	while(m->cylinders)
+	{
+		if((*m->cylinders).texture)
+			mlx_delete_image(m->mlx, (*m->cylinders).texture);
+		m->cylinders = m->cylinders + 1;
+	}
+}
+
 void	mrt_destroy(t_minirt *m)
 {
+	if (m->img)
+		free_textures(m);
 	if (m->mlx != NULL && m->img != NULL)
 		mlx_delete_image(m->mlx, m->img);
 	free(m->mlx);

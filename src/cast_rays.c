@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 16:19:36 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 20:26:04 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,12 +99,19 @@ static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
 {
 	const double	specular_reflection = 1.5;
-	const double	diffuse_reflection = .75;
+	const double	diffuse_reflection = 0.75;
 	const double	alpha = 10.0;
+	t_vec3			shape_color;
 	t_vec3			surface;
 	t_vec3			light;
 	t_vec3			reflection;
 	size_t			i;
+
+	// TODO atm this assumes the shape is a sphere
+	if (shape->texture)
+		shape_color = get_texture_color(ray, shape, SHAPE_SPHERE);
+	else
+		shape_color = shape->color;
 
 	surface = (t_vec3){};
 	i = (size_t) - 1;
@@ -115,11 +122,9 @@ static t_vec3	phong(
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		surface = vec3_add(surface, vec3_add( \
-			vec3_muls(m->light_color, diffuse_reflection * fmax(vec3_dot(light, normal), 0)), \
-			vec3_muls(m->light_color, specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
+		surface = vec3_add(surface, vec3_add(vec3_muls(m->light_color, diffuse_reflection * fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
 	}
-	return (vec3_mul(vec3_add(m->ambient_light, surface), shape->color));
+	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
 
 t_vec3	surface_color(t_minirt *m, t_ray data)
@@ -189,15 +194,6 @@ void	cast_rays(t_minirt *m)
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * ray.length * ray.length);
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * ray.length * ray.length);
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
-
-
-
-			t_vec3 intersect = vec3_normalize(vec3_sub(vec3_muls(ray.dir, t1), s_pos));
-			double two_pi = 6.28318530718;
-			double u = atan2(intersect.x, intersect.z) / two_pi + 0.5;
-			double v = intersect.y * 0.5 + 0.5;
-
-			mlx_put_pixel(minirt->img, column, row, get_texture_from_uv(minirt->temp, u, v));
 		}
 	}
 	fflush(stdout); // TODO get rid of this!

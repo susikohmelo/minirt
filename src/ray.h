@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:14:26 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/03 17:54:24 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 18:04:29 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include "shapes.h"
 # include "vec3.h"
+
+# define TWO_PI 6.28318530718
 
 typedef struct s_ray
 {

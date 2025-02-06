@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 15:16:51 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 19:16:29 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-# define INIT_WIDTH 1024
+# define INIT_WIDTH 1200
 # define INIT_HEIGHT 1024
 
 typedef struct s_minirt
@@ -68,9 +68,10 @@ char		*parse_float(t_minirt *m, double *f, const char *line, char sep);
 bool		assert_range(t_minirt *m, t_vec3 inputs, const char *name);
 double		str_to_f(const char *str);
 
-int			get_texture_from_uv(mlx_image_t *img, double u, double v);
-mlx_image_t	*parse_texture(t_minirt *m, const char *line);
+t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v);
+mlx_image_t	*parse_texture(t_minirt *m, const char **l);
 mlx_image_t	*load_texture(t_minirt *m, char *filename);
+t_vec3		get_texture_color(t_vec3 r, const t_shape *shape, int shape_type);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

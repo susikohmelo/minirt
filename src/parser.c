@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 13:17:41 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 20:08:05 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include <stdio.h>
 
 double	str_to_f(const char *str)
 {
@@ -64,6 +66,8 @@ char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 	if (separator == ' ' && mrt_assert(m, ft_isspace(*line), "Invalid number"))
 		while (ft_isspace(*line))
 			++line;
+	else if (separator == -1)
+		mrt_assert(m, *line == '\0' || *line == ' ', "Invalid numerical value");
 	else
 		mrt_assert(m, *line == separator, "Invalid numerical value");
 	return ((char *)line + (separator != ' '));

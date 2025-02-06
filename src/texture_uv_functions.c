@@ -6,34 +6,23 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 16:20:36 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/06 19:06:54 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
-
-static int set_rgba(int r, int g, int b, int a)
-{
-    return (r << 24 | g << 16 | b << 8 | a);
-}
+#include <fcntl.h>
+#include <unistd.h>
 
 mlx_image_t	*load_texture(t_minirt *m, char *filename)
 {
 	xpm_t		*xpm;
 	mlx_image_t	*img;
-	bool		no_filename;
 	int			i;
 
 	i = 0;
-	no_filename = true;
-	while (filename && filename[i])
-		if (!ft_isspace(filename[i++]))
-			no_filename = false;
-	if (no_filename)
-		return (NULL);
-	else
-		xpm = mlx_load_xpm42(filename);
+	xpm = mlx_load_xpm42(filename);
 	if (!xpm)
 	{
 		ft_putstr_fd("WARN: xpm42 could not be loaded, loading default\n", 2);
@@ -46,15 +35,18 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename)
 	return (img);
 }
 
-int get_texture_from_uv(mlx_image_t *img, double u, double v)
+t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v)
 {
-	int			pixel;
-	int			x;
-	int			y;
-	int			pos;
+	t_vec3	color;
+	int		pos;
+	int		x;
+	int		y;
 
 	x = img->width - round(u * (double) img->width);
 	y = round(v * (double) img->height);
 	pos = (y * img->width + x) * 4;
-	return (set_rgba(img->pixels[pos], img->pixels[pos + 1], img->pixels[pos + 2], img->pixels[pos + 3]));
+	color.r = ((double) img->pixels[pos + 0] / 255);
+	color.g = ((double) img->pixels[pos + 1] / 255);
+	color.b = ((double) img->pixels[pos + 2] / 255);
+	return (color);
 }
