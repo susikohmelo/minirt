@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 13:51:08 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 15:54:16 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,26 @@
 
 
 #include <stdio.h>
+
+
+
+
+void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
+{
+	if (!m->cursor_pointing)
+		return ;
+	printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
+}
+
+void	mrt_print_double(t_minirt *m, const char *name, double x)
+{
+	if (!m->cursor_pointing)
+		return ;
+	printf("%s = %g ; ", name, x);
+}
+
+
+
 
 static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 {
@@ -60,7 +80,7 @@ static inline t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
 /*
 	multiplying by 0.01745 converts degrees to radians
 */
-static t_ray	create_ray(t_minirt *minirt, int x, int y)
+static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 {
 	t_ray	new_ray;
 	t_vec3	pos_screenspace;
@@ -82,21 +102,30 @@ static t_vec3	phong(
 	// const double	diffuse_reflection = 1.0;
 	// const double	alpha = 1.0;
 	t_vec3			surface;
-	// t_vec3			light;
-	// t_vec3			reflection;
+	t_vec3			light;
+	t_vec3			reflection;
 	size_t			i;
 
 	surface = (t_vec3){};
 	i = (size_t) - 1;
 	while (++i < 1)
 	{
-		// light = vec3_normalize(vec3_sub(m->light_coords, ray));
-		// reflection = vec3_sub( \
-		// 	vec3_muls(normal, 2 * vec3_dot(light, normal)), \
-		// 	light);
-		// vec3_add(surface, vec3_add( \
-		// 	vec3_muls(m->light_color, vec3_dot(light, normal)), \
-		// 	vec3_muls(m->light_color, vec3_dot(reflection, ray))));
+		light = vec3_normalize(vec3_sub(m->light_coords, ray));
+		ray = vec3_normalize(ray); // TODO don't recalculate!
+		reflection = vec3_sub( \
+			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
+			light);
+		mrt_print(reflection);
+		mrt_print(light);
+		mrt_print(vec3_dot(light, normal));
+		mrt_print(vec3_dot(reflection, ray));
+		mrt_print(fmax(vec3_dot(light, normal), 0));
+		mrt_print(fmax(vec3_dot(reflection, ray), 0));
+		mrt_print(m->light_color);
+		surface = vec3_add(surface, vec3_add( \
+			vec3_muls(m->light_color, fmax(vec3_dot(light, normal), 0)), \
+			vec3_muls(m->light_color, fmax(-vec3_dot(reflection, ray), 0))));
+		mrt_print(surface);
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape->color));
 }
@@ -126,6 +155,8 @@ void	cast_rays(t_minirt *m)
 	size_t	i;
 	t_vec3	color;
 
+	printf("\r                                                                 "
+		"                                                                  \r");
 	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
 	set_cam_rot_matrix(m);
 	row = -1;
@@ -134,6 +165,7 @@ void	cast_rays(t_minirt *m)
 		column = -1;
 		while (++column < m->mlx->width)
 		{
+			m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
 			i = (size_t) - 1;
@@ -146,11 +178,12 @@ void	cast_rays(t_minirt *m)
 			// while (++i < m->cylinders_length)
 			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
 
+			// double temp = ray.dir.x;
+			// ray.dir.x = -ray.dir.y;
+			// ray.dir.y = -temp;
+
 			color = surface_color(m, ray);
-			if (m->mouse_x == row && m->mouse_y == column) {
-				printf("\r                         \r%g, %g, %g\r", color.r, color.g, color.b);
-				fflush(stdout);
-			}
+			//mrt_print(color);
 			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
@@ -162,4 +195,5 @@ void	cast_rays(t_minirt *m)
 			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 		}
 	}
+	fflush(stdout); // TODO get rid of this!
 }

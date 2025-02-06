@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 13:56:31 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 15:16:51 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ typedef struct s_minirt
 	char			*line;
 	int32_t			mouse_x;
 	int32_t			mouse_y;
+	bool			cursor_pointing;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
@@ -77,5 +78,11 @@ void	cast_rays(t_minirt *minirt);
 void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
 void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
 void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
+
+void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
+void	mrt_print_double(t_minirt *m, const char *name, double x);
+#define mrt_print(X) _Generic(X, \
+	t_vec3: mrt_print_vec3, \
+	double: mrt_print_double)(m, #X, X)
 
 #endif
