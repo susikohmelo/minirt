@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 15:54:16 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/06 16:19:36 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,9 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
 {
-	// const double	specular_reflection = 1.0;
-	// const double	diffuse_reflection = 1.0;
-	// const double	alpha = 1.0;
+	const double	specular_reflection = 1.5;
+	const double	diffuse_reflection = .75;
+	const double	alpha = 10.0;
 	t_vec3			surface;
 	t_vec3			light;
 	t_vec3			reflection;
@@ -115,17 +115,9 @@ static t_vec3	phong(
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		mrt_print(reflection);
-		mrt_print(light);
-		mrt_print(vec3_dot(light, normal));
-		mrt_print(vec3_dot(reflection, ray));
-		mrt_print(fmax(vec3_dot(light, normal), 0));
-		mrt_print(fmax(vec3_dot(reflection, ray), 0));
-		mrt_print(m->light_color);
 		surface = vec3_add(surface, vec3_add( \
-			vec3_muls(m->light_color, fmax(vec3_dot(light, normal), 0)), \
-			vec3_muls(m->light_color, fmax(-vec3_dot(reflection, ray), 0))));
-		mrt_print(surface);
+			vec3_muls(m->light_color, diffuse_reflection * fmax(vec3_dot(light, normal), 0)), \
+			vec3_muls(m->light_color, specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape->color));
 }
@@ -183,7 +175,10 @@ void	cast_rays(t_minirt *m)
 			// ray.dir.y = -temp;
 
 			color = surface_color(m, ray);
-			//mrt_print(color);
+			mrt_print(color);
+			color.r = fmin(fmax(color.r, 0), 1);
+			color.g = fmin(fmax(color.g, 0), 1);
+			color.b = fmin(fmax(color.b, 0), 1);
 			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
