@@ -16,9 +16,10 @@ SRCS = main.c minirt.c vec3.c vec3_scalar.c hooks.c \
 	parser.c parse_attributes.c parse_shapes.c \
 	get_next_line.c get_next_line_utils.c \
 	cast_rays.c render_frame.c intersect_dist.c
+
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
-
+MSYS_VERSION = $(if $(findstring Msys, $(shell uname -o)),$(word 1, $(subst ., ,$(shell uname -r))),0)
 CC = cc
 CFLAGS = -Iinclude
 LFLAGS = -lm -lpthread
