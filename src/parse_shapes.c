@@ -6,19 +6,17 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 00:22:23 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 11:21:11 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
-#include <math.h>
 
 void	parse_sphere(t_minirt *m, const char *line)
 {
 	t_sphere	sphere;
 
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	line = parse_float(m, &sphere.coords.x, line, ',');
 	line = parse_float(m, &sphere.coords.y, line, ',');
 	line = parse_float(m, &sphere.coords.z, line, ' ');
@@ -39,8 +37,7 @@ void	parse_plane(t_minirt *m, const char *line)
 {
 	t_plane	plane;
 
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	line = parse_float(m, &plane.coords.x, line, ',');
 	line = parse_float(m, &plane.coords.y, line, ',');
 	line = parse_float(m, &plane.coords.z, line, ' ');
@@ -50,8 +47,7 @@ void	parse_plane(t_minirt *m, const char *line)
 	assert_range(m, vec3(plane.normal.y, -1, 1), "Plane normal y component");
 	line = parse_float(m, &plane.normal.z, line, ' ');
 	assert_range(m, vec3(plane.normal.z, -1, 1), "Plane normal z component");
-	if (fabs(vec3_length(plane.normal) - 1.) >= .001)
-		ft_putendl_fd("Warning\nUnnormalized camera orientation", 2);
+	plane.normal = expect_normalized(plane.normal, "camera orientation");
 	plane.normal = vec3_normalize(plane.normal);
 	line = parse_float(m, &plane.color.r, line, ',');
 	assert_range(m, vec3(plane.color.r, 0, 255), "Plane red component");
@@ -68,8 +64,7 @@ void	parse_cylinder(t_minirt *m, const char *line)
 {
 	t_cylinder	cylinder;
 
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	line = parse_float(m, &cylinder.coords.x, line, ',');
 	line = parse_float(m, &cylinder.coords.y, line, ',');
 	line = parse_float(m, &cylinder.coords.z, line, ' ');
@@ -79,8 +74,7 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	assert_range(m, vec3(cylinder.axis.y, -1, 1), "Cylinder axis y component");
 	line = parse_float(m, &cylinder.axis.z, line, ' ');
 	assert_range(m, vec3(cylinder.axis.z, -1, 1), "Cylinder axis z component");
-	if (fabs(vec3_length(cylinder.axis) - 1.) >= .001)
-		ft_putendl_fd("Warning\nUnnormalized cylinder axis", 2);
+	cylinder.axis = expect_normalized(cylinder.axis, "cylinder axis");
 	cylinder.axis = vec3_normalize(cylinder.axis);
 	line = parse_float(m, &cylinder.diameter, line, ' ');
 	line = parse_float(m, &cylinder.height, line, ' ');

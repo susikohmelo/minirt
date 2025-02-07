@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 20:08:05 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 11:09:21 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,36 +17,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <math.h>
-
-#include <stdio.h>
-
-double	str_to_f(const char *str)
-{
-	uint64_t	integer;
-	uint64_t	fraction;
-	size_t		fraction_power;
-	double		sign;
-
-	sign = 1.;
-	if ((*str == '+' || *str == '-'))
-		sign = 1. - 2 * (*str++ == '-');
-	integer = 0;
-	while (ft_isdigit(*str) && integer < UINT64_MAX / 10 - 10)
-		integer = integer * 10 + *str++ - '0';
-	if (integer >= UINT64_MAX / 10 - 10)
-		return (sign * INFINITY);
-	if (*str == '.')
-		++str;
-	fraction = 0;
-	fraction_power = 1;
-	while (ft_isdigit(*str) && fraction < (1llu << 52) - 1)
-	{
-		fraction_power *= 10;
-		fraction = fraction * 10 + *str++ - '0';
-	}
-	return (sign * (integer + (double)fraction / fraction_power));
-}
 
 char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 {
@@ -64,8 +34,7 @@ char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 		digit_found = ++line;
 	mrt_assert(m, digit_found, "Number has no digits");
 	if (separator == ' ' && mrt_assert(m, ft_isspace(*line), "Invalid number"))
-		while (ft_isspace(*line))
-			++line;
+		line = trim_left(line);
 	else if (separator == -1)
 		mrt_assert(m, *line == '\0' || *line == ' ', "Invalid numerical value");
 	else
@@ -73,29 +42,9 @@ char	*parse_float(t_minirt *m, double *f, const char *line, char separator)
 	return ((char *)line + (separator != ' '));
 }
 
-bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name)
-{
-	char	msg[256];
-	char	buf[16];
-	double	min;
-	double	max;
-
-	min = inputs.y;
-	max = inputs.z;
-	ft_strlcpy(msg, name, sizeof msg);
-	ft_strlcat(msg, " not in range [", sizeof msg);
-	ft_strlcat(msg, ft_i_to_str(buf, min), sizeof msg);
-	ft_strlcat(msg, ",", sizeof msg);
-	ft_strlcat(msg, ft_i_to_str(buf, max), sizeof msg);
-	ft_strlcat(msg, "]", sizeof msg);
-	mrt_assert(m, min <= inputs.x && inputs.x <= max, msg);
-	return (true);
-}
-
 static void	parse_line(t_minirt *m, bool found[128], const char *line)
 {
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	if (line[0] == 'A' && ft_isspace(line[1])
 		&& mrt_assert(m, !found['A'], "Multiple ambient lights"))
 		found['A'] = parse_ambient_light(m, line + ft_strlen("A "));

@@ -6,19 +6,17 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:03:30 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 16:00:44 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 11:22:22 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
-#include <math.h>
 
 bool	parse_ambient_light(t_minirt *m, const char *line)
 {
 	double	ratio;
 
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	line = parse_float(m, &ratio, line, ' ');
 	assert_range(m, vec3(ratio, 0., 1.), "Ambient lighting ratio");
 	line = parse_float(m, &m->ambient_light.r, line, ',');
@@ -36,8 +34,7 @@ bool	parse_ambient_light(t_minirt *m, const char *line)
 
 bool	parse_camera(t_minirt *m, const char *line)
 {
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	line = parse_float(m, &m->camera_coords.x, line, ',');
 	line = parse_float(m, &m->camera_coords.y, line, ',');
 	line = parse_float(m, &m->camera_coords.z, line, ' ');
@@ -50,8 +47,8 @@ bool	parse_camera(t_minirt *m, const char *line)
 	line = parse_float(m, &m->camera_orientation.z, line, ' ');
 	assert_range(m, vec3(m->camera_orientation.z, -1, 1), \
 		"Camera orientation z component");
-	if (fabs(vec3_length(m->camera_orientation) - 1.) >= .001)
-		ft_putendl_fd("Warning\nUnnormalized camera orientation", 2);
+	m->camera_orientation = expect_normalized(m->camera_orientation, \
+		"camera orientation");
 	m->camera_orientation = vec3_normalize(m->camera_orientation);
 	line = parse_float(m, &m->camera_field_of_view, line, '\0');
 	assert_range(m, vec3(m->camera_field_of_view, 0, 180),
@@ -61,8 +58,7 @@ bool	parse_camera(t_minirt *m, const char *line)
 
 bool	parse_light(t_minirt *m, const char *line)
 {
-	while (ft_isspace(*line))
-		++line;
+	line = trim_left(line);
 	line = parse_float(m, &m->light_coords.x, line, ',');
 	line = parse_float(m, &m->light_coords.y, line, ',');
 	line = parse_float(m, &m->light_coords.z, line, ' ');
