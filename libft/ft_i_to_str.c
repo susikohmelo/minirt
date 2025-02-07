@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:41:49 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/01/31 11:18:48 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/04 18:08:26 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ char	*ft_i_to_str(char result[static 12], int num)
 	size_t			length;
 
 	ft_memset(result, '\0', 12);
-	if (num == 0 && result != NULL)
+	if (num == 0)
 		result[0] = '0';
-	if (result == NULL || (num == 0))
+	if (num == 0)
 		return (result);
 	n = num;
 	length = 0;

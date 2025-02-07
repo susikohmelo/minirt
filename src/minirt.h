@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 20:30:11 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 00:34:50 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,13 +65,17 @@ void		parse_sphere(t_minirt *m, const char *line);
 void		parse_plane(t_minirt *m, const char *line);
 void		parse_cylinder(t_minirt *m, const char *line);
 char		*parse_float(t_minirt *m, double *f, const char *line, char sep);
+char		*parse_texture(t_minirt *m, const char *line, t_shape *shape);
 bool		assert_range(t_minirt *m, t_vec3 inputs, const char *name);
 double		str_to_f(const char *str);
 
+void		free_textures(t_minirt *m);
 t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v);
-mlx_image_t	*parse_texture(t_minirt *m, const char **l);
-mlx_image_t	*load_texture(t_minirt *m, char *filename);
-t_vec3		get_texture_color(t_vec3 r, const t_shape *shape, int shape_type);
+mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type);
+t_vec3		get_texture_color(t_vec3 r, int texture_type,
+				const t_shape *shape, int shape_type);
+double	get_rough_value(t_vec3 r, int	texture_type,
+			const t_shape *shape, int shape_type);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

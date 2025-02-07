@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 22:35:01 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 02:24:20 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-mlx_image_t	*load_texture(t_minirt *m, char *filename)
+mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type)
 {
 	xpm_t		*xpm;
 	mlx_image_t	*img;
@@ -23,6 +23,8 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename)
 	xpm = mlx_load_xpm42(filename);
 	if (!xpm)
 	{
+		if (texture_type != ALBEDO)
+			return (NULL);
 		ft_putstr_fd("WARN: xpm42 could not be loaded, loading default\n", 2);
 		xpm = mlx_load_xpm42("textures/default.xpm42");
 		mrt_assert(m, xpm, "default xpm42 could not be loaded");
@@ -40,6 +42,7 @@ t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v)
 	int		x;
 	int		y;
 
+	v = 1 - v;
 	x = img->width - round(u * (double) img->width);
 	y = round(v * (double) img->height);
 	pos = (y * img->width + x) * 4;

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/06 20:55:58 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 00:06:15 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,30 +71,6 @@ void	mrt_init(t_minirt *m, const char *path)
 	mlx_resize_hook(m->mlx, resize_hook, m);
 	mlx_cursor_hook(m->mlx, cursor_hook, m);
 	mlx_mouse_hook(m->mlx, mouse_hook, m);
-}
-
-void	free_textures(t_minirt *m)
-{
-	int	len;
-
-	len = (int) m->planes_length;
-	while(len--)
-	{
-		if((*(m->planes + len)).texture)
-			mlx_delete_image(m->mlx, (*(m->planes + len)).texture);
-	}
-	len = (int)	m->spheres_length;
-	while(len--)
-	{
-		if((*(m->spheres + len)).texture)
-			mlx_delete_image(m->mlx, (*(m->spheres + len)).texture);
-	}
-	len = (int) m->cylinders_length;
-	while(len--)
-	{
-		if((*(m->cylinders + len)).texture)
-			mlx_delete_image(m->mlx, (*(m->cylinders + len)).texture);
-	}
 }
 
 void	mrt_destroy(t_minirt *m)

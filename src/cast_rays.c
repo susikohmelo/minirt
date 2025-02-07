@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 22:51:47 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 05:28:34 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,31 @@ void	mrt_print_double(t_minirt *m, const char *name, double x)
 	printf("%s = %g ; ", name, x);
 }
 
+static t_vec3	normal_to_surf_normal(t_vec3 v1, t_vec3 v2)
+{
+	t_vec3	f;
+	t_vec3	r;
+	t_vec3	u;
+	t_vec3	t;
 
-
+	f = v2;
+	r = vec3_cross(vec3(0, 1, 0), f);
+	u = vec3_cross(f, r);
+	t = v1;
+	v1.x = t.x * r.x + t.y * u.x + t.z * f.x;
+	v1.y = t.x * r.y + t.y * u.y + t.z * f.y;
+	v1.z = t.x * r.z + t.y * u.z + t.z * f.z;
+	return (v1);
+}
 
 static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 {
-	r->dir.x = r->dir.x * m[0][0] + r->dir.y * m[1][0] + r->dir.z * m[2][0];
-	r->dir.y = r->dir.x * m[0][1] + r->dir.y * m[1][1] + r->dir.z * m[2][1];
-	r->dir.z = r->dir.x * m[0][2] + r->dir.y * m[1][2] + r->dir.z * m[2][2];
+	t_vec3	tmp;
+
+	tmp = r->dir;
+	r->dir.x = tmp.x * m[0][0] + tmp.y * m[1][0] + tmp.z * m[2][0];
+	r->dir.y = tmp.x * m[0][1] + tmp.y * m[1][1] + tmp.z * m[2][1];
+	r->dir.z = tmp.x * m[0][2] + tmp.y * m[1][2] + tmp.z * m[2][2];
 	r->start = minirt->camera_coords;
 }
 
@@ -95,23 +112,35 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	return (new_ray);
 }
 
+
+// TODO NOTE TODO NOTE TODO NOTE
+// I might not be in school on friday so I've commented most of the basic changes here
+// I've implemented textures (albedo), normal maps and roughness maps.
+// To use one, write the path of the texture file (.xpm42) in the parser options after the object color.
+// This will also load normal and roughness maps, if they exist. There are some textures already in ./textures
+// For example: sp 0,0,0 1 255,255,255 textures/granite.xpm42
+// If a texture file is given but can't be opened, a default missing texture is used instead.
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
 {
-	const double	specular_reflection = 1.5;
-	const double	diffuse_reflection = 0.75;
+	const double	specular_reflection = 4;
+	const double	diffuse_reflection = 6;
 	const double	alpha = 10.0;
+	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
 	t_vec3			light;
 	t_vec3			reflection;
 	size_t			i;
 
-	// TODO atm this assumes the shape is a sphere
+	// TODO NOTE atm all of this assumes the shape is a sphere bc no shape info here
+	shape_color = shape->color;
+	shape_rough = 0.5;
 	if (shape->texture)
-		shape_color = get_texture_color(ray, shape, SHAPE_SPHERE);
-	else
-		shape_color = shape->color;
+		shape_color = get_texture_color(ray, false, shape, SHAPE_SPHERE);
+	// roughness is between 0 and 1. 0 is smooth, 1 is rough
+	if (shape->roughness_map)
+		shape_rough = get_rough_value(ray, false, shape, SHAPE_SPHERE);
 
 	surface = (t_vec3){};
 	i = (size_t) - 1;
@@ -122,9 +151,11 @@ static t_vec3	phong(
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		surface = vec3_add(surface, \
-		vec3_add(vec3_muls(m->light_color, diffuse_reflection * \
-		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, \
+		surface = vec3_add(surface, 
+	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
+	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
+		vec3_add(vec3_muls(m->light_color, diffuse_reflection * shape_rough * \
+		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, (1 - shape_rough) * \
 		specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
@@ -132,8 +163,10 @@ static t_vec3	phong(
 
 t_vec3	surface_color(t_minirt *m, t_ray data)
 {
-	t_vec3	ray;
-	t_vec3	normal;
+	t_vec3			ray;
+	t_vec3			normal;
+	t_vec3			map_normal;
+	const double	normal_strength = 0.5;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	if (data.shape_type == SHAPE_SPHERE)
@@ -144,6 +177,13 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 		normal = (t_vec3){};
 	else
 		return (t_vec3){};
+	if (((t_shape *) data.shape)->normal_map)
+	{
+		map_normal = normal_to_surf_normal(get_texture_color( \
+		ray, NORMAL_MAP, data.shape, data.shape_type), normal);
+		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
+		vec3_muls(map_normal, normal_strength)));
+	}
 	return phong(m, ray, normal, data.shape);
 }
 
