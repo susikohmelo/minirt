@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 05:28:34 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 12:06:21 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 // For example: sp 0,0,0 1 255,255,255 textures/granite.xpm42
 // If a texture file is given but can't be opened, a default missing texture is used instead.
 static t_vec3	phong(
-	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
+	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
 	const double	specular_reflection = 4;
 	const double	diffuse_reflection = 6;
@@ -133,30 +133,28 @@ static t_vec3	phong(
 	t_vec3			reflection;
 	size_t			i;
 
-	// TODO NOTE atm all of this assumes the shape is a sphere bc no shape info here
-	shape_color = shape->color;
+	shape_color = ray_data.shape->color;
 	shape_rough = 0.5;
-	if (shape->texture)
-		shape_color = get_texture_color(ray, false, shape, SHAPE_SPHERE);
+	if (ray_data.shape->texture)
+		shape_color = get_texture_color(ray, false, ray_data.shape, ray_data.shape_type);
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (shape->roughness_map)
-		shape_rough = get_rough_value(ray, false, shape, SHAPE_SPHERE);
+	if (ray_data.shape->roughness_map)
+		shape_rough = get_rough_value(ray, false, ray_data.shape, ray_data.shape_type);
 
 	surface = (t_vec3){};
 	i = (size_t) - 1;
 	while (++i < 1)
 	{
 		light = vec3_normalize(vec3_sub(m->light_coords, ray));
-		ray = vec3_normalize(ray); // TODO don't recalculate!
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		surface = vec3_add(surface, 
+		surface = vec3_add(surface,
 	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
 	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
 		vec3_add(vec3_muls(m->light_color, diffuse_reflection * shape_rough * \
 		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, (1 - shape_rough) * \
-		specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
+		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
@@ -184,7 +182,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
 		vec3_muls(map_normal, normal_strength)));
 	}
-	return phong(m, ray, normal, data.shape);
+	return phong(m, ray, normal, data);
 }
 
 void	cast_rays(t_minirt *m)
@@ -218,10 +216,6 @@ void	cast_rays(t_minirt *m)
 			// i = (size_t) - 1;
 			// while (++i < m->cylinders_length)
 			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
-
-			// double temp = ray.dir.x;
-			// ray.dir.x = -ray.dir.y;
-			// ray.dir.y = -temp;
 
 			color = surface_color(m, ray);
 			mrt_print(color);

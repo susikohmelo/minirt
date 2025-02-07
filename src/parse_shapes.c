@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 11:21:11 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 11:36:00 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	parse_sphere(t_minirt *m, const char *line)
 {
-	t_sphere	sphere;
+	t_sphere	sphere; // TODO diameter for readability
 
 	line = trim_left(line);
 	line = parse_float(m, &sphere.coords.x, line, ',');
