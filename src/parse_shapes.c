@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 11:36:00 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 12:55:38 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 
 void	parse_sphere(t_minirt *m, const char *line)
 {
-	t_sphere	sphere; // TODO diameter for readability
+	t_sphere	sphere;
+	double		diameter;
 
 	line = trim_left(line);
 	line = parse_float(m, &sphere.coords.x, line, ',');
 	line = parse_float(m, &sphere.coords.y, line, ',');
 	line = parse_float(m, &sphere.coords.z, line, ' ');
-	line = parse_float(m, &sphere.radius, line, ' ');
-	sphere.radius /= 2.;
+	line = parse_float(m, &diameter, line, ' ');
+	sphere.radius = diameter / 2.;
 	line = parse_float(m, &sphere.color.r, line, ',');
 	assert_range(m, vec3(sphere.color.r, 0, 255), "Sphere red component");
 	line = parse_float(m, &sphere.color.g, line, ',');
@@ -48,7 +49,6 @@ void	parse_plane(t_minirt *m, const char *line)
 	line = parse_float(m, &plane.normal.z, line, ' ');
 	assert_range(m, vec3(plane.normal.z, -1, 1), "Plane normal z component");
 	plane.normal = expect_normalized(plane.normal, "camera orientation");
-	plane.normal = vec3_normalize(plane.normal);
 	line = parse_float(m, &plane.color.r, line, ',');
 	assert_range(m, vec3(plane.color.r, 0, 255), "Plane red component");
 	line = parse_float(m, &plane.color.g, line, ',');
@@ -75,8 +75,8 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	line = parse_float(m, &cylinder.axis.z, line, ' ');
 	assert_range(m, vec3(cylinder.axis.z, -1, 1), "Cylinder axis z component");
 	cylinder.axis = expect_normalized(cylinder.axis, "cylinder axis");
-	cylinder.axis = vec3_normalize(cylinder.axis);
-	line = parse_float(m, &cylinder.diameter, line, ' ');
+	line = parse_float(m, &cylinder.radius, line, ' ');
+	cylinder.radius /= 2.;
 	line = parse_float(m, &cylinder.height, line, ' ');
 	line = parse_float(m, &cylinder.color.r, line, ',');
 	assert_range(m, vec3(cylinder.color.r, 0, 255), "Cylinder red component");

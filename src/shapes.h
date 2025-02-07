@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 00:11:15 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 12:50:40 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ typedef enum e_texture_type
 
 typedef struct s_shape
 {
-	t_vec3  coords;
-	t_vec3	color;
+	t_vec3		coords;
+	t_vec3		color;
 	mlx_image_t *texture;
 	mlx_image_t *normal_map;
 	mlx_image_t *roughness_map;
@@ -42,34 +42,34 @@ typedef struct s_shape
 
 typedef struct s_sphere
 {
-	t_vec3	coords;
-	t_vec3	color;
+	t_vec3		coords;
+	t_vec3		color;
 	mlx_image_t *texture;
 	mlx_image_t *normal_map;
 	mlx_image_t *roughness_map;
-	double	radius;
+	double		radius;
 }	t_sphere;
 
 typedef struct s_plane
 {
-	t_vec3	coords;
-	t_vec3	color;
+	t_vec3		coords;
+	t_vec3		color;
 	mlx_image_t *texture;
 	mlx_image_t *normal_map;
 	mlx_image_t *roughness_map;
-	t_vec3	normal;
+	t_vec3		normal;
 }	t_plane;
 
 typedef struct s_cylinder
 {
-	t_vec3	coords;
-	t_vec3	color;
+	t_vec3		coords;
+	t_vec3		color;
 	mlx_image_t *texture;
 	mlx_image_t *normal_map;
 	mlx_image_t *roughness_map;
-	t_vec3	axis;
-	double	diameter;
-	double	height;
+	t_vec3		axis;
+	double		radius;
+	double		height;
 }	t_cylinder;
 
 #endif

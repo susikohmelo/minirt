@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 12:43:45 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 14:59:13 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	t_vec3			ray;
 	t_vec3			normal;
 	t_vec3			map_normal;
+	double			n;
 	const double	normal_strength = 0.5;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
@@ -176,7 +177,14 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	else if (data.shape_type == SHAPE_PLANE)
 		normal = ((t_plane *)data.shape)->normal;
 	else if (data.shape_type == SHAPE_CYLINDER)
-		normal = (t_vec3){};
+	{
+		n = vec3_dot(ray, ((t_cylinder *)data.shape)->axis) \
+			+ vec3_dot(vec3_sub(data.start, data.shape->coords), \
+				((t_cylinder *)data.shape)->axis);
+		normal = vec3_normalize(vec3_sub(vec3_sub( \
+			ray, data.shape->coords), vec3_muls(
+				((t_cylinder *)data.shape)->axis, n)));
+	}
 	else
 		return (t_vec3){};
 	if (((t_shape *) data.shape)->normal_map)
@@ -217,9 +225,9 @@ void	cast_rays(t_minirt *m)
 			i = (size_t) - 1;
 			while (++i < m->planes_length)
 				min_plane_intersect_dist(&ray, &m->planes[i]);
-			// i = (size_t) - 1;
-			// while (++i < m->cylinders_length)
-			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
+			i = (size_t) - 1;
+			while (++i < m->cylinders_length)
+				min_cylinder_intersect_dist(&ray, &m->cylinders[i]);
 
 			color = surface_color(m, ray);
 			mrt_print(color);

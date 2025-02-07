@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 12:39:51 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 14:26:16 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,35 @@ void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane)
 	}
 }
 
-// void	min_cylinder_intersect_dist(t_ray ray, t_cylinder cylinder)
-// {
-// 	(void)ray;
-// 	(void)cylinder;
-// 	return (INFINITY);
-// }
-//
+void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
+{
+	double	length;
+	double	a;
+	double	b;
+	double	c;
+	double	discriminant;
+	t_vec3	x;
+	double	dir_dot_axis;
+	double	x_dot_axis;
+
+	x = vec3_sub(ray->start, cylinder->coords);
+	dir_dot_axis = vec3_dot(ray->dir, cylinder->axis);
+	x_dot_axis = vec3_dot(x, cylinder->axis);
+	a = 1. - dir_dot_axis * dir_dot_axis;
+	b = 2. * (vec3_dot(ray->dir, x) - dir_dot_axis * x_dot_axis);
+	c = vec3_dot(x, x) \
+		- x_dot_axis * x_dot_axis - \
+		cylinder->radius * cylinder->radius;
+	discriminant = b * b - 4 * a * c;
+
+	if (discriminant >= 0.)
+	{
+		length = (-b - sqrt(discriminant)) / (2. * a);
+		if (length <= ray->length && length >= 0.)
+		{
+			ray->length = length;
+			ray->shape = (t_shape *)cylinder;
+			ray->shape_type = SHAPE_CYLINDER;
+		}
+	}
+}
