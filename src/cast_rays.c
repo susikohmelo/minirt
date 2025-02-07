@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 14:59:13 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 17:06:25 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
 	else if (data.shape_type == SHAPE_PLANE)
 		normal = ((t_plane *)data.shape)->normal;
-	else if (data.shape_type == SHAPE_CYLINDER)
+	else if (data.shape_type == SHAPE_CYLINDER) // TODO why is cylinder bottom not illuminated? Is this behaviour the same with planes??
 	{
 		n = vec3_dot(ray, ((t_cylinder *)data.shape)->axis) \
 			+ vec3_dot(vec3_sub(data.start, data.shape->coords), \
@@ -187,7 +187,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	}
 	else
 		return (t_vec3){};
-	if (((t_shape *) data.shape)->normal_map)
+	if (data.shape->normal_map)
 	{
 		map_normal = normal_to_surf_normal(get_texture_color( \
 			ray, NORMAL_MAP, data.shape, data.shape_type), normal);
