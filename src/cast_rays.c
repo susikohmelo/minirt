@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 12:06:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 12:43:45 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 // This will also load normal and roughness maps, if they exist. There are some textures already in ./textures
 // For example: sp 0,0,0 1 255,255,255 textures/granite.xpm42
 // If a texture file is given but can't be opened, a default missing texture is used instead.
+// TODO loading default texture seg faults, fix this!
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
@@ -152,6 +153,9 @@ static t_vec3	phong(
 		surface = vec3_add(surface,
 	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
 	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
+	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
+	// combine them somehow. Also, they will not be constants, but will be parsed for each
+	// shape later on.
 		vec3_add(vec3_muls(m->light_color, diffuse_reflection * shape_rough * \
 		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, (1 - shape_rough) * \
 		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
@@ -168,9 +172,9 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	if (data.shape_type == SHAPE_SPHERE)
-		normal = vec3_normalize(vec3_sub(ray, ((t_sphere*)data.shape)->coords));
+		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
 	else if (data.shape_type == SHAPE_PLANE)
-		normal = (t_vec3){};
+		normal = ((t_plane *)data.shape)->normal;
 	else if (data.shape_type == SHAPE_CYLINDER)
 		normal = (t_vec3){};
 	else
@@ -178,7 +182,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	if (((t_shape *) data.shape)->normal_map)
 	{
 		map_normal = normal_to_surf_normal(get_texture_color( \
-		ray, NORMAL_MAP, data.shape, data.shape_type), normal);
+			ray, NORMAL_MAP, data.shape, data.shape_type), normal);
 		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
 		vec3_muls(map_normal, normal_strength)));
 	}
@@ -210,9 +214,9 @@ void	cast_rays(t_minirt *m)
 			i = (size_t) - 1;
 			while (++i < m->spheres_length)
 				min_sphere_intersect_dist(&ray, &m->spheres[i]);
-			// i = (size_t) - 1;
-			// while (++i < m->planes_length)
-			// 	dist = fmin(dist, plane_intersect_dist(ray, m->planes[i]));
+			i = (size_t) - 1;
+			while (++i < m->planes_length)
+				min_plane_intersect_dist(&ray, &m->planes[i]);
 			// i = (size_t) - 1;
 			// while (++i < m->cylinders_length)
 			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
