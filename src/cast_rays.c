@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 17:06:25 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 17:39:20 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,17 @@
 
 #include <stdio.h>
 
+// Does nothing, works just as a placeholder to but breakpoints into.
+void	mrt_break(void)
+{
+	(void)0;
+}
 
-
+void	mrt_debug(t_minirt *mrt)
+{
+	if (mrt->cursor_pointing)
+		mrt_break();
+}
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
 {
@@ -216,7 +225,8 @@ void	cast_rays(t_minirt *m)
 		column = -1;
 		while (++column < m->mlx->width)
 		{
-			m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
+			if (row != 0 && column != 0)
+				m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
 			i = (size_t) - 1;

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 11:23:27 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/07 17:35:38 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,5 +95,11 @@ void	mrt_print_double(t_minirt *m, const char *name, double x);
 #define mrt_print(X) _Generic(X, \
 	t_vec3: mrt_print_vec3, \
 	double: mrt_print_double)(m, #X, X)
+
+// To debug a specific pixel with GDB, call `mrt_debug()` wherever you want to
+// debug. Then, put a breakpoint on `mrt_break()` and click the pixel you want
+// to debug.
+void	mrt_debug(t_minirt *m);
+void	mrt_break(void);
 
 #endif
