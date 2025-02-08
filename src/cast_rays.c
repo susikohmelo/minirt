@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 17:39:20 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 11:28:01 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,8 +152,8 @@ static t_vec3	phong(
 		shape_rough = get_rough_value(ray, false, ray_data.shape, ray_data.shape_type);
 
 	surface = (t_vec3){};
-	i = (size_t) - 1;
-	while (++i < 1)
+	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
+	while (++i < 1)   // behind the objects (normal dot light_direction >= 0)
 	{
 		light = vec3_normalize(vec3_sub(m->light_coords, ray));
 		reflection = vec3_sub( \
@@ -184,8 +184,12 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	if (data.shape_type == SHAPE_SPHERE)
 		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
 	else if (data.shape_type == SHAPE_PLANE)
+	{
 		normal = ((t_plane *)data.shape)->normal;
-	else if (data.shape_type == SHAPE_CYLINDER) // TODO why is cylinder bottom not illuminated? Is this behaviour the same with planes??
+		if (vec3_dot(normal, ray) >= 0.)
+			normal = vec3_muls(normal, -1);
+	}
+	else if (data.shape_type == SHAPE_CYLINDER)
 	{
 		n = vec3_dot(ray, ((t_cylinder *)data.shape)->axis) \
 			+ vec3_dot(vec3_sub(data.start, data.shape->coords), \
@@ -229,6 +233,9 @@ void	cast_rays(t_minirt *m)
 				m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
+
+			mrt_debug(m);
+
 			i = (size_t) - 1;
 			while (++i < m->spheres_length)
 				min_sphere_intersect_dist(&ray, &m->spheres[i]);
@@ -238,12 +245,19 @@ void	cast_rays(t_minirt *m)
 			i = (size_t) - 1;
 			while (++i < m->cylinders_length)
 				min_cylinder_intersect_dist(&ray, &m->cylinders[i]);
-
-			color = surface_color(m, ray);
-			mrt_print(color);
-			color.r = fmin(fmax(color.r, 0), 1);
-			color.g = fmin(fmax(color.g, 0), 1);
-			color.b = fmin(fmax(color.b, 0), 1);
+			if (isinf(ray.length))
+			{
+				color = (t_vec3){};
+				mrt_print(color);
+			}
+			else
+			{
+				color = surface_color(m, ray);
+				mrt_print(color);
+				color.r = fmin(fmax(color.r, 0), 1);
+				color.g = fmin(fmax(color.g, 0), 1);
+				color.b = fmin(fmax(color.b, 0), 1);
+			}
 			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
