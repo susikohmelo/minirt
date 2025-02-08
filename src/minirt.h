@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 12:43:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 15:06:58 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
 void		parse_input(t_minirt *m, const char *path);
 bool		parse_ambient_light(t_minirt *m, const char *line);
 bool		parse_camera(t_minirt *m, const char *line);
-bool		parse_lights(t_minirt *m, const char *line);
+bool		parse_light(t_minirt *m, const char *line);
 void		parse_sphere(t_minirt *m, const char *line);
 void		parse_plane(t_minirt *m, const char *line);
 void		parse_cylinder(t_minirt *m, const char *line);
@@ -94,6 +94,7 @@ void	cast_rays(t_minirt *minirt);
 void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
 void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
 void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
+void	get_shape_intersect_dist(t_minirt *m, t_ray *ray);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
 void	mrt_print_double(t_minirt *m, const char *name, double x);

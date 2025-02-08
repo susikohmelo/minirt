@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:03:30 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 12:52:02 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 12:57:15 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ bool	parse_camera(t_minirt *m, const char *line)
 	return (true);
 }
 
-bool	parse_lights(t_minirt *m, const char *line)
+bool	parse_light(t_minirt *m, const char *line)
 {
 	t_light	light;
 	double	ratio;

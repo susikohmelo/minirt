@@ -6,13 +6,12 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 17:11:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 15:06:31 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
-
 
 void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 {
@@ -28,10 +27,10 @@ void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 	discriminant = b * b - 4 * 1 * c;
 	if (discriminant >= 0.)
 	{
-		length = (-b - sqrt(discriminant)) / (2. * 1);
-		if (length <= ray->length && length >= 0.)
+		length = (-b - sqrt(discriminant)) / (2. * 1); // TODO square this and calculate sqrt() lazily
+		if (length <= ray->length && length >= 0.) // TODO square these too
 		{
-			ray->length = length;
+			ray->length = length; // and the sqrt() would go here
 			ray->shape = (t_shape *)sphere;
 			ray->shape_type = SHAPE_SPHERE;
 		}
@@ -65,12 +64,12 @@ static void	min_disc_intersect_dist(
 
 	disc_top = (t_plane){.coords = top, .normal = cylinder->axis};
 	min_plane_intersect_dist(&disc_ray, &disc_top);
-	if (vec3_length(vec3_sub(vec3_muls(disc_ray.dir, disc_ray.length), top)) <= cylinder->radius)
+	if (vec3_length(vec3_sub(vec3_muls(disc_ray.dir, disc_ray.length), top)) <= cylinder->radius) // TODO square these
 		length = disc_ray.length;
 
 	disc_bot = (t_plane){.coords = bot, .normal = cylinder->axis};
 	min_plane_intersect_dist(&disc_ray, &disc_bot);
-	if (vec3_length(vec3_sub(vec3_muls(disc_ray.dir, disc_ray.length), bot)) <= cylinder->radius)
+	if (vec3_length(vec3_sub(vec3_muls(disc_ray.dir, disc_ray.length), bot)) <= cylinder->radius) // TODO square these
 		length = fmin(length, disc_ray.length);
 
 	if (length <= ray->length && length >= 0.)
@@ -118,7 +117,7 @@ void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 			vec3_sub(top, vec3_muls(ray->dir, length)), cylinder->axis);
 
 		if (!(0 <= top_sub_hitp_dot_axis
-			&& top_sub_hitp_dot_axis <= vec3_length(vec3_sub(top, bot))))
+			&& top_sub_hitp_dot_axis <= vec3_length(vec3_sub(top, bot)))) // TODO square this
 			min_disc_intersect_dist(ray, cylinder, top, bot);
 		else if (length <= ray->length && length >= 0.)
 		{
@@ -127,4 +126,19 @@ void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 			ray->shape_type = SHAPE_CYLINDER;
 		}
 	}
+}
+
+void	get_shape_intersect_dist(t_minirt *m, t_ray *ray)
+{
+	size_t	i;
+
+	i = (size_t) - 1;
+	while (++i < m->spheres_length)
+		min_sphere_intersect_dist(ray, &m->spheres[i]);
+	i = (size_t) - 1;
+	while (++i < m->planes_length)
+		min_plane_intersect_dist(ray, &m->planes[i]);
+	i = (size_t) - 1;
+	while (++i < m->cylinders_length)
+		min_cylinder_intersect_dist(ray, &m->cylinders[i]);
 }

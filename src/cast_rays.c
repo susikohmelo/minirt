@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/08 12:49:13 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 15:18:20 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@ static t_vec3	phong(
 	t_vec3			light;
 	t_vec3			reflection;
 	size_t			i;
+	t_ray			light_ray;
 
 	shape_color = ray_data.shape->color;
 	shape_rough = 0.5;
@@ -155,6 +156,14 @@ static t_vec3	phong(
 	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
 	while (++i < m->lights_length)   // behind the objects (normal dot light_direction >= 0)
 	{
+		light_ray = (t_ray){
+			.start = ray,
+			.dir = vec3_normalize(vec3_sub(ray, m->lights[i].coords)),
+			.length = INFINITY};
+		get_shape_intersect_dist(m, &light_ray);
+		// if (isinf(light_ray.length))
+		// 	continue ;
+
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
@@ -198,7 +207,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 			ray, data.shape->coords), vec3_muls(
 				((t_cylinder *)data.shape)->axis, n)));
 	}
-	else
+	else // should there be some logic for lighting here? And is this dead code?
 		return (t_vec3){};
 	if (data.shape->normal_map)
 	{
@@ -215,7 +224,6 @@ void	cast_rays(t_minirt *m)
 	t_ray	ray;
 	int32_t	column;
 	int32_t	row;
-	size_t	i;
 	t_vec3	color;
 
 	printf("\r                                                                 "
@@ -234,17 +242,7 @@ void	cast_rays(t_minirt *m)
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
 
-			mrt_debug(m);
-
-			i = (size_t) - 1;
-			while (++i < m->spheres_length)
-				min_sphere_intersect_dist(&ray, &m->spheres[i]);
-			i = (size_t) - 1;
-			while (++i < m->planes_length)
-				min_plane_intersect_dist(&ray, &m->planes[i]);
-			i = (size_t) - 1;
-			while (++i < m->cylinders_length)
-				min_cylinder_intersect_dist(&ray, &m->cylinders[i]);
+			get_shape_intersect_dist(m, &ray);
 			if (isinf(ray.length))
 			{
 				color = (t_vec3){};
