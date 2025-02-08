@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:03:30 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 12:55:53 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 11:42:48 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,6 @@ bool	parse_light(t_minirt *m, const char *line)
 	assert_range(m, vec3(m->light_color.g, 0, 255), "Light green component");
 	line = parse_float(m, &m->light_color.b, line, '\0');
 	assert_range(m, vec3(m->light_color.b, 0, 255), "Light blue component");
-	m->light_color = vec3_divs(m->light_color, 255);
+	m->light_color = vec3_muls(m->light_color, m->light_ratio / 255);
 	return (true);
 }
