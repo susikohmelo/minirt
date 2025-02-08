@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:03:30 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 11:42:48 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 12:52:02 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,20 +55,24 @@ bool	parse_camera(t_minirt *m, const char *line)
 	return (true);
 }
 
-bool	parse_light(t_minirt *m, const char *line)
+bool	parse_lights(t_minirt *m, const char *line)
 {
+	t_light	light;
+	double	ratio;
+
 	line = trim_left(line);
-	line = parse_float(m, &m->light_coords.x, line, ',');
-	line = parse_float(m, &m->light_coords.y, line, ',');
-	line = parse_float(m, &m->light_coords.z, line, ' ');
-	line = parse_float(m, &m->light_ratio, line, ' ');
-	assert_range(m, vec3(m->light_ratio, 0., 1.), "Light brightness ratio");
-	line = parse_float(m, &m->light_color.r, line, ',');
-	assert_range(m, vec3(m->light_color.r, 0, 255), "Light red component");
-	line = parse_float(m, &m->light_color.g, line, ',');
-	assert_range(m, vec3(m->light_color.g, 0, 255), "Light green component");
-	line = parse_float(m, &m->light_color.b, line, '\0');
-	assert_range(m, vec3(m->light_color.b, 0, 255), "Light blue component");
-	m->light_color = vec3_muls(m->light_color, m->light_ratio / 255);
+	line = parse_float(m, &light.coords.x, line, ',');
+	line = parse_float(m, &light.coords.y, line, ',');
+	line = parse_float(m, &light.coords.z, line, ' ');
+	line = parse_float(m, &ratio, line, ' ');
+	assert_range(m, vec3(ratio, 0., 1.), "Light brightness ratio");
+	line = parse_float(m, &light.color.r, line, ',');
+	assert_range(m, vec3(light.color.r, 0, 255), "Light red component");
+	line = parse_float(m, &light.color.g, line, ',');
+	assert_range(m, vec3(light.color.g, 0, 255), "Light green component");
+	line = parse_float(m, &light.color.b, line, '\0');
+	assert_range(m, vec3(light.color.b, 0, 255), "Light blue component");
+	light.color = vec3_muls(light.color, ratio / 255);
+	m->lights[m->lights_length++] = light;
 	return (true);
 }

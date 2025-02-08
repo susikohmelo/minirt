@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/08 11:28:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 12:49:13 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,9 +153,9 @@ static t_vec3	phong(
 
 	surface = (t_vec3){};
 	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
-	while (++i < 1)   // behind the objects (normal dot light_direction >= 0)
+	while (++i < m->lights_length)   // behind the objects (normal dot light_direction >= 0)
 	{
-		light = vec3_normalize(vec3_sub(m->light_coords, ray));
+		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
@@ -165,8 +165,8 @@ static t_vec3	phong(
 	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
 	// combine them somehow. Also, they will not be constants, but will be parsed for each
 	// shape later on.
-		vec3_add(vec3_muls(m->light_color, diffuse_reflection * shape_rough * \
-		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, (1 - shape_rough) * \
+		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough * \
+		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->lights[i].color, (1 - shape_rough) * \
 		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));

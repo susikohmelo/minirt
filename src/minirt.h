@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 17:35:38 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 12:43:01 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@
 
 # define INIT_WIDTH 1200
 # define INIT_HEIGHT 1024
+
+typedef struct s_light
+{
+	t_vec3	coords;
+	t_vec3	color;
+}	t_light;
 
 typedef struct s_minirt
 {
@@ -40,9 +46,8 @@ typedef struct s_minirt
 	double			cam_rot_matrix[3][3];
 	double			aspect_ratio;
 
-	t_vec3			light_coords;
-	double			light_ratio;
-	t_vec3			light_color;
+	t_light			*lights;
+	size_t			lights_length;
 
 	t_sphere		*spheres;
 	size_t			spheres_length;
@@ -60,7 +65,7 @@ bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
 void		parse_input(t_minirt *m, const char *path);
 bool		parse_ambient_light(t_minirt *m, const char *line);
 bool		parse_camera(t_minirt *m, const char *line);
-bool		parse_light(t_minirt *m, const char *line);
+bool		parse_lights(t_minirt *m, const char *line);
 void		parse_sphere(t_minirt *m, const char *line);
 void		parse_plane(t_minirt *m, const char *line);
 void		parse_cylinder(t_minirt *m, const char *line);
