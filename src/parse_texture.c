@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:34:53 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 00:42:28 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 11:45:05 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ char	*parse_texture(t_minirt *m, const char *line, t_shape *shape)
 	char		filename[210];
 	bool		name_is_empty;
 
+	shape->texture = NULL;
+	shape->normal_map = NULL;
+	shape->roughness_map = NULL;
 	i = 0;
 	name_is_empty = true;
 	while (line[i] && i < 199)

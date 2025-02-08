@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 05:28:34 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/08 11:28:01 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,17 @@
 
 #include <stdio.h>
 
+// Does nothing, works just as a placeholder to but breakpoints into.
+void	mrt_break(void)
+{
+	(void)0;
+}
 
-
+void	mrt_debug(t_minirt *mrt)
+{
+	if (mrt->cursor_pointing)
+		mrt_break();
+}
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
 {
@@ -120,8 +129,9 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 // This will also load normal and roughness maps, if they exist. There are some textures already in ./textures
 // For example: sp 0,0,0 1 255,255,255 textures/granite.xpm42
 // If a texture file is given but can't be opened, a default missing texture is used instead.
+// TODO loading default texture seg faults, fix this!
 static t_vec3	phong(
-	t_minirt *m, t_vec3 ray, t_vec3 normal, const t_shape *shape)
+	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
 	const double	specular_reflection = 4;
 	const double	diffuse_reflection = 6;
@@ -133,30 +143,31 @@ static t_vec3	phong(
 	t_vec3			reflection;
 	size_t			i;
 
-	// TODO NOTE atm all of this assumes the shape is a sphere bc no shape info here
-	shape_color = shape->color;
+	shape_color = ray_data.shape->color;
 	shape_rough = 0.5;
-	if (shape->texture)
-		shape_color = get_texture_color(ray, false, shape, SHAPE_SPHERE);
+	if (ray_data.shape->texture)
+		shape_color = get_texture_color(ray, false, ray_data.shape, ray_data.shape_type);
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (shape->roughness_map)
-		shape_rough = get_rough_value(ray, false, shape, SHAPE_SPHERE);
+	if (ray_data.shape->roughness_map)
+		shape_rough = get_rough_value(ray, false, ray_data.shape, ray_data.shape_type);
 
 	surface = (t_vec3){};
-	i = (size_t) - 1;
-	while (++i < 1)
+	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
+	while (++i < 1)   // behind the objects (normal dot light_direction >= 0)
 	{
 		light = vec3_normalize(vec3_sub(m->light_coords, ray));
-		ray = vec3_normalize(ray); // TODO don't recalculate!
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
 			light);
-		surface = vec3_add(surface, 
+		surface = vec3_add(surface,
 	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
 	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
+	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
+	// combine them somehow. Also, they will not be constants, but will be parsed for each
+	// shape later on.
 		vec3_add(vec3_muls(m->light_color, diffuse_reflection * shape_rough * \
 		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->light_color, (1 - shape_rough) * \
-		specular_reflection * pow(fmax(-vec3_dot(reflection, ray), 0), alpha))));
+		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
@@ -166,25 +177,37 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	t_vec3			ray;
 	t_vec3			normal;
 	t_vec3			map_normal;
+	double			n;
 	const double	normal_strength = 0.5;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	if (data.shape_type == SHAPE_SPHERE)
-		normal = vec3_normalize(vec3_sub(ray, ((t_sphere*)data.shape)->coords));
+		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
 	else if (data.shape_type == SHAPE_PLANE)
-		normal = (t_vec3){};
+	{
+		normal = ((t_plane *)data.shape)->normal;
+		if (vec3_dot(normal, ray) >= 0.)
+			normal = vec3_muls(normal, -1);
+	}
 	else if (data.shape_type == SHAPE_CYLINDER)
-		normal = (t_vec3){};
+	{
+		n = vec3_dot(ray, ((t_cylinder *)data.shape)->axis) \
+			+ vec3_dot(vec3_sub(data.start, data.shape->coords), \
+				((t_cylinder *)data.shape)->axis);
+		normal = vec3_normalize(vec3_sub(vec3_sub( \
+			ray, data.shape->coords), vec3_muls(
+				((t_cylinder *)data.shape)->axis, n)));
+	}
 	else
 		return (t_vec3){};
-	if (((t_shape *) data.shape)->normal_map)
+	if (data.shape->normal_map)
 	{
 		map_normal = normal_to_surf_normal(get_texture_color( \
-		ray, NORMAL_MAP, data.shape, data.shape_type), normal);
+			ray, NORMAL_MAP, data.shape, data.shape_type), normal);
 		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
 		vec3_muls(map_normal, normal_strength)));
 	}
-	return phong(m, ray, normal, data.shape);
+	return phong(m, ray, normal, data);
 }
 
 void	cast_rays(t_minirt *m)
@@ -206,28 +229,35 @@ void	cast_rays(t_minirt *m)
 		column = -1;
 		while (++column < m->mlx->width)
 		{
-			m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
+			if (row != 0 && column != 0)
+				m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
+
+			mrt_debug(m);
+
 			i = (size_t) - 1;
 			while (++i < m->spheres_length)
 				min_sphere_intersect_dist(&ray, &m->spheres[i]);
-			// i = (size_t) - 1;
-			// while (++i < m->planes_length)
-			// 	dist = fmin(dist, plane_intersect_dist(ray, m->planes[i]));
-			// i = (size_t) - 1;
-			// while (++i < m->cylinders_length)
-			// 	dist = fmin(dist, cylinder_intersect_dist(ray, m->cylinders[i]));
-
-			// double temp = ray.dir.x;
-			// ray.dir.x = -ray.dir.y;
-			// ray.dir.y = -temp;
-
-			color = surface_color(m, ray);
-			mrt_print(color);
-			color.r = fmin(fmax(color.r, 0), 1);
-			color.g = fmin(fmax(color.g, 0), 1);
-			color.b = fmin(fmax(color.b, 0), 1);
+			i = (size_t) - 1;
+			while (++i < m->planes_length)
+				min_plane_intersect_dist(&ray, &m->planes[i]);
+			i = (size_t) - 1;
+			while (++i < m->cylinders_length)
+				min_cylinder_intersect_dist(&ray, &m->cylinders[i]);
+			if (isinf(ray.length))
+			{
+				color = (t_vec3){};
+				mrt_print(color);
+			}
+			else
+			{
+				color = surface_color(m, ray);
+				mrt_print(color);
+				color.r = fmin(fmax(color.r, 0), 1);
+				color.g = fmin(fmax(color.g, 0), 1);
+				color.b = fmin(fmax(color.b, 0), 1);
+			}
 			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;

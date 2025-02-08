@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:14:26 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/06 18:04:29 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/07 12:03:31 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ typedef struct s_ray
 	t_vec3			start;
 	t_vec3			dir;
 	double			length;
-	const void		*shape;
+	const t_shape	*shape;
 	t_shape_type	shape_type;
 }	t_ray;
 
