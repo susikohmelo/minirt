@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/08 15:18:20 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 17:19:46 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,11 +158,11 @@ static t_vec3	phong(
 	{
 		light_ray = (t_ray){
 			.start = ray,
-			.dir = vec3_normalize(vec3_sub(ray, m->lights[i].coords)),
+			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
 			.length = INFINITY};
-		get_shape_intersect_dist(m, &light_ray);
-		// if (isinf(light_ray.length))
-		// 	continue ;
+		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+		if (!isinf(light_ray.length))
+			continue ;
 
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
 		reflection = vec3_sub( \
@@ -242,7 +242,7 @@ void	cast_rays(t_minirt *m)
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
 
-			get_shape_intersect_dist(m, &ray);
+			get_shape_intersect_dist(m, &ray, NULL);
 			if (isinf(ray.length))
 			{
 				color = (t_vec3){};

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 15:06:31 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 17:11:01 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,17 +128,20 @@ void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 	}
 }
 
-void	get_shape_intersect_dist(t_minirt *m, t_ray *ray)
+void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip)
 {
 	size_t	i;
 
 	i = (size_t) - 1;
 	while (++i < m->spheres_length)
-		min_sphere_intersect_dist(ray, &m->spheres[i]);
+		if ((t_shape *)&m->spheres[i] != skip)
+			min_sphere_intersect_dist(ray, &m->spheres[i]);
 	i = (size_t) - 1;
 	while (++i < m->planes_length)
-		min_plane_intersect_dist(ray, &m->planes[i]);
+		if ((t_shape *)&m->planes[i] != skip)
+			min_plane_intersect_dist(ray, &m->planes[i]);
 	i = (size_t) - 1;
 	while (++i < m->cylinders_length)
-		min_cylinder_intersect_dist(ray, &m->cylinders[i]);
+		if ((t_shape *)&m->cylinders[i] != skip)
+			min_cylinder_intersect_dist(ray, &m->cylinders[i]);
 }

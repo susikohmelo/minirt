@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 15:06:58 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 17:10:48 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	cast_rays(t_minirt *minirt);
 void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
 void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
 void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
-void	get_shape_intersect_dist(t_minirt *m, t_ray *ray);
+void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
 void	mrt_print_double(t_minirt *m, const char *name, double x);
