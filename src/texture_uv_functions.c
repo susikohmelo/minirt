@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 02:24:20 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/09 02:00:33 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type)
 	xpm_t		*xpm;
 	mlx_image_t	*img;
 
+	if (!filename)
+		return (NULL);
 	xpm = mlx_load_xpm42(filename);
 	if (!xpm)
 	{
@@ -43,8 +45,8 @@ t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v)
 	int		y;
 
 	v = 1 - v;
-	x = img->width - round(u * (double) img->width);
-	y = round(v * (double) img->height);
+	x = img->width - round(u * ((double) img->width - 1));
+	y = round(v * ((double) img->height - 1));
 	pos = (y * img->width + x) * 4;
 	color.r = ((double) img->pixels[pos + 0] / 255);
 	color.g = ((double) img->pixels[pos + 1] / 255);
