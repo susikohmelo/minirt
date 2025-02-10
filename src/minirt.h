@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 17:35:38 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 17:10:48 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@
 
 # define INIT_WIDTH 1200
 # define INIT_HEIGHT 1024
+
+typedef struct s_light
+{
+	t_vec3	coords;
+	t_vec3	color;
+}	t_light;
 
 typedef struct s_minirt
 {
@@ -40,9 +46,8 @@ typedef struct s_minirt
 	double			cam_rot_matrix[3][3];
 	double			aspect_ratio;
 
-	t_vec3			light_coords;
-	double			light_ratio;
-	t_vec3			light_color;
+	t_light			*lights;
+	size_t			lights_length;
 
 	t_sphere		*spheres;
 	size_t			spheres_length;
@@ -89,6 +94,7 @@ void	cast_rays(t_minirt *minirt);
 void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
 void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
 void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
+void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
 void	mrt_print_double(t_minirt *m, const char *name, double x);

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 00:06:15 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/08 12:46:08 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include <string.h>
 
 static void	get_shape_buf_sizes(
-	t_minirt *m, size_t sizes[3], const char* path)
+	t_minirt *m, size_t sizes[static 4], const char* path)
 {
 	int		fd;
 	char	*line;
@@ -42,6 +42,8 @@ static void	get_shape_buf_sizes(
 			sizes[1]++;
 		else if (line[0] == 'c' && line[1] == 'y' && ft_isspace(line[2]))
 			sizes[2]++;
+		else if (line[0] == 'L' && ft_isspace(line[1]))
+			sizes[3]++;
 		free(m->line);
 	}
 	close(fd);
@@ -50,7 +52,7 @@ static void	get_shape_buf_sizes(
 // TODO NOTE made mlx init before the input parsing
 void	mrt_init(t_minirt *m, const char *path)
 {
-	size_t	sizes[3];
+	size_t	sizes[4];
 
 	ft_memset(sizes, 0, sizeof sizes);
 	get_shape_buf_sizes(m, sizes, path);
@@ -60,6 +62,8 @@ void	mrt_init(t_minirt *m, const char *path)
 	ft_memset(m->planes, 0, sizes[1] * sizeof m->planes[0]);
 	m->cylinders = ft_arena_alloc(&m->arena, sizes[2] * sizeof m->cylinders[0]);
 	ft_memset(m->cylinders, 0, sizes[2] * sizeof m->cylinders[0]);
+	m->lights = ft_arena_alloc(&m->arena, sizes[3] * sizeof m->lights[0]);
+	ft_memset(m->lights, 0, sizes[3] * sizeof m->lights[0]);
 	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
 	parse_input(m, path);
 	mrt_assert(m, m->mlx != NULL, "mlx_init() failed");

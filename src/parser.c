@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:03:43 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 11:09:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/08 12:57:29 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,7 @@ static void	parse_line(t_minirt *m, bool found[128], const char *line)
 	else if (line[0] == 'C' && ft_isspace(line[1])
 		&& mrt_assert(m, !found['C'], "Multiple cameras"))
 		found['C'] = parse_camera(m, line + ft_strlen("C "));
-	else if (line[0] == 'L' && ft_isspace(line[1])
-		&& mrt_assert(m, !found['L'], "Multiple lights"))
+	else if (line[0] == 'L' && ft_isspace(line[1]))
 		found['L'] = parse_light(m, line + ft_strlen("L "));
 	else if (line[0] == 's' && line[1] == 'p' && ft_isspace(line[2]))
 		parse_sphere(m, line + ft_strlen("sp "));

@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/07 11:07:47 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/02/08 15:20:16 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,7 @@ MAKEFLAGS += -j6
 
 all: release
 
-release: CFLAGS += -O3 -march=native -ffast-math -flto
+release: CFLAGS += -O3 -march=native -flto
 release: $(NAME)
 
 libft/libft.a:
