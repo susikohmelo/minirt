@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/10 12:51:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 13:59:29 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,9 +162,10 @@ static t_vec3	phong(
 			.start = ray,
 			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
 			.length = INFINITY};
+		mrt_print(light_ray.start);
 		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
 		if (!isinf(light_ray.length))
-			continue ;
+			continue ; // TODO we probably still can do reflection? So don't skip I guess?
 
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
 		reflection = vec3_sub( \
@@ -240,7 +241,7 @@ void	cast_rays(t_minirt *m)
 		while (++column < m->mlx->width)
 		{
 			if (row != 0 && column != 0)
-				m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
+				m->cursor_pointing = m->mouse_x == column && m->mouse_y == row;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
 
