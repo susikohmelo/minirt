@@ -45,23 +45,6 @@ void	mrt_print_double(t_minirt *m, const char *name, double x)
 	printf("%s = %g ; ", name, x);
 }
 
-static t_vec3	normal_to_surf_normal(t_vec3 v1, t_vec3 v2)
-{
-	t_vec3	f;
-	t_vec3	r;
-	t_vec3	u;
-	t_vec3	t;
-
-	f = v2;
-	r = vec3_cross(vec3(0, 1, 0), f);
-	u = vec3_cross(f, r);
-	t = v1;
-	v1.x = t.x * r.x + t.y * u.x + t.z * f.x;
-	v1.y = t.x * r.y + t.y * u.y + t.z * f.y;
-	v1.z = t.x * r.z + t.y * u.z + t.z * f.z;
-	return (v1);
-}
-
 static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 {
 	t_vec3	tmp;
@@ -214,7 +197,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 		return (t_vec3){};
 	if (data.shape->normal_map)
 	{
-		map_normal = normal_to_surf_normal(get_texture_color( \
+		map_normal = vec3_inverse_lookat(get_texture_color( \
 			ray, NORMAL_MAP, data.shape, data.shape_type), normal);
 		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
 		vec3_muls(map_normal, normal_strength)));
