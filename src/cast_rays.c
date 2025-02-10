@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/10 13:59:29 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 16:53:59 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,8 +116,8 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
-	const double	specular_reflection = 4;
-	const double	diffuse_reflection = 6;
+	const double	specular_reflection = 10;
+	const double	diffuse_reflection = 5;
 	const double	alpha = 10.0;
 	double			shape_rough;
 	t_vec3			shape_color;
@@ -147,7 +147,8 @@ static t_vec3	phong(
 			.length = INFINITY};
 		mrt_print(light_ray.start);
 		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-		if (!isinf(light_ray.length))
+		//if (!isinf(light_ray.length))
+		if (light_ray.length < vec3_length(vec3_sub(m->lights[i].coords, ray))) // TODO square
 			continue ; // TODO we probably still can do reflection? So don't skip I guess?
 
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
