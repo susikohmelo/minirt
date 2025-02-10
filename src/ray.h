@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:14:26 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 12:03:31 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 20:24:30 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct s_ray
 	double			length;
 	const t_shape	*shape;
 	t_shape_type	shape_type;
+	int				is_reflect;
 }	t_ray;
 
 # endif

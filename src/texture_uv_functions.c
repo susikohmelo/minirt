@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/09 02:00:33 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/10 20:52:04 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,54 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type)
 	return (img);
 }
 
-t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v)
+static inline t_vec3	get_colors(mlx_image_t *img, int pos)
+{
+	t_vec3	color;
+
+	color.r = ((double) img->pixels[pos + 0] / 255);
+	color.g = ((double) img->pixels[pos + 1] / 255);
+	color.b = ((double) img->pixels[pos + 2] / 255);
+	return (color);
+}
+
+static t_vec3	get_nearby_pixels(mlx_image_t *img, int targ_x, int targ_y)
+{
+	t_vec3	color;
+	int		row;
+	int		column;
+	int		counter;
+	int		xy[2];
+
+	color = vec3(0,0,0);
+	counter = 0;
+	row = -4;
+	while (++row <= 3)
+	{
+		column = -4;
+		while (++column <= 3)
+		{
+			xy[0] = targ_x + column * 5;
+			xy[1] = targ_y + row * 5;
+			if (xy[0] < 0 || xy[1] < 0
+					|| xy[0] > (int) img->width - 1
+					|| xy[1] > (int) img->height - 1)
+				continue ;
+			++counter;
+			color = vec3_add(color, get_colors( \
+						img, (xy[1] * img->width + xy[0]) * 4));
+		}
+	}
+	return (vec3_divs(color, (double) counter));
+}
+
+static inline void	mix_colors(t_vec3 *c1, t_vec3 c2, double amount)
+{
+	c1->x = c1->x * (1 - amount) + c2.x * amount;
+	c1->y = c1->y * (1 - amount) + c2.y * amount;
+	c1->z = c1->z * (1 - amount) + c2.z * amount;
+}
+
+t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v, double blur)
 {
 	t_vec3	color;
 	int		pos;
@@ -45,11 +92,11 @@ t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v)
 	int		y;
 
 	v = 1 - v;
-	x = img->width - round(u * ((double) img->width - 1));
-	y = round(v * ((double) img->height - 1));
+	x = img->width - round(u * ((double) img->width - 2));
+	y = round(v * ((double) img->height - 2));
 	pos = (y * img->width + x) * 4;
-	color.r = ((double) img->pixels[pos + 0] / 255);
-	color.g = ((double) img->pixels[pos + 1] / 255);
-	color.b = ((double) img->pixels[pos + 2] / 255);
+	color = get_colors(img, pos);
+	if (blur != 0)
+		mix_colors(&color, get_nearby_pixels(img, x, y), blur);
 	return (color);
 }

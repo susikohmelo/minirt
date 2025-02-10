@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/10 13:17:26 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 20:25:03 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static void	min_disc_intersect_dist(
 	double	length;
 
 	length = INFINITY;
-	disc_ray = (t_ray){ray->start, ray->dir, INFINITY, NULL, SHAPE_NO_SHAPE};
+	disc_ray = (t_ray){ray->start, ray->dir, INFINITY, NULL, SHAPE_NO_SHAPE, 0};
 
 	disc_top = (t_plane){.coords = top, .normal = cylinder->axis};
 	min_plane_intersect_dist(&disc_ray, &disc_top);
