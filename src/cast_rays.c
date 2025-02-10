@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/10 16:53:59 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 19:25:18 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,10 +145,11 @@ static t_vec3	phong(
 			.start = ray,
 			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
 			.length = INFINITY};
-		mrt_print(light_ray.start);
 		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-		//if (!isinf(light_ray.length))
 		if (light_ray.length < vec3_length(vec3_sub(m->lights[i].coords, ray))) // TODO square
+			// TODO in case of camera pointing to cylinders bottom, and light pointing on top,
+			// currently we skip the cylinder when checking if objects intersect lights. Will
+			// this incorrectly illuminate the cylinders bottom?
 			continue ; // TODO we probably still can do reflection? So don't skip I guess?
 
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
@@ -176,6 +177,13 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	double			n;
 	const double	normal_strength = 0.5;
 
+	if (m->cursor_pointing) switch (data.shape_type) {
+		case SHAPE_SPHERE: printf("Sphere: "); break;
+		case SHAPE_PLANE: printf("Plane: "); break;
+		case SHAPE_CYLINDER: printf("Cylinder: "); break;
+		default:;
+	}
+	mrt_print(data.length);
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	if (data.shape_type == SHAPE_SPHERE)
 		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
