@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/08 17:19:46 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 12:51:21 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,8 @@ static t_vec3	phong(
 	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
 	while (++i < m->lights_length)   // behind the objects (normal dot light_direction >= 0)
 	{
+		mrt_debug(m);
+
 		light_ray = (t_ray){
 			.start = ray,
 			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),

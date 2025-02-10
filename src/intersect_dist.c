@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 17:11:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/10 13:17:26 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,37 +87,55 @@ void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 	double	b;
 	double	c;
 	double	discriminant;
-	t_vec3	x;
-	double	dir_dot_axis;
-	double	x_dot_axis;
+	//t_vec3	x;
+	double	axis_dot_dir;
+	//double	x_dot_axis;
 	t_vec3	cap;
 	t_vec3	top;
 	t_vec3	bot;
 	double	top_sub_hitp_dot_axis;
 
-	x = vec3_sub(ray->start, cylinder->coords);
-	dir_dot_axis = vec3_dot(ray->dir, cylinder->axis);
-	x_dot_axis = vec3_dot(x, cylinder->axis);
-	a = 1. - dir_dot_axis * dir_dot_axis;
-	b = 2. * (vec3_dot(ray->dir, x) - dir_dot_axis * x_dot_axis);
+	/*
+	x = vec3_sub(ray->start, cylinder->coords);                    // ray to cylinder center direction
+	axis_dot_dir = vec3_dot(cylinder->axis, ray->dir);             // how aligned ray dir and axis are
+	x_dot_axis = vec3_dot(x, cylinder->axis);                      // how aligned ray to cylinder is with axis
+	a = 1. - axis_dot_dir * axis_dot_dir;
+	b = 2. * (vec3_dot(ray->dir, x) - axis_dot_dir * x_dot_axis);
 	c = vec3_dot(x, x) \
 		- x_dot_axis * x_dot_axis - \
 		cylinder->radius * cylinder->radius;
+	*/
+
+
+
+	cap = vec3_muls(cylinder->axis, cylinder->height / 2.);
+	top = vec3_add(cylinder->coords, cap);
+	bot = vec3_sub(cylinder->coords, cap);
+
+	axis_dot_dir = vec3_dot(cylinder->axis, ray->dir);
+	t_vec3 rl = vec3_sub(ray->start, bot);
+	double axis_dot_rl = vec3_dot(cylinder->axis, rl);
+
+	a = 1. - axis_dot_dir * axis_dot_dir;
+	b = 2. * (vec3_dot(ray->dir, rl) - vec3_dot(cylinder->axis, ray->dir) * axis_dot_rl);
+	c = vec3_dot(rl, rl) - axis_dot_rl * axis_dot_rl - cylinder->radius * cylinder->radius;
+
 	discriminant = b * b - 4 * a * c;
 
 	if (discriminant >= 0.)
 	{
-		cap = vec3_muls(cylinder->axis, cylinder->height / 2.);
-		top = vec3_add(cylinder->coords, cap);
-		bot = vec3_sub(cylinder->coords, cap);
+		double length1 = (-b - sqrt(discriminant)) / (2. * a);
+		double length2 = (-b + sqrt(discriminant)) / (2. * a);
 
-		length = (-b - sqrt(discriminant)) / (2. * a);
+		if (length1 < 0 && length2 < 0)
+			return ;
+		length = fmin(fmax(0, length1), fmax(0, length2));
 
 		top_sub_hitp_dot_axis = vec3_dot( \
 			vec3_sub(top, vec3_muls(ray->dir, length)), cylinder->axis);
 
 		if (!(0 <= top_sub_hitp_dot_axis
-			&& top_sub_hitp_dot_axis <= vec3_length(vec3_sub(top, bot)))) // TODO square this
+			&& top_sub_hitp_dot_axis <= cylinder->height))
 			min_disc_intersect_dist(ray, cylinder, top, bot);
 		else if (length <= ray->length && length >= 0.)
 		{
@@ -131,6 +149,8 @@ void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip)
 {
 	size_t	i;
+
+	mrt_debug(m);
 
 	i = (size_t) - 1;
 	while (++i < m->spheres_length)
