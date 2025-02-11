@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 17:13:53 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 18:30:44 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,10 @@ static void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 	discriminant = b * b - 4 * 1 * c;
 	if (discriminant >= 0)
 	{
-		length = (-b - sqrt(discriminant)) / (2. * 1); // TODO square this and calculate sqrt() lazily
-		if (length < ray->length && length >= 0) // TODO square these too
+		length = (-b - sqrt(discriminant)) / (2. * 1);
+		if (length < ray->length && length >= 0)
 		{
-			ray->length = length; // and the sqrt() would go here
+			ray->length = length;
 			ray->shape = (t_shape *)sphere;
 			ray->shape_type = SHAPE_SPHERE;
 		}
@@ -84,9 +84,6 @@ static void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 		double hit1 = b_term / (2. * a);
 		double hit2 = (2. * c) / b_term;
 
-		// double hit1 = (-b + sqrt(discriminant)) / (2. * a);
-		// double hit2 = (-b - sqrt(discriminant)) / (2. * a);
-
 		t_vec3 hitp1 = vec3_add(ray->start, vec3_muls(ray->dir, hit1));
 		t_vec3 hitp2 = vec3_add(ray->start, vec3_muls(ray->dir, hit2));
 		double hit_offset1 = vec3_dot(vec3_sub(top, hitp1), cylinder->axis);
@@ -135,8 +132,6 @@ static void	min_disc_intersect_dist(t_ray *ray, const t_disc *disc)
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip)
 {
 	size_t	i;
-
-	mrt_debug(m);
 
 	i = (size_t) - 1;
 	while (++i < m->spheres_length)

@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 17:56:42 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 18:21:24 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,15 +102,6 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	return (new_ray);
 }
 
-
-// TODO NOTE TODO NOTE TODO NOTE
-// I might not be in school on friday so I've commented most of the basic changes here
-// I've implemented textures (albedo), normal maps and roughness maps.
-// To use one, write the path of the texture file (.xpm42) in the parser options after the object color.
-// This will also load normal and roughness maps, if they exist. There are some textures already in ./textures
-// For example: sp 0,0,0 1 255,255,255 textures/granite.xpm42
-// If a texture file is given but can't be opened, a default missing texture is used instead.
-// TODO loading default texture seg faults, fix this!
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
@@ -120,7 +111,7 @@ static t_vec3	phong(
 	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
-	t_vec3			light;
+	t_vec3			light_dir;
 	t_vec3			reflection;
 	size_t			i;
 	t_ray			light_ray;
@@ -134,30 +125,33 @@ static t_vec3	phong(
 		shape_rough = get_rough_value(ray, false, ray_data.shape, ray_data.shape_type);
 
 	surface = (t_vec3){};
-	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
-	while (++i < m->lights_length)   // behind the objects (normal dot light_direction >= 0)
+	i = (size_t) - 1;
+	while (++i < m->lights_length)
 	{
-		diffuse_reflection = 1.;
-		light_ray = (t_ray){
-			.start = ray,
-			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
-			.length = INFINITY};
-		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-		if (light_ray.length < vec3_length(vec3_sub(m->lights[i].coords, ray))) // TODO square
-			diffuse_reflection = 0;
-
-		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
+		t_vec3 light = vec3_sub(m->lights[i].coords, ray);
+		light_dir = vec3_normalize(light);
+		diffuse_reflection = fmax(0, vec3_dot(light_dir, normal));
+		if (diffuse_reflection > 0)
+		{
+			light_ray = (t_ray){
+				.start = ray,
+				.dir = light_dir,
+				.length = INFINITY};
+			get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+			if (light_ray.length * light_ray.length <= vec3_dot(light, light))
+				diffuse_reflection = 0;
+		}
 		reflection = vec3_sub( \
-			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
-			light);
+			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
+			light_dir);
 		surface = vec3_add(surface,
 	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
 	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
 	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
 	// combine them somehow. Also, they will not be constants, but will be parsed for each
 	// shape later on.
-		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough * \
-		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->lights[i].color, (1 - shape_rough) * \
+		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough), \
+		vec3_muls(m->lights[i].color, (1 - shape_rough) * \
 		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
