@@ -6,12 +6,20 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 17:51:21 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 17:18:09 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 18:53:40 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
+
+double	wrap_coord_around(double coord)
+{
+	coord = coord - (int) coord;
+	if (coord < 0)
+		coord = 1 + coord;
+	return (coord);
+}
 
 static t_vec2	get_plane_uv(t_vec3 intersect, t_plane *plane)
 {
@@ -20,8 +28,8 @@ static t_vec2	get_plane_uv(t_vec3 intersect, t_plane *plane)
 
 	local_intersect = vec3_sub(intersect, plane->coords);
 	local_intersect = vec3_lookat(local_intersect, plane->normal);
-	uv.x = (local_intersect.x - (int) local_intersect.x) * 0.5 + 0.5;
-	uv.y = (local_intersect.y - (int) local_intersect.y) * 0.5 + 0.5;
+	uv.x = wrap_coord_around(local_intersect.x);
+	uv.y = wrap_coord_around(local_intersect.y);
 	return (uv);
 }
 
@@ -33,7 +41,7 @@ static t_vec2	get_cylinder_uv(t_vec3 intersect, t_cylinder *cylinder)
 	local_intersect = vec3_sub(intersect, cylinder->coords);
 	local_intersect = vec3_lookat(local_intersect, cylinder->axis);
 	uv.x = atan2(local_intersect.x, local_intersect.y) / TWO_PI + 0.5;
-	uv.y = (local_intersect.z - (int) local_intersect.z) * 0.5 + 0.5;
+	uv.y = wrap_coord_around(local_intersect.z);
 	return (uv);
 }
 
@@ -59,7 +67,7 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 	uv = (t_vec2) {0, 0};
 	if (shape_type == SHAPE_SPHERE)
 		uv = get_sphere_uv(intersect, shape->coords);
-	else if (shape_type == SHAPE_PLANE)
+	else if (shape_type == SHAPE_PLANE || shape_type == SHAPE_DISC)
 		uv = get_plane_uv(intersect, (t_plane *) shape);
 	else if (shape_type == SHAPE_CYLINDER)
 		uv = get_cylinder_uv(intersect, (t_cylinder *) shape);
