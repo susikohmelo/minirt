@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 09:37:26 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 11:21:55 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,9 @@ void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	cast_rays(t_minirt *minirt);
 
-void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
-void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
-void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
+// void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
+// void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
+// void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);

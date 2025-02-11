@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/10 19:25:18 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 13:00:20 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 	r->start = minirt->camera_coords;
 }
 
-static inline void	set_cam_rot_matrix(t_minirt *minirt)
+static void	set_cam_rot_matrix(t_minirt *minirt)
 {
 	t_vec3	forward;
 	t_vec3	right;
@@ -76,14 +76,13 @@ static inline void	set_cam_rot_matrix(t_minirt *minirt)
 	minirt->cam_rot_matrix[2][2] = forward.z;
 }
 
-static inline t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
+static t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
 {
-	t_vec3	rval;
-
-	rval.x = (2 * ((x + 0.5) / (double) minirt->mlx->width) - 1) * minirt->aspect_ratio;
-	rval.y = -(2 * ((y + 0.5) / (double) minirt->mlx->height) - 1);
-	rval.z = 0;
-	return (rval);
+	return ((t_vec3){
+		.x = (2 * ((x + 0.5) / (double) minirt->mlx->width) - 1) * minirt->aspect_ratio,
+		.y = -(2 * ((y + 0.5) / (double) minirt->mlx->height) - 1),
+		.z = 0,
+	});
 }
 
 /*
@@ -178,16 +177,18 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 	const double	normal_strength = 0.5;
 
 	if (m->cursor_pointing) switch (data.shape_type) {
+		case SHAPE_NO_SHAPE:;
 		case SHAPE_SPHERE: printf("Sphere: "); break;
 		case SHAPE_PLANE: printf("Plane: "); break;
 		case SHAPE_CYLINDER: printf("Cylinder: "); break;
-		default:;
+		case SHAPE_DISC: printf("Disc: "); break;
+		case SHAPES_LENGTH:;
 	}
 	mrt_print(data.length);
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	if (data.shape_type == SHAPE_SPHERE)
 		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
-	else if (data.shape_type == SHAPE_PLANE)
+	else if (data.shape_type == SHAPE_PLANE || data.shape_type == SHAPE_DISC)
 	{
 		normal = ((t_plane *)data.shape)->normal;
 		if (vec3_dot(normal, ray) >= 0.)
