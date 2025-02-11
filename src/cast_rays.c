@@ -6,14 +6,13 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 17:43:32 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 18:21:24 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ray.h"
 #include "minirt.h"
 #include <math.h>
-
 
 
 
@@ -107,13 +106,13 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
-	const double	specular_reflection = 10;
-	const double	diffuse_reflection = 5;
+	const double	specular_reflection = 1;
+	double	diffuse_reflection;
 	const double	alpha = 10.0;
 	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
-	t_vec3			light;
+	t_vec3			light_dir;
 	t_vec3			reflection;
 	size_t			i;
 	t_ray			light_ray;
@@ -129,32 +128,33 @@ static t_vec3	phong(
 		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect > 0)), shape_color);
 
 	surface = (t_vec3){};
-	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
-	while (++i < m->lights_length)   // behind the objects (normal dot light_direction >= 0)
+	i = (size_t) - 1;
+	while (++i < m->lights_length)
 	{
-		light_ray = (t_ray){
-			.start = ray,
-			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
-			.length = INFINITY};
-		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-		if (light_ray.length < vec3_length(vec3_sub(m->lights[i].coords, ray))) // TODO square
-			// TODO in case of camera pointing to cylinders bottom, and light pointing on top,
-			// currently we skip the cylinder when checking if objects intersect lights. Will
-			// this incorrectly illuminate the cylinders bottom?
-			continue ; // TODO we probably still can do reflection? So don't skip I guess?
-
-		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
+		t_vec3 light = vec3_sub(m->lights[i].coords, ray);
+		light_dir = vec3_normalize(light);
+		diffuse_reflection = fmax(0, vec3_dot(light_dir, normal));
+		if (diffuse_reflection > 0)
+		{
+			light_ray = (t_ray){
+				.start = ray,
+				.dir = light_dir,
+				.length = INFINITY};
+			get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+			if (light_ray.length * light_ray.length <= vec3_dot(light, light))
+				diffuse_reflection = 0;
+		}
 		reflection = vec3_sub( \
-			vec3_muls(normal, 2 * vec3_dot(light, normal)), \
-			light);
+			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
+			light_dir);
 		surface = vec3_add(surface,
 	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
 	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
 	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
 	// combine them somehow. Also, they will not be constants, but will be parsed for each
 	// shape later on.
-		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough * \
-		fmax(vec3_dot(light, normal), 0)), vec3_muls(m->lights[i].color, (1 - shape_rough) * \
+		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough), \
+		vec3_muls(m->lights[i].color, (1 - shape_rough) * \
 		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
@@ -194,8 +194,6 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray data)
 			ray, data.shape->coords), vec3_muls(
 				((t_cylinder *)data.shape)->axis, n)));
 	}
-	else // should there be some logic for lighting here? And is this dead code?
-		return (t_vec3){};
 	if (data.shape->normal_map)
 	{
 		map_normal = vec3_inverse_lookat(get_texture_color( \
@@ -286,11 +284,6 @@ void	cast_rays(t_minirt *m)
 			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
-
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * ray.length * ray.length);
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * ray.length * ray.length);
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * ray.length * ray.length);
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 		}
 	}
 	fflush(stdout); // TODO get rid of this!
