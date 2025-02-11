@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 12:06:40 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 14:56:38 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,6 +306,11 @@ static void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 
 static void	min_disc_intersect_dist(t_ray *ray, const t_disc *disc)
 {
+	#if 0
+	length = -vec3_dot(vec3_sub(ray->start, plane->coords), plane->normal) / \
+		vec3_dot(ray->dir, plane->normal);
+	if (length < ray->length && length >= 0)
+	#endif
 	double	length;
 	t_vec3	hitp;
 	t_vec3	hitp_sub_orig;

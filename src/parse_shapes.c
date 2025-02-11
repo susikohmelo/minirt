@@ -6,11 +6,11 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 10:03:23 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 14:55:40 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minirt.h"
+#include "minirt.h" // TODO empty all shapes, avoid UB!
 
 void	parse_sphere(t_minirt *m, const char *line)
 {
@@ -66,7 +66,7 @@ static void	push_cylinder(t_minirt *m, t_cylinder c)
 	t_disc	bot;
 
 	ft_memcpy(&top, &c, sizeof top);
-	ft_memcpy(&top, &c, sizeof bot);
+	ft_memcpy(&bot, &c, sizeof bot);
 	top.coords = vec3_add(c.coords, vec3_muls(c.axis, c.height / 2));
 	bot.coords = vec3_sub(c.coords, vec3_muls(c.axis, c.height / 2));
 	m->discs[m->discs_length++] = top;
