@@ -6,7 +6,7 @@
 #    By: lfiestas <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/30 07:17:39 by lfiestas          #+#    #+#              #
-#    Updated: 2025/01/04 12:56:23 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/02/10 17:46:15 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ MAKEFLAGS += -j6
 
 .PHONY: all clean fclean re bonus
 
-all: CFLAGS += -O3
+all: CFLAGS += -O3 -march=native
 all: $(NAME)
 
 debug: CFLAGS += -ggdb3 -gdwarf
