@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/10 19:56:55 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 17:00:23 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v,
 mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type);
 t_vec3		get_texture_color(t_vec3 r, int texture_type,
 				const t_shape *shape, int shape_type);
-double	get_rough_value(t_vec3 r, int	texture_type,
+double	get_rough_value(t_vec3 r,
 			const t_shape *shape, int shape_type);
 t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);

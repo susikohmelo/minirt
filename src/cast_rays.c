@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/10 20:53:39 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 17:35:37 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	pos_screenspace.z = scr_dist_from_cmr;
 	new_ray.dir = vec3_normalize(pos_screenspace);
 	new_ray.length = INFINITY;
-	new_ray.is_reflect = false;
+	new_ray.is_reflect = 0;
 	return (new_ray);
 }
 
@@ -122,10 +122,12 @@ static t_vec3	phong(
 	shape_color = ray_data.shape->color;
 	shape_rough = 0.5;
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (ray_data.shape->roughness_map)
-		shape_rough = get_rough_value(ray, ROUGHNESS_MAP, ray_data.shape, ray_data.shape_type);
+	if (ray_data.is_reflect > 0)
+		shape_rough = ray_data.is_reflect;
+	else if (ray_data.shape->roughness_map)
+		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
-		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * ray_data.is_reflect), shape_color);
+		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect > 0)), shape_color);
 
 	surface = (t_vec3){};
 	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
@@ -204,14 +206,14 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	normal = get_obj_normal(ray, data);
 	if (is_reflection)
 		return phong(m, ray, normal, data);
-	reflect = 0.1;
-	if (data.shape->roughness_map)
-	{
-		reflect = get_rough_value(ray, ROUGHNESS_MAP, data.shape, \
-				data.shape_type);
-		reflect = (1 - pow(reflect, 2)) * 0.2;
-	}
 	main_color = phong(m, ray, normal, data);
+	reflect = 0.5;
+	if (data.shape->roughness_map)
+		reflect = get_rough_value(ray, data.shape, data.shape_type);
+	data.is_reflect = 0.5;
+	if (data.shape->roughness_map)
+		data.is_reflect = reflect;
+	reflect = pow(1 - reflect / (0.5 + reflect) * 1.5, 2);
 	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
 	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
 	data.start = vec3_add(ray, vec3_muls(data.dir, 0.001));
@@ -222,8 +224,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	else
 	{
 		normal = get_obj_normal(ray, data);
-		//reflection = vec3_sub(vec3_muls(normal, 2 * vec3_dot(data.start, normal)), data.start);
-		data.is_reflect = 1;
 		main_color = vec3_add(vec3_muls(surface_color(m, data, true), 1 / sqrt(data.length + 1) * reflect), main_color);
 		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);

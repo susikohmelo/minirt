@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 17:51:21 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/10 20:02:05 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 17:18:09 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 	if (uv.x > 1. || uv.x < 0. || uv.y > 1. || uv.y < 0.)
 		return (vec3(0, 0, 0));
 	img = shape->texture;
-	vect = get_texture_from_uv(img, uv.x, uv.y, blur);
+	vect = get_texture_from_uv(img, uv.x, uv.y, blur / (0.25 + blur) * 1.25);
 	return(vect);
 }
 
@@ -104,8 +104,7 @@ t_vec3	get_texture_color(t_vec3 intersect, int	texture_type,
 	return(vect);
 }
 
-double	get_rough_value(t_vec3 intersect, int	texture_type,
-			const t_shape *shape, int shape_type)
+double	get_rough_value(t_vec3 intersect, const t_shape *shape, int shape_type)
 {
 	t_vec2		uv;
 	mlx_image_t	*img;
@@ -121,12 +120,7 @@ double	get_rough_value(t_vec3 intersect, int	texture_type,
 		uv = get_cylinder_uv(intersect, (t_cylinder *) shape);
 	if (uv.x > 1. || uv.x < 0. || uv.y > 1. || uv.y < 0.)
 		return (0.5);
-	if (texture_type == ALBEDO)
-		img = shape->texture;
-	else if (texture_type == NORMAL_MAP)
-		img = shape->normal_map;
-	else if (texture_type == ROUGHNESS_MAP)
-		img = shape->roughness_map;
+	img = shape->roughness_map;
 	vect = get_texture_from_uv(img, uv.x, uv.y, 0);
 	return((vect.r + vect.g + vect.b) / 3);
 }
