@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 17:10:48 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 09:37:26 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ typedef struct s_minirt
 	size_t			planes_length;
 	t_cylinder		*cylinders;
 	size_t			cylinders_length;
+	t_disc			*discs;
+	size_t			discs_length;
 }	t_minirt;
 
 void		mrt_init(t_minirt *m, const char *path);

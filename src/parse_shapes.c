@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 12:55:38 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 10:03:23 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	parse_plane(t_minirt *m, const char *line)
 	assert_range(m, vec3(plane.normal.y, -1, 1), "Plane normal y component");
 	line = parse_float(m, &plane.normal.z, line, ' ');
 	assert_range(m, vec3(plane.normal.z, -1, 1), "Plane normal z component");
-	plane.normal = expect_normalized(plane.normal, "camera orientation");
+	plane.normal = expect_normalized(plane.normal, "plane orientation");
 	line = parse_float(m, &plane.color.r, line, ',');
 	assert_range(m, vec3(plane.color.r, 0, 255), "Plane red component");
 	line = parse_float(m, &plane.color.g, line, ',');
@@ -58,6 +58,20 @@ void	parse_plane(t_minirt *m, const char *line)
 	plane.color = vec3_divs(plane.color, 255);
 	line = parse_texture(m, line, (t_shape *) &plane);
 	m->planes[m->planes_length++] = plane;
+}
+
+static void	push_cylinder(t_minirt *m, t_cylinder c)
+{
+	t_disc	top;
+	t_disc	bot;
+
+	ft_memcpy(&top, &c, sizeof top);
+	ft_memcpy(&top, &c, sizeof bot);
+	top.coords = vec3_add(c.coords, vec3_muls(c.axis, c.height / 2));
+	bot.coords = vec3_sub(c.coords, vec3_muls(c.axis, c.height / 2));
+	m->discs[m->discs_length++] = top;
+	m->discs[m->discs_length++] = bot;
+	m->cylinders[m->cylinders_length++] = c;
 }
 
 void	parse_cylinder(t_minirt *m, const char *line)
@@ -86,5 +100,5 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	assert_range(m, vec3(cylinder.color.b, 0, 255), "Cylinder blue component");
 	cylinder.color = vec3_divs(cylinder.color, 255);
 	line = parse_texture(m, line, (t_shape *) &cylinder);
-	m->cylinders[m->cylinders_length++] = cylinder;
+	push_cylinder(m, cylinder);
 }

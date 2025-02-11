@@ -6,7 +6,7 @@
 /*   By: lfiestas <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 07:42:38 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 12:36:44 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 09:50:15 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 void	*ft_xmalloc(size_t size);
 void	*ft_arena_alloc(t_arena *arena, size_t size);
+void	*ft_arena_calloc(t_arena *arena, size_t nmemb, size_t size);
 void	ft_arena_rewind(t_arena *arena, void *position);
 void	ft_arena_clear(t_arena *arena);
 
