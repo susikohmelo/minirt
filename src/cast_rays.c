@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 18:21:24 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 20:01:32 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	mrt_print_double(t_minirt *m, const char *name, double x)
 	printf("%s = %g ; ", name, x);
 }
 
-static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
+static void	ray_to_cam_rot_pos(double m[3][3], t_ray *r)
 {
 	t_vec3	tmp;
 
@@ -52,7 +52,6 @@ static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 	r->dir.x = tmp.x * m[0][0] + tmp.y * m[1][0] + tmp.z * m[2][0];
 	r->dir.y = tmp.x * m[0][1] + tmp.y * m[1][1] + tmp.z * m[2][1];
 	r->dir.z = tmp.x * m[0][2] + tmp.y * m[1][2] + tmp.z * m[2][2];
-	r->start = minirt->camera_coords;
 }
 
 static void	set_cam_rot_matrix(t_minirt *minirt)
@@ -62,7 +61,10 @@ static void	set_cam_rot_matrix(t_minirt *minirt)
 	t_vec3	up;
 
 	forward = minirt->camera_orientation;
-	right = vec3_cross(vec3(0, 1, 0 ), forward);
+	if (forward.y == 1 || forward.y == -1)
+		right = vec3(1, 0, 0);
+	else
+		right = vec3_normalize(vec3_cross(vec3(0, 1, 0 ), forward));
 	up = vec3_cross(forward, right);
 	minirt->cam_rot_matrix[0][0] = right.x;
 	minirt->cam_rot_matrix[0][1] = right.y;
@@ -98,6 +100,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	pos_screenspace = pix_to_scrspace(minirt, (double) x, (double) y);
 	pos_screenspace.z = scr_dist_from_cmr;
 	new_ray.dir = vec3_normalize(pos_screenspace);
+	new_ray.start = minirt->camera_coords;
 	new_ray.length = INFINITY;
 	new_ray.is_reflect = 0;
 	return (new_ray);
@@ -264,7 +267,9 @@ void	cast_rays(t_minirt *m)
 			if (row != 0 && column != 0)
 				m->cursor_pointing = m->mouse_x == column && m->mouse_y == row;
 			ray = create_ray(m, column, row);
-			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
+			//printf("x%d y%d %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
+			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
+			//printf("x%d y%d %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
 
 			get_shape_intersect_dist(m, &ray, NULL);
 			if (isinf(ray.length))

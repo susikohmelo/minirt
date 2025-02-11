@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:32:49 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/09 04:12:23 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 20:02:12 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ t_vec3	vec3_inverse_lookat(t_vec3 v1, t_vec3 v2)
 	t_vec3	t;
 
 	f = v2;
-	if (f.x == 0 && f.y == 1 && f.z == 0)
+	if (f.y == 1 || f.y == -1)
 		r = vec3(1, 0, 0);
 	else
-		r = vec3_cross(vec3(0, 1, 0), f);
+		r = vec3_normalize(vec3_cross(vec3(0, 1, 0), f));
 	u = vec3_cross(f, r);
 	t = v1;
 	v1.x = t.x * r.x + t.y * u.x + t.z * f.x;
@@ -91,10 +91,10 @@ t_vec3	vec3_lookat(t_vec3 v1, t_vec3 v2)
 	t_vec3	t;
 
 	f = v2;
-	if (f.x == 0 && f.y == 1 && f.z == 0)
+	if (f.y == 1 || f.y == -1)
 		r = vec3(1, 0, 0);
 	else
-		r = vec3_cross(vec3(0, 1, 0), f);
+		r = vec3_normalize(vec3_cross(vec3(0, 1, 0), f));
 	u = vec3_cross(f, r);
 	t = v1;
 	v1.x = t.x * r.x + t.y * r.y + t.z * r.z;
