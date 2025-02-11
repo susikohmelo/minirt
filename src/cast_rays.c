@@ -6,14 +6,13 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 14:41:08 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 17:56:42 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ray.h"
 #include "minirt.h"
 #include <math.h>
-
 
 
 
@@ -115,8 +114,8 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
-	const double	specular_reflection = 10;
-	const double	diffuse_reflection = 5;
+	const double	specular_reflection = 1;
+	double	diffuse_reflection;
 	const double	alpha = 10.0;
 	double			shape_rough;
 	t_vec3			shape_color;
@@ -138,18 +137,14 @@ static t_vec3	phong(
 	i = (size_t) - 1; // TODO when casting to light sources, skip all the ones
 	while (++i < m->lights_length)   // behind the objects (normal dot light_direction >= 0)
 	{
-		mrt_debug(m);
-
+		diffuse_reflection = 1.;
 		light_ray = (t_ray){
 			.start = ray,
 			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
 			.length = INFINITY};
 		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
 		if (light_ray.length < vec3_length(vec3_sub(m->lights[i].coords, ray))) // TODO square
-			// TODO in case of camera pointing to cylinders bottom, and light pointing on top,
-			// currently we skip the cylinder when checking if objects intersect lights. Will
-			// this incorrectly illuminate the cylinders bottom?
-			continue ; // TODO we probably still can do reflection? So don't skip I guess?
+			diffuse_reflection = 0;
 
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
 		reflection = vec3_sub( \
@@ -203,8 +198,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data)
 			ray, data.shape->coords), vec3_muls(
 				((t_cylinder *)data.shape)->axis, n)));
 	}
-	else // should there be some logic for lighting here? And is this dead code?
-		return (t_vec3){};
 	if (data.shape->normal_map)
 	{
 		map_normal = vec3_inverse_lookat(get_texture_color( \
@@ -256,11 +249,6 @@ void	cast_rays(t_minirt *m)
 			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
 			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
-
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 / (1. + .2 * ray.length * ray.length);
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 / (1. + .2 * ray.length * ray.length);
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 / (1. + .2 * ray.length * ray.length);
-			// m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
 		}
 	}
 	fflush(stdout); // TODO get rid of this!

@@ -6,17 +6,18 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 14:55:40 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 15:35:31 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minirt.h" // TODO empty all shapes, avoid UB!
+#include "minirt.h"
 
 void	parse_sphere(t_minirt *m, const char *line)
 {
 	t_sphere	sphere;
 	double		diameter;
 
+	sphere = (t_sphere){};
 	line = trim_left(line);
 	line = parse_float(m, &sphere.coords.x, line, ',');
 	line = parse_float(m, &sphere.coords.y, line, ',');
@@ -38,6 +39,7 @@ void	parse_plane(t_minirt *m, const char *line)
 {
 	t_plane	plane;
 
+	plane = (t_plane){};
 	line = trim_left(line);
 	line = parse_float(m, &plane.coords.x, line, ',');
 	line = parse_float(m, &plane.coords.y, line, ',');
@@ -65,6 +67,7 @@ static void	push_cylinder(t_minirt *m, t_cylinder c)
 	t_disc	top;
 	t_disc	bot;
 
+	c.radius /= 2;
 	ft_memcpy(&top, &c, sizeof top);
 	ft_memcpy(&bot, &c, sizeof bot);
 	top.coords = vec3_add(c.coords, vec3_muls(c.axis, c.height / 2));
@@ -78,6 +81,7 @@ void	parse_cylinder(t_minirt *m, const char *line)
 {
 	t_cylinder	cylinder;
 
+	cylinder = (t_cylinder){};
 	line = trim_left(line);
 	line = parse_float(m, &cylinder.coords.x, line, ',');
 	line = parse_float(m, &cylinder.coords.y, line, ',');
@@ -90,7 +94,6 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	assert_range(m, vec3(cylinder.axis.z, -1, 1), "Cylinder axis z component");
 	cylinder.axis = expect_normalized(cylinder.axis, "cylinder axis");
 	line = parse_float(m, &cylinder.radius, line, ' ');
-	cylinder.radius /= 2.;
 	line = parse_float(m, &cylinder.height, line, ' ');
 	line = parse_float(m, &cylinder.color.r, line, ',');
 	assert_range(m, vec3(cylinder.color.r, 0, 255), "Cylinder red component");
