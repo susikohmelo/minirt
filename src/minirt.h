@@ -20,8 +20,8 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-# define INIT_WIDTH 1200
-# define INIT_HEIGHT 1024
+# define INIT_WIDTH 1600
+# define INIT_HEIGHT 1200
 
 typedef struct s_light
 {
@@ -79,12 +79,15 @@ double		str_to_f(const char *str);
 char		*trim_left(const char *str);
 
 void		free_textures(t_minirt *m);
-t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v);
+t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v,
+				double blur);
 mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type);
 t_vec3		get_texture_color(t_vec3 r, int texture_type,
 				const t_shape *shape, int shape_type);
-double	get_rough_value(t_vec3 r, int	texture_type,
+double	get_rough_value(t_vec3 r,
 			const t_shape *shape, int shape_type);
+t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
+			int shape_type, double blur);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

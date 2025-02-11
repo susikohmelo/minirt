@@ -6,16 +6,13 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 17:51:21 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/09 04:11:53 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 17:18:09 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
 
-/*
-	Planes can be infinite, so the UV will loop around every time it is > 1
-*/
 static t_vec2	get_plane_uv(t_vec3 intersect, t_plane *plane)
 {
 	t_vec3	local_intersect;
@@ -51,6 +48,29 @@ static t_vec2	get_sphere_uv(t_vec3 intersect, t_vec3 obj_pos)
 	return (uv);
 }
 
+t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
+			int shape_type, double blur)
+{
+	t_vec2		uv;
+	mlx_image_t	*img;
+	t_vec3		vect;
+
+	img = NULL;
+	uv = (t_vec2) {0, 0};
+	if (shape_type == SHAPE_SPHERE)
+		uv = get_sphere_uv(intersect, shape->coords);
+	else if (shape_type == SHAPE_PLANE)
+		uv = get_plane_uv(intersect, (t_plane *) shape);
+	else if (shape_type == SHAPE_CYLINDER)
+		uv = get_cylinder_uv(intersect, (t_cylinder *) shape);
+	if (uv.x > 1. || uv.x < 0. || uv.y > 1. || uv.y < 0.)
+		return (vec3(0, 0, 0));
+	img = shape->texture;
+	vect = get_texture_from_uv(img, uv.x, uv.y, blur / (0.25 + blur) * 1.25);
+	return(vect);
+}
+
+
 t_vec3	get_texture_color(t_vec3 intersect, int	texture_type,
 			const t_shape *shape, int shape_type)
 {
@@ -74,7 +94,7 @@ t_vec3	get_texture_color(t_vec3 intersect, int	texture_type,
 		img = shape->normal_map;
 	else if (texture_type == ROUGHNESS_MAP)
 		img = shape->roughness_map;
-	vect = get_texture_from_uv(img, uv.x, uv.y);
+	vect = get_texture_from_uv(img, uv.x, uv.y, 0);
 	if (texture_type == NORMAL_MAP)
 	{
 		vect.x = -vect.x * 2 + 1;
@@ -84,8 +104,7 @@ t_vec3	get_texture_color(t_vec3 intersect, int	texture_type,
 	return(vect);
 }
 
-double	get_rough_value(t_vec3 intersect, int	texture_type,
-			const t_shape *shape, int shape_type)
+double	get_rough_value(t_vec3 intersect, const t_shape *shape, int shape_type)
 {
 	t_vec2		uv;
 	mlx_image_t	*img;
@@ -101,12 +120,7 @@ double	get_rough_value(t_vec3 intersect, int	texture_type,
 		uv = get_cylinder_uv(intersect, (t_cylinder *) shape);
 	if (uv.x > 1. || uv.x < 0. || uv.y > 1. || uv.y < 0.)
 		return (0.5);
-	if (texture_type == ALBEDO)
-		img = shape->texture;
-	else if (texture_type == NORMAL_MAP)
-		img = shape->normal_map;
-	else if (texture_type == ROUGHNESS_MAP)
-		img = shape->roughness_map;
-	vect = get_texture_from_uv(img, uv.x, uv.y);
+	img = shape->roughness_map;
+	vect = get_texture_from_uv(img, uv.x, uv.y, 0);
 	return((vect.r + vect.g + vect.b) / 3);
 }
