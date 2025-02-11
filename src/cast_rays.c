@@ -56,7 +56,7 @@ static void	ray_to_cam_rot_pos(t_minirt *minirt, double m[3][3], t_ray *r)
 	r->start = minirt->camera_coords;
 }
 
-static inline void	set_cam_rot_matrix(t_minirt *minirt)
+static void	set_cam_rot_matrix(t_minirt *minirt)
 {
 	t_vec3	forward;
 	t_vec3	right;
@@ -76,14 +76,13 @@ static inline void	set_cam_rot_matrix(t_minirt *minirt)
 	minirt->cam_rot_matrix[2][2] = forward.z;
 }
 
-static inline t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
+static t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
 {
-	t_vec3	rval;
-
-	rval.x = (2 * ((x + 0.5) / (double) minirt->mlx->width) - 1) * minirt->aspect_ratio;
-	rval.y = -(2 * ((y + 0.5) / (double) minirt->mlx->height) - 1);
-	rval.z = 0;
-	return (rval);
+	return ((t_vec3){
+		.x = (2 * ((x + 0.5) / (double) minirt->mlx->width) - 1) * minirt->aspect_ratio,
+		.y = -(2 * ((y + 0.5) / (double) minirt->mlx->height) - 1),
+		.z = 0,
+	});
 }
 
 /*
@@ -108,8 +107,8 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
-	const double	specular_reflection = 4;
-	const double	diffuse_reflection = 6;
+	const double	specular_reflection = 10;
+	const double	diffuse_reflection = 5;
 	const double	alpha = 10.0;
 	double			shape_rough;
 	t_vec3			shape_color;
@@ -138,8 +137,11 @@ static t_vec3	phong(
 			.dir = vec3_normalize(vec3_sub(m->lights[i].coords, ray)),
 			.length = INFINITY};
 		get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-		if (!isinf(light_ray.length))
-			continue ;
+		if (light_ray.length < vec3_length(vec3_sub(m->lights[i].coords, ray))) // TODO square
+			// TODO in case of camera pointing to cylinders bottom, and light pointing on top,
+			// currently we skip the cylinder when checking if objects intersect lights. Will
+			// this incorrectly illuminate the cylinders bottom?
+			continue ; // TODO we probably still can do reflection? So don't skip I guess?
 
 		light = vec3_normalize(vec3_sub(m->lights[i].coords, ray));
 		reflection = vec3_sub( \
@@ -165,9 +167,19 @@ t_vec3	get_obj_normal(t_vec3 ray, t_ray data)
 	t_vec3			normal;
 	double			n;
 
+	if (m->cursor_pointing) switch (data.shape_type) {
+		case SHAPE_NO_SHAPE:;
+		case SHAPE_SPHERE: printf("Sphere: "); break;
+		case SHAPE_PLANE: printf("Plane: "); break;
+		case SHAPE_CYLINDER: printf("Cylinder: "); break;
+		case SHAPE_DISC: printf("Disc: "); break;
+		case SHAPES_LENGTH:;
+	}
+	mrt_print(data.length);
+	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	if (data.shape_type == SHAPE_SPHERE)
 		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
-	else if (data.shape_type == SHAPE_PLANE)
+	else if (data.shape_type == SHAPE_PLANE || data.shape_type == SHAPE_DISC)
 	{
 		normal = ((t_plane *)data.shape)->normal;
 		if (vec3_dot(normal, ray) >= 0.)
@@ -252,7 +264,7 @@ void	cast_rays(t_minirt *m)
 		while (++column < m->mlx->width)
 		{
 			if (row != 0 && column != 0)
-				m->cursor_pointing = m->mouse_x == row && m->mouse_y == column;
+				m->cursor_pointing = m->mouse_x == column && m->mouse_y == row;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m, m->cam_rot_matrix, &ray);
 

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 09:58:57 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/03 12:37:44 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 09:49:47 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,11 @@ void	*ft_arena_alloc(t_arena *arena, size_t size)
 	}
 	(*arena)->pos += aligned_size;
 	return ((*arena)->pos - aligned_size);
+}
+
+void	*ft_arena_calloc(t_arena *arena, size_t nmemb, size_t size)
+{
+	return (ft_memset(ft_arena_alloc(arena, nmemb * size), 0, nmemb * size));
 }
 
 void	ft_arena_rewind(t_arena *arena, void *pos)

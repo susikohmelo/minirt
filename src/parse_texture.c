@@ -43,6 +43,7 @@ char	*parse_texture(t_minirt *m, const char *line, t_shape *shape)
 	char		filename[210];
 	bool		name_is_empty;
 
+	line = trim_left(line);
 	shape->texture = NULL;
 	shape->normal_map = NULL;
 	shape->roughness_map = NULL;

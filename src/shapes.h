@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 12:50:40 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/11 09:41:57 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ typedef enum e_shape_type
 	SHAPE_SPHERE,
 	SHAPE_PLANE,
 	SHAPE_CYLINDER,
+	SHAPE_DISC,
+	SHAPES_LENGTH,
 }	t_shape_type;
 
 typedef enum e_texture_type
@@ -71,5 +73,16 @@ typedef struct s_cylinder
 	double		radius;
 	double		height;
 }	t_cylinder;
+
+typedef struct s_disc
+{
+	t_vec3		coords;
+	t_vec3		color;
+	mlx_image_t *texture;
+	mlx_image_t *normal_map;
+	mlx_image_t *roughness_map;
+	t_vec3		normal;
+	double		radius;
+}	t_disc;
 
 #endif
