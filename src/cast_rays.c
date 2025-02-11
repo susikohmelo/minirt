@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 17:38:06 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/11 17:43:32 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ static t_vec3	phong(
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
 
-t_vec3	get_obj_normal(t_vec3 ray, t_ray data)
+t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray data)
 {
 	const double	normal_strength = 0.5;
 	t_vec3			map_normal;
@@ -215,7 +215,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	double			reflect;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-	normal = get_obj_normal(ray, data);
+	normal = get_obj_normal(m, ray, data);
 	if (is_reflection)
 		return phong(m, ray, normal, data);
 	main_color = phong(m, ray, normal, data);
@@ -235,7 +235,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 		return (main_color);
 	else
 	{
-		normal = get_obj_normal(ray, data);
+		normal = get_obj_normal(m, ray, data);
 		main_color = vec3_add(vec3_muls(surface_color(m, data, true), 1 / sqrt(data.length + 1) * reflect), main_color);
 		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);
