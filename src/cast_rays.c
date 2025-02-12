@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 20:11:20 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 20:40:26 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,7 +235,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	else
 	{
 		normal = get_obj_normal(m, ray, data);
-		main_color = vec3_add(vec3_muls(surface_color(m, data, true), 1 / sqrt(data.length + 1) * reflect), main_color);
+		main_color = vec3_add(vec3_muls(surface_color(m, data, true), reflect), main_color);
 		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);
 		main_color.g = fmin(fmax(main_color.g, 0), 1);
