@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 20:44:16 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/13 01:04:36 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,10 +224,10 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	if (data.shape->roughness_map)
 		reflect = get_rough_value(ray, data.shape, data.shape_type);
 	data.is_reflect = reflect;
-	reflect = pow(1 - reflect / (0.65 + reflect) * 1.65, 2);
+	reflect = reflect/*/ (0.2 + reflect) * 1.2*/;
 	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
 	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
-	data.start = vec3_add(ray, vec3_muls(data.dir, 0.001));
+	data.start = vec3_add(ray, vec3_muls(normal, 0.001));
 	data.length = INFINITY;
 	get_shape_intersect_dist(m, &data, NULL);
 	if (isinf(data.length) || data.length < 0.0001)
@@ -235,7 +235,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	else
 	{
 		normal = get_obj_normal(m, ray, data);
-		main_color = vec3_add(vec3_muls(surface_color(m, data, true), reflect), main_color);
+		main_color = vec3_add(vec3_muls(surface_color(m, data, true), (1 - reflect) / (1 + reflect * data.length * 16)), main_color);
 		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);
 		main_color.g = fmin(fmax(main_color.g, 0), 1);
