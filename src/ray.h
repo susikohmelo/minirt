@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:14:26 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 17:08:48 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 21:27:20 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,4 +28,4 @@ typedef struct s_ray
 	double			is_reflect;
 }	t_ray;
 
-# endif
+#endif

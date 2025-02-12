@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:04:50 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 12:38:25 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 21:26:36 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ double	str_to_f(const char *str)
 	return (sign * (integer + (double)fraction / fraction_power));
 }
 
-char		*f_to_str(char buf[static 32], double f)
+char	*f_to_str(char buf[static 32], double f)
 {
 	int		i;
 
