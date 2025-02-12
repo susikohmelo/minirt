@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 14:23:42 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 21:13:19 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,9 @@ char		*f_to_str(char buf[static 32], double f);
 char		*trim_left(const char *str);
 
 void		free_textures(t_minirt *m);
+t_vec2		get_plane_uv(t_vec3 intersect, t_plane *plane, int shape);
+t_vec2		get_cylinder_uv(t_vec3 intersect, t_cylinder *cylinder);
+t_vec2		get_sphere_uv(t_vec3 intersect, t_sphere *sphere);
 t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v,
 				double blur);
 mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type);

@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 12:30:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 21:36:05 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type)
 	return (img);
 }
 
-static inline t_vec3	get_colors(mlx_image_t *img, int pos)
+static inline t_vec3	get_clr(mlx_image_t *img, int pos)
 {
 	t_vec3	color;
 
@@ -51,13 +51,13 @@ static inline t_vec3	get_colors(mlx_image_t *img, int pos)
 
 static t_vec3	get_nearby_pixels(mlx_image_t *img, int targ_x, int targ_y)
 {
-	t_vec3	color;
+	t_vec3	clr;
 	int		row;
 	int		column;
 	int		counter;
 	int		xy[2];
 
-	color = vec3(0,0,0);
+	clr = (t_vec3){};
 	counter = 0;
 	row = -4;
 	while (++row <= 3)
@@ -67,16 +67,14 @@ static t_vec3	get_nearby_pixels(mlx_image_t *img, int targ_x, int targ_y)
 		{
 			xy[0] = targ_x + column * 6;
 			xy[1] = targ_y + row * 6;
-			if (xy[0] < 0 || xy[1] < 0
-					|| xy[0] > (int) img->width - 1
-					|| xy[1] > (int) img->height - 1)
+			if (xy[0] < 0 || xy[1] < 0 || xy[0] > (int) img->width - 1
+				|| xy[1] > (int) img->height - 1)
 				continue ;
 			++counter;
-			color = vec3_add(color, get_colors( \
-						img, (xy[1] * img->width + xy[0]) * 4));
+			clr = vec3_add(clr, get_clr(img, (xy[1] * img->width + xy[0]) * 4));
 		}
 	}
-	return (vec3_divs(color, (double) counter));
+	return (vec3_divs(clr, (double) counter));
 }
 
 static inline void	mix_colors(t_vec3 *c1, t_vec3 c2, double amount)
@@ -97,7 +95,7 @@ t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v, double blur)
 	x = img->width - round(u * ((double) img->width - 2));
 	y = round(v * ((double) img->height - 2));
 	pos = (y * img->width + x) * 4;
-	color = get_colors(img, pos);
+	color = get_clr(img, pos);
 	if (blur != 0)
 		mix_colors(&color, get_nearby_pixels(img, x, y), blur);
 	return (color);
