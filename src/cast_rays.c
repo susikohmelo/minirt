@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 15:02:05 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 15:16:37 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,11 @@ static void	set_cam_rot_matrix(t_minirt *minirt)
 	minirt->cam_rot_matrix[2][2] = forward.z;
 }
 
-static t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
+static t_vec3	pix_to_scrspace(t_minirt *m, double x, double y)
 {
 	return ((t_vec3){
-		.x = (2 * ((x + 0.5) / (double) minirt->mlx->width) - 1) * minirt->aspect_ratio,
-		.y = -(2 * ((y + 0.5) / (double) minirt->mlx->height) - 1),
+		.x = (2 * ((x + 0.5) / (double) m->img->width) - 1) * m->aspect_ratio,
+		.y = -(2 * ((y + 0.5) / (double) m->img->height) - 1),
 		.z = 0,
 	});
 }
