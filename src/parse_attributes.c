@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:03:30 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/08 12:57:15 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 11:48:06 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ bool	parse_camera(t_minirt *m, const char *line)
 	line = parse_float(m, &m->camera_orientation.z, line, ' ');
 	assert_range(m, vec3(m->camera_orientation.z, -1, 1), \
 		"Camera orientation z component");
-	m->camera_orientation = expect_normalized(m->camera_orientation, \
+	m->camera_orientation = assert_normalized(m, m->camera_orientation, \
 		"camera orientation");
 	line = parse_float(m, &m->camera_field_of_view, line, '\0');
 	assert_range(m, vec3(m->camera_field_of_view, 0, 180),

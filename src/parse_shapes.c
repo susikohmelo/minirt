@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:00:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 15:35:31 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 10:31:37 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	parse_plane(t_minirt *m, const char *line)
 	assert_range(m, vec3(plane.normal.y, -1, 1), "Plane normal y component");
 	line = parse_float(m, &plane.normal.z, line, ' ');
 	assert_range(m, vec3(plane.normal.z, -1, 1), "Plane normal z component");
-	plane.normal = expect_normalized(plane.normal, "plane orientation");
+	plane.normal = assert_normalized(m, plane.normal, "plane orientation");
 	line = parse_float(m, &plane.color.r, line, ',');
 	assert_range(m, vec3(plane.color.r, 0, 255), "Plane red component");
 	line = parse_float(m, &plane.color.g, line, ',');
@@ -92,7 +92,7 @@ void	parse_cylinder(t_minirt *m, const char *line)
 	assert_range(m, vec3(cylinder.axis.y, -1, 1), "Cylinder axis y component");
 	line = parse_float(m, &cylinder.axis.z, line, ' ');
 	assert_range(m, vec3(cylinder.axis.z, -1, 1), "Cylinder axis z component");
-	cylinder.axis = expect_normalized(cylinder.axis, "cylinder axis");
+	cylinder.axis = assert_normalized(m, cylinder.axis, "cylinder axis");
 	line = parse_float(m, &cylinder.radius, line, ' ');
 	line = parse_float(m, &cylinder.height, line, ' ');
 	line = parse_float(m, &cylinder.color.r, line, ',');

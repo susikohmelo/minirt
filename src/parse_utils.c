@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser_utils.c                                     :+:      :+:    :+:   */
+/*   parse_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:04:50 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/07 11:18:45 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 12:38:25 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,22 @@ double	str_to_f(const char *str)
 	return (sign * (integer + (double)fraction / fraction_power));
 }
 
+char		*f_to_str(char buf[static 32], double f)
+{
+	int		i;
+
+	i = f;
+	ft_i_to_str(buf, i);
+	if (fabs(f - i) < .000001)
+		return (buf);
+	ft_i_to_str(ft_memcpy(buf + ft_strlen(buf), ".", 2) + 1, (f - i) * 1000000);
+	while (buf[ft_strlen(buf) - 1] != '.' && buf[ft_strlen(buf) - 1] == '0')
+		buf[ft_strlen(buf) - 1] = '\0';
+	if (buf[ft_strlen(buf) - 1] == '.')
+		buf[ft_strlen(buf) - 1] = '\0';
+	return (buf);
+}
+
 char	*trim_left(const char *str)
 {
 	while (ft_isspace(*str))
@@ -48,10 +64,10 @@ char	*trim_left(const char *str)
 	return ((char *)str);
 }
 
-bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name)
+bool	expect_range(t_minirt *m, t_vec3 inputs, const char *name)
 {
 	char	msg[256];
-	char	buf[16];
+	char	buf[32];
 	double	min;
 	double	max;
 
@@ -59,20 +75,20 @@ bool	assert_range(t_minirt *m, t_vec3 inputs, const char *name)
 	max = inputs.z;
 	ft_strlcpy(msg, name, sizeof msg);
 	ft_strlcat(msg, " not in range [", sizeof msg);
-	ft_strlcat(msg, ft_i_to_str(buf, min), sizeof msg);
+	ft_strlcat(msg, f_to_str(buf, min), sizeof msg);
 	ft_strlcat(msg, ",", sizeof msg);
-	ft_strlcat(msg, ft_i_to_str(buf, max), sizeof msg);
+	ft_strlcat(msg, f_to_str(buf, max), sizeof msg);
 	ft_strlcat(msg, "]", sizeof msg);
-	mrt_assert(m, min <= inputs.x && inputs.x <= max, msg);
+	mrt_expect(m, min <= inputs.x && inputs.x <= max, msg);
 	return (true);
 }
 
-t_vec3	expect_normalized(t_vec3 v, const char *name)
+t_vec3	expect_normalized(t_minirt *m, t_vec3 v, const char *name)
 {
-	if (fabs(vec3_length(v) - 1.) >= .001)
-	{
-		ft_putstr_fd("Warning\nUnnormalized ", STDERR_FILENO);
-		ft_putendl_fd(name, STDERR_FILENO);
-	}
+	char	msg[256];
+
+	ft_strlcpy(msg, "Unnormalized ", sizeof msg);
+	ft_strlcat(msg, name, sizeof msg);
+	mrt_expect(m, fabs(vec3_length(v) - 1.) < .001, msg);
 	return (vec3_normalize(v));
 }
