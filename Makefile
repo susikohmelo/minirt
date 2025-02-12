@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/08 15:20:16 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/02/12 12:39:31 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,6 +43,9 @@ all: release
 release: CFLAGS += -O3 -march=native -flto
 release: $(NAME)
 
+dev: CFLAGS += -O3 -march=native -flto -DMRT_FATAL_EXPECT=0
+dev: $(NAME)
+
 libft/libft.a:
 	make -C libft
 
@@ -72,10 +75,14 @@ re:
 	make fclean
 	make all
 
-debug: CFLAGS += -ggdb3 -gdwarf
+debug: CFLAGS += -ggdb3 -gdwarf -DMRT_FATAL_EXPECT=0
 debug: CFLAGS += -fsanitize=address -fsanitize=undefined -fsanitize=leak
 debug: $(NAME)
 
 rebug:
 	make clean
 	make debug
+
+rev:
+	make clean
+	make dev

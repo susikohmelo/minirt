@@ -6,47 +6,34 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:34:53 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 16:25:58 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 16:48:00 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
+#include <stdlib.h>
+#include <math.h>
 
-static inline char	*concat_normal(char *filename, int pos)
+static inline void	null_and_trim(t_shape *shape, const char **line)
 {
-	filename[pos + 0] = '.';
-	filename[pos + 1] = 'n';
-	filename[pos + 2] = 'o';
-	filename[pos + 3] = 'r';
-	filename[pos + 4] = 'm';
-	filename[pos + 5] = 'a';
-	filename[pos + 6] = 'l';
-	filename[pos + 7] = '\0';
-	return (filename);
-}
-
-static inline char	*concat_roughness(char *filename, int pos)
-{
-	filename[pos + 0] = '.';
-	filename[pos + 1] = 'r';
-	filename[pos + 2] = 'o';
-	filename[pos + 3] = 'u';
-	filename[pos + 4] = 'g';
-	filename[pos + 5] = 'h';
-	filename[pos + 6] = '\0';
-	return (filename);
+	shape->texture = NULL;
+	shape->normal_map = NULL;
+	shape->roughness_map = NULL;
+	shape->default_rough = 0.5;
+	*line = trim_left(*line);
 }
 
 char	*parse_texture(t_minirt *m, const char *line, t_shape *shape)
 {
 	int			i;
-	char		filename[210];
+	char		*filename;
 	bool		name_is_empty;
 
-	line = trim_left(line);
-	shape->texture = NULL;
-	shape->normal_map = NULL;
-	shape->roughness_map = NULL;
+	filename = ft_arena_alloc(&m->arena, 210);
+	null_and_trim(shape, &line);
+	if (ft_isdigit(*line) || *line == '+' || *line == '-' || *line == '.')
+		line = parse_float(m, &shape->default_rough, line, -1);
+	shape->default_rough = fmax(fmin(shape->default_rough, 1), 0);
 	i = 0;
 	name_is_empty = true;
 	while (line[i] && i < 199)
@@ -59,9 +46,7 @@ char	*parse_texture(t_minirt *m, const char *line, t_shape *shape)
 	filename[i] = '\0';
 	if (name_is_empty)
 		return ((char *) line);
-	mrt_assert(m, !(i == 199 && line[i]), "texture path is too long (200+)");
-	shape->texture = load_texture(m, filename, ALBEDO);
-	shape->normal_map = load_texture(m, concat_normal(filename, i), NORMAL_MAP);
-	shape->roughness_map = load_texture(m, concat_roughness(filename, i), ROUGHNESS_MAP);
+	mrt_assert(m, !(i == 199 && line[i]), "texture path too long (200+)");
+	shape->texture = (mlx_image_t *)filename;
 	return ((char *) line + i);
 }

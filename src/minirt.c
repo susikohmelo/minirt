@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 09:53:09 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 12:39:53 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,39 @@ static void	get_shape_buf_sizes(
 	close(fd);
 }
 
-// TODO NOTE made mlx init before the input parsing
+static void	load_shape_texture(t_minirt *m, t_shape *shape)
+{
+	char	filename[210];
+
+	if (shape->texture == NULL)
+		return ;
+	ft_memcpy(filename, shape->texture, sizeof filename);
+	shape->texture = load_texture(m, filename, ALBEDO);
+	ft_strlcat(filename, ".normal", sizeof filename);
+	shape->normal_map = load_texture(m, filename, NORMAL_MAP);
+	filename[ft_strlen(filename) - ft_strlen(".normal")] = '\0';
+	ft_strlcat(filename, ".rough", sizeof filename);
+	shape->roughness_map = load_texture(m, filename, ROUGHNESS_MAP);
+}
+
+static void	load_textures(t_minirt *m)
+{
+	size_t	i;
+
+	i = (size_t) - 1;
+	while (++i < m->spheres_length)
+		load_shape_texture(m, (t_shape *)&m->spheres[i]);
+	i = (size_t) - 1;
+	while (++i < m->planes_length)
+		load_shape_texture(m, (t_shape *)&m->planes[i]);
+	i = (size_t) - 1;
+	while (++i < m->cylinders_length)
+		load_shape_texture(m, (t_shape *)&m->cylinders[i]);
+	i = (size_t) - 1;
+	while (++i < m->discs_length)
+		load_shape_texture(m, (t_shape *)&m->discs[i]);
+}
+
 void	mrt_init(t_minirt *m, const char *path)
 {
 	size_t	sizes[SHAPES_LENGTH];
@@ -65,8 +97,9 @@ void	mrt_init(t_minirt *m, const char *path)
 		&m->arena, sizes[SHAPE_CYLINDER], sizeof m->cylinders[0]);
 	m->discs = ft_arena_calloc( \
 		&m->arena, 2 * sizes[SHAPE_CYLINDER], sizeof m->discs[0]);
-	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
 	parse_input(m, path);
+	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
+	load_textures(m);
 	mrt_assert(m, m->mlx != NULL, "mlx_init() failed");
 	m->img = mlx_new_image(m->mlx, INIT_WIDTH, INIT_HEIGHT);
 	mrt_assert(m, m->img != NULL, "mlx_new_image() failed");
@@ -94,14 +127,17 @@ void	mrt_exit(t_minirt *m, int status)
 	exit(status);
 }
 
-bool	mrt_assert(t_minirt *m, bool condition, const char *msg)
+bool	mrt_expect(t_minirt *m, bool condition, const char *msg)
 {
 	int	errno_value;
 
 	errno_value = errno;
 	if (condition == true)
 		return (true);
-	ft_putstr_fd("Error\n", STDERR_FILENO);
+	if (MRT_FATAL_EXPECT)
+		ft_putstr_fd("Error\n", STDERR_FILENO);
+	else
+		ft_putstr_fd("Warning\n", STDERR_FILENO);
 	if (msg != NULL || errno_value != 0)
 	{
 		if (errno_value != 0)
@@ -112,6 +148,15 @@ bool	mrt_assert(t_minirt *m, bool condition, const char *msg)
 			ft_putstr_fd(msg, STDERR_FILENO);
 		ft_putstr_fd("\n", STDERR_FILENO);
 	}
+	if (MRT_FATAL_EXPECT)
+		mrt_exit(m, EXIT_FAILURE);
+	return (false);
+}
+
+bool	mrt_assert(t_minirt *m, bool condition, const char *msg)
+{
+	if (mrt_expect(m, condition, msg))
+		return (true);
 	mrt_exit(m, EXIT_FAILURE);
 	return (false);
 }

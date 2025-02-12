@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 20:01:32 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 20:40:26 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,11 @@ static void	set_cam_rot_matrix(t_minirt *minirt)
 	minirt->cam_rot_matrix[2][2] = forward.z;
 }
 
-static t_vec3	pix_to_scrspace(t_minirt *minirt, double x, double y)
+static t_vec3	pix_to_scrspace(t_minirt *m, double x, double y)
 {
 	return ((t_vec3){
-		.x = (2 * ((x + 0.5) / (double) minirt->mlx->width) - 1) * minirt->aspect_ratio,
-		.y = -(2 * ((y + 0.5) / (double) minirt->mlx->height) - 1),
+		.x = (2 * ((x + 0.5) / (double) m->img->width) - 1) * m->aspect_ratio,
+		.y = -(2 * ((y + 0.5) / (double) m->img->height) - 1),
 		.z = 0,
 	});
 }
@@ -102,7 +102,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	new_ray.dir = vec3_normalize(pos_screenspace);
 	new_ray.start = minirt->camera_coords;
 	new_ray.length = INFINITY;
-	new_ray.is_reflect = 0;
+	new_ray.is_reflect = INFINITY;
 	return (new_ray);
 }
 
@@ -121,14 +121,14 @@ static t_vec3	phong(
 	t_ray			light_ray;
 
 	shape_color = ray_data.shape->color;
-	shape_rough = 0.5;
+	shape_rough = ray_data.shape->default_rough;
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (ray_data.is_reflect > 0)
+	if (ray_data.is_reflect != INFINITY)
 		shape_rough = ray_data.is_reflect;
 	else if (ray_data.shape->roughness_map)
 		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
-		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect > 0)), shape_color);
+		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect != INFINITY)), shape_color);
 
 	surface = (t_vec3){};
 	i = (size_t) - 1;
@@ -220,12 +220,10 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	if (is_reflection)
 		return phong(m, ray, normal, data);
 	main_color = phong(m, ray, normal, data);
-	reflect = 0.5;
+	reflect = data.shape->default_rough;
 	if (data.shape->roughness_map)
 		reflect = get_rough_value(ray, data.shape, data.shape_type);
-	data.is_reflect = 0.5;
-	if (data.shape->roughness_map)
-		data.is_reflect = reflect;
+	data.is_reflect = reflect;
 	reflect = pow(1 - reflect / (0.65 + reflect) * 1.65, 2);
 	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
 	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
@@ -237,7 +235,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	else
 	{
 		normal = get_obj_normal(m, ray, data);
-		main_color = vec3_add(vec3_muls(surface_color(m, data, true), 1 / sqrt(data.length + 1) * reflect), main_color);
+		main_color = vec3_add(vec3_muls(surface_color(m, data, true), reflect), main_color);
 		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);
 		main_color.g = fmin(fmax(main_color.g, 0), 1);
@@ -249,27 +247,33 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
-	int32_t	column;
-	int32_t	row;
+	size_t	column;
+	size_t	row;
+	size_t	i_pixel;
 	t_vec3	color;
 
 	printf("\r                                                                 "
 		"                                                                  \r");
-	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
+	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
 	set_cam_rot_matrix(m);
 
-	row = -1;
-	while (++row < m->mlx->height)
+	row = (size_t) - 1;
+	while (++row < m->img->height)
 	{
-		column = -1;
-		while (++column < m->mlx->width)
+		column = (size_t) - 1;
+		while (++column < m->img->width)
 		{
-			if (row != 0 && column != 0)
-				m->cursor_pointing = m->mouse_x == column && m->mouse_y == row;
+			m->cursor_pointing = row != 0 && column != 0 \
+				&& row < m->img->height - 10 && column != m->img->width - 10 \
+				&& m->mouse_x == (int)column && m->mouse_y == (int)row;
+
+			i_pixel = row * m->img->width + column;
+			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
+				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
+				continue;
+
 			ray = create_ray(m, column, row);
-			//printf("x%d y%d %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
-			//printf("x%d y%d %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
 
 			get_shape_intersect_dist(m, &ray, NULL);
 			if (isinf(ray.length))
@@ -285,10 +289,10 @@ void	cast_rays(t_minirt *m)
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);
 			}
-			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
-			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
-			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
-			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
+			m->img->pixels[4 * i_pixel + 0] = 255 * color.r;
+			m->img->pixels[4 * i_pixel + 1] = 255 * color.g;
+			m->img->pixels[4 * i_pixel + 2] = 255 * color.b;
+			m->img->pixels[4 * i_pixel + 3] = 255;
 		}
 	}
 	fflush(stdout); // TODO get rid of this!

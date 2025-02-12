@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 17:19:35 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 12:30:21 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,14 @@ mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type)
 	{
 		if (texture_type != ALBEDO)
 			return (NULL);
-		ft_putstr_fd("WARN: xpm42 could not be loaded, loading default\n", 2);
+		ft_putstr_fd("Warning\nxpm42 couldn't be loaded, loading default\n", 2);
 		xpm = mlx_load_xpm42("textures/default.xpm42");
-		mrt_assert(m, xpm, "default xpm42 could not be loaded");
+		if (!mrt_assert(m, xpm, "default xpm42 could not be loaded"))
+			return (NULL);
 	}
 	img = mlx_texture_to_image(m->mlx, &xpm->texture);
-	mrt_assert(m, img, "converting xpm42 to image failed");
+	if (!mrt_assert(m, img, "converting xpm42 to image failed"))
+		return (NULL);
 	mlx_delete_xpm42(xpm);
 	return (img);
 }

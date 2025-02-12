@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/11 19:53:49 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:23:42 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,12 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-# define INIT_WIDTH 1600
+# ifndef MRT_FATAL_EXPECT
+#  define MRT_FATAL_EXPECT 1
+# endif
+
+// Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
+# define INIT_WIDTH 1597
 # define INIT_HEIGHT 1200
 
 typedef struct s_light
@@ -38,6 +43,8 @@ typedef struct s_minirt
 	int32_t			mouse_x;
 	int32_t			mouse_y;
 	bool			cursor_pointing;
+	bool			valid_pixel[8];
+	size_t			valid_pixel_i;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
@@ -63,6 +70,7 @@ void		mrt_init(t_minirt *m, const char *path);
 void		mrt_destroy(t_minirt *m);
 void		mrt_exit(t_minirt *m, int status);
 bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
+bool		mrt_expect(t_minirt *m, bool condition, const char *msg);
 
 void		parse_input(t_minirt *m, const char *path);
 bool		parse_ambient_light(t_minirt *m, const char *line);
@@ -73,9 +81,10 @@ void		parse_plane(t_minirt *m, const char *line);
 void		parse_cylinder(t_minirt *m, const char *line);
 char		*parse_float(t_minirt *m, double *f, const char *line, char sep);
 char		*parse_texture(t_minirt *m, const char *line, t_shape *shape);
-bool		assert_range(t_minirt *m, t_vec3 inputs, const char *name);
-t_vec3		expect_normalized(t_vec3 v, const char *name);
+bool		expect_range(t_minirt *m, t_vec3 inputs, const char *name);
+t_vec3		expect_normalized(t_minirt *m, t_vec3 v, const char *name);
 double		str_to_f(const char *str);
+char		*f_to_str(char buf[static 32], double f);
 char		*trim_left(const char *str);
 
 void		free_textures(t_minirt *m);
@@ -96,9 +105,6 @@ void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	cast_rays(t_minirt *minirt);
 
-// void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
-// void	min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
-// void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
