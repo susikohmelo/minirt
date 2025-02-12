@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 00:06:31 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/07 00:27:57 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:21:43 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,26 @@ static inline void	free_cylinders(t_minirt *m)
 	}
 }
 
+static inline void	free_discs(t_minirt *m)
+{
+	int	len;
+
+	len = (int) m->discs_length;
+	while (len--)
+	{
+		if((*(m->discs + len)).texture)
+			mlx_delete_image(m->mlx, (*(m->discs + len)).texture);
+		if((*(m->discs + len)).normal_map)
+			mlx_delete_image(m->mlx, (*(m->discs + len)).normal_map);
+		if((*(m->discs + len)).roughness_map)
+			mlx_delete_image(m->mlx, (*(m->discs + len)).roughness_map);
+	}
+}
+
 void	free_textures(t_minirt *m)
 {
 	free_planes(m);
 	free_spheres(m);
 	free_cylinders(m);
+	free_discs(m);
 }

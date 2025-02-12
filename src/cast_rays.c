@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/11 20:01:32 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:16:14 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,27 +249,32 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
-	int32_t	column;
-	int32_t	row;
+	size_t	column;
+	size_t	row;
+	size_t	i_pixel;
 	t_vec3	color;
 
 	printf("\r                                                                 "
 		"                                                                  \r");
-	m->aspect_ratio = (double) m->mlx->width / (double) m->mlx->height;
+	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
 	set_cam_rot_matrix(m);
 
-	row = -1;
-	while (++row < m->mlx->height)
+	row = (size_t) - 1;
+	while (++row < m->img->height)
 	{
-		column = -1;
-		while (++column < m->mlx->width)
+		column = (size_t) - 1;
+		while (++column < m->img->width)
 		{
-			if (row != 0 && column != 0)
-				m->cursor_pointing = m->mouse_x == column && m->mouse_y == row;
+			i_pixel = row * m->img->width + column;
+			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
+				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
+				continue;
+
+			if (row != 0 && column != 0
+				&& m->mouse_x == (int)column && m->mouse_y == (int)row)
+				m->cursor_pointing = true;
 			ray = create_ray(m, column, row);
-			//printf("x%d y%d %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
-			//printf("x%d y%d %f %f %f\n", column, row, ray.dir.x, ray.dir.y, ray.dir.z);
 
 			get_shape_intersect_dist(m, &ray, NULL);
 			if (isinf(ray.length))
@@ -285,10 +290,10 @@ void	cast_rays(t_minirt *m)
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);
 			}
-			m->img->pixels[4 * (row * m->mlx->width + column) + 0] = 255 * color.r;
-			m->img->pixels[4 * (row * m->mlx->width + column) + 1] = 255 * color.g;
-			m->img->pixels[4 * (row * m->mlx->width + column) + 2] = 255 * color.b;
-			m->img->pixels[4 * (row * m->mlx->width + column) + 3] = 255;
+			m->img->pixels[4 * i_pixel + 0] = 255 * color.r;
+			m->img->pixels[4 * i_pixel + 1] = 255 * color.g;
+			m->img->pixels[4 * i_pixel + 2] = 255 * color.b;
+			m->img->pixels[4 * i_pixel + 3] = 255;
 		}
 	}
 	fflush(stdout); // TODO get rid of this!

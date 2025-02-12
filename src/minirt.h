@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 12:39:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:04:25 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 #  define MRT_FATAL_EXPECT 1
 # endif
 
-# define INIT_WIDTH 1600
+# define INIT_WIDTH 1597
 # define INIT_HEIGHT 1200
 
 typedef struct s_light
@@ -42,6 +42,8 @@ typedef struct s_minirt
 	int32_t			mouse_x;
 	int32_t			mouse_y;
 	bool			cursor_pointing;
+	bool			valid_pixel[8];
+	size_t			valid_pixel_i;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
