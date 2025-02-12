@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 14:11:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:42:13 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	mouse_hook(
 	(void)mods;
 	m = minirt;
 	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_PRESS)
-		ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	 	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
 }
 
 void	cursor_hook(double x, double y, void *minirt)

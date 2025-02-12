@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 14:04:25 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:23:42 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #  define MRT_FATAL_EXPECT 1
 # endif
 
+// Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
 # define INIT_WIDTH 1597
 # define INIT_HEIGHT 1200
 

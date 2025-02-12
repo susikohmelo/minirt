@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 14:16:14 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 15:02:05 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,14 +265,15 @@ void	cast_rays(t_minirt *m)
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
+			m->cursor_pointing = row != 0 && column != 0 \
+				&& row < m->img->height - 10 && column != m->img->width - 10 \
+				&& m->mouse_x == (int)column && m->mouse_y == (int)row;
+
 			i_pixel = row * m->img->width + column;
 			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
 				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
 				continue;
 
-			if (row != 0 && column != 0
-				&& m->mouse_x == (int)column && m->mouse_y == (int)row)
-				m->cursor_pointing = true;
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
