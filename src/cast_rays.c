@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 15:16:37 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 19:19:34 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ static t_vec3	phong(
 {
 	const double	specular_reflection = 1;
 	double	diffuse_reflection;
-	const double	alpha = 10.0;
+	const double	alpha = 100.0;
 	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
@@ -140,13 +140,22 @@ static t_vec3	phong(
 		if (diffuse_reflection > 0)
 		{
 			light_ray = (t_ray){
-				.start = ray,
+				.start = vec3_add(ray, vec3_muls(normal, .001)),
+				//.start = ray,
 				.dir = light_dir,
 				.length = INFINITY};
-			get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+			if (!ray_data.inverted_normal)
+				get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+			else
+				get_shape_intersect_dist(m, &light_ray, NULL);
 			if (light_ray.length * light_ray.length <= vec3_dot(light, light))
 				diffuse_reflection = 0;
 		}
+		else
+			mrt_print(light);
+		mrt_print(light);
+		mrt_print(normal);
+		mrt_print(vec3_dot(light, normal));
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
 			light_dir);
@@ -163,14 +172,14 @@ static t_vec3	phong(
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
 
-t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray data)
+t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 {
 	const double	normal_strength = 0.5;
 	t_vec3			map_normal;
 	t_vec3			normal;
 	double			n;
 
-	if (m->cursor_pointing) switch (data.shape_type) {
+	if (m->cursor_pointing) switch (data->shape_type) {
 		case SHAPE_NO_SHAPE:;
 		case SHAPE_SPHERE: printf("Sphere: "); break;
 		case SHAPE_PLANE: printf("Plane: "); break;
@@ -178,31 +187,43 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray data)
 		case SHAPE_DISC: printf("Disc: "); break;
 		case SHAPES_LENGTH:;
 	}
-	mrt_print(data.length);
-	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-	if (data.shape_type == SHAPE_SPHERE)
-		normal = vec3_normalize(vec3_sub(ray, data.shape->coords));
-	else if (data.shape_type == SHAPE_PLANE || data.shape_type == SHAPE_DISC)
+	mrt_print(data->length);
+	ray = vec3_add(vec3_muls(data->dir, data->length), data->start);
+	if (data->shape_type == SHAPE_SPHERE)
 	{
-		normal = ((t_plane *)data.shape)->normal;
+		normal = vec3_normalize(vec3_sub(ray, data->shape->coords));
+		if (vec3_dot(normal, ray) >= 0.)
+		{
+			normal = vec3_muls(normal, -1);
+			data->inverted_normal = true;
+		}
+	}
+	else if (data->shape_type == SHAPE_PLANE || data->shape_type == SHAPE_DISC)
+	{
+		normal = ((t_plane *)data->shape)->normal;
 		if (vec3_dot(normal, ray) >= 0.)
 			normal = vec3_muls(normal, -1);
 	}
-	else if (data.shape_type == SHAPE_CYLINDER)
+	else if (data->shape_type == SHAPE_CYLINDER)
 	{
-		n = vec3_dot(ray, ((t_cylinder *)data.shape)->axis) \
-			+ vec3_dot(vec3_sub(data.start, data.shape->coords), \
-				((t_cylinder *)data.shape)->axis);
+		n = vec3_dot(ray, ((t_cylinder *)data->shape)->axis) \
+			+ vec3_dot(vec3_sub(data->start, data->shape->coords), \
+				((t_cylinder *)data->shape)->axis);
 		normal = vec3_normalize(vec3_sub(vec3_sub( \
-			ray, data.shape->coords), vec3_muls(
-				((t_cylinder *)data.shape)->axis, n)));
+			ray, data->shape->coords), vec3_muls(
+				((t_cylinder *)data->shape)->axis, n)));
+		if (vec3_dot(normal, ray) >= 0.)
+		{
+			normal = vec3_muls(normal, -1);
+			data->inverted_normal = true;
+		}
 	}
-	if (data.shape->normal_map)
+	if (data->shape->normal_map)
 	{
 		map_normal = vec3_inverse_lookat(get_texture_color( \
-			ray, NORMAL_MAP, data.shape, data.shape_type), normal);
+			ray, NORMAL_MAP, data->shape, data->shape_type), normal);
 		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
-		vec3_muls(map_normal, normal_strength)));
+			vec3_muls(map_normal, normal_strength)));
 	}
 	return (normal);
 }
@@ -216,7 +237,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	double			reflect;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-	normal = get_obj_normal(m, ray, data);
+	normal = get_obj_normal(m, ray, &data);
 	if (is_reflection)
 		return phong(m, ray, normal, data);
 	main_color = phong(m, ray, normal, data);
@@ -236,7 +257,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 		return (main_color);
 	else
 	{
-		normal = get_obj_normal(m, ray, data);
+		normal = get_obj_normal(m, ray, &data);
 		main_color = vec3_add(vec3_muls(surface_color(m, data, true), 1 / sqrt(data.length + 1) * reflect), main_color);
 		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);
@@ -265,7 +286,7 @@ void	cast_rays(t_minirt *m)
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
-			m->cursor_pointing = row != 0 && column != 0 \
+			m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
 				&& row < m->img->height - 10 && column != m->img->width - 10 \
 				&& m->mouse_x == (int)column && m->mouse_y == (int)row;
 

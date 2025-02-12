@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 12:39:53 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 17:08:15 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,8 +155,22 @@ bool	mrt_expect(t_minirt *m, bool condition, const char *msg)
 
 bool	mrt_assert(t_minirt *m, bool condition, const char *msg)
 {
-	if (mrt_expect(m, condition, msg))
+	int	errno_value;
+
+	errno_value = errno;
+	if (condition == true)
 		return (true);
+	ft_putstr_fd("Error\n", STDERR_FILENO);
+	if (msg != NULL || errno_value != 0)
+	{
+		if (errno_value != 0)
+			ft_putstr_fd(strerror(errno_value), STDERR_FILENO);
+		if (errno_value != 0 && msg != NULL)
+			ft_putstr_fd(": ", STDERR_FILENO);
+		if (msg != NULL)
+			ft_putstr_fd(msg, STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+	}
 	mrt_exit(m, EXIT_FAILURE);
 	return (false);
 }

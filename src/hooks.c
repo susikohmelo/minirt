@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 14:42:13 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 15:23:07 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	resize_hook(int w, int h, void *minirt)
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
 	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	m->resizing = true;
 }
 
 void	mouse_hook(
