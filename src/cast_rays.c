@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/13 01:04:36 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/13 01:10:45 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ static t_vec3	phong(
 
 t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray data)
 {
-	const double	normal_strength = 0.5;
+	const double	normal_strength = 1;
 	t_vec3			map_normal;
 	t_vec3			normal;
 	double			n;
