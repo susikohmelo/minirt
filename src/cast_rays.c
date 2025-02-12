@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 15:16:37 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/12 20:11:20 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	new_ray.dir = vec3_normalize(pos_screenspace);
 	new_ray.start = minirt->camera_coords;
 	new_ray.length = INFINITY;
-	new_ray.is_reflect = 0;
+	new_ray.is_reflect = INFINITY;
 	return (new_ray);
 }
 
@@ -121,14 +121,14 @@ static t_vec3	phong(
 	t_ray			light_ray;
 
 	shape_color = ray_data.shape->color;
-	shape_rough = 0.5;
+	shape_rough = ray_data.shape->default_rough;
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (ray_data.is_reflect > 0)
+	if (ray_data.is_reflect != INFINITY)
 		shape_rough = ray_data.is_reflect;
 	else if (ray_data.shape->roughness_map)
 		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
-		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect > 0)), shape_color);
+		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect != INFINITY)), shape_color);
 
 	surface = (t_vec3){};
 	i = (size_t) - 1;
@@ -220,12 +220,10 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	if (is_reflection)
 		return phong(m, ray, normal, data);
 	main_color = phong(m, ray, normal, data);
-	reflect = 0.5;
+	reflect = data.shape->default_rough;
 	if (data.shape->roughness_map)
 		reflect = get_rough_value(ray, data.shape, data.shape_type);
-	data.is_reflect = 0.5;
-	if (data.shape->roughness_map)
-		data.is_reflect = reflect;
+	data.is_reflect = reflect;
 	reflect = pow(1 - reflect / (0.65 + reflect) * 1.65, 2);
 	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
 	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
