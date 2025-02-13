@@ -29,4 +29,4 @@ typedef struct s_ray
 	bool			inside_shape;
 }	t_ray;
 
-# endif
+#endif
