@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 12:42:23 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/09 02:57:56 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/13 13:07:03 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,13 @@ t_vec3	vec3_adds(t_vec3 v, double s)__attribute__((warn_unused_result));
 t_vec3	vec3_subs(t_vec3 v, double s)__attribute__((warn_unused_result));
 t_vec3	vec3_muls(t_vec3 v, double s)__attribute__((warn_unused_result));
 t_vec3	vec3_divs(t_vec3 v, double s)__attribute__((warn_unused_result));
+
+t_vec3  vec3_mat3( \
+    t_vec3 v, const double m[3][3])__attribute__((warn_unused_result));
+t_vec3  mat3_vec3( \
+    const double m[3][3], t_vec3 v)__attribute__((warn_unused_result));
+t_vec3  vec3_rotatex(t_vec3 v, double r)__attribute__((warn_unused_result));
+t_vec3  vec3_rotatey(t_vec3 v, double r)__attribute__((warn_unused_result));
+t_vec3  vec3_rotatez(t_vec3 v, double r)__attribute__((warn_unused_result));
 
 #endif
