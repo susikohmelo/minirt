@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 16:29:20 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:45:52 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ typedef struct s_shape
 {
 	t_vec3		coords;
 	t_vec3		color;
-	mlx_image_t *texture;
-	mlx_image_t *normal_map;
-	mlx_image_t *roughness_map;
+	mlx_image_t	*texture;
+	mlx_image_t	*normal_map;
+	mlx_image_t	*roughness_map;
 	double		default_rough;
 }	t_shape;
 
@@ -47,9 +47,9 @@ typedef struct s_sphere
 {
 	t_vec3		coords;
 	t_vec3		color;
-	mlx_image_t *texture;
-	mlx_image_t *normal_map;
-	mlx_image_t *roughness_map;
+	mlx_image_t	*texture;
+	mlx_image_t	*normal_map;
+	mlx_image_t	*roughness_map;
 	double		default_rough;
 	double		radius;
 }	t_sphere;
@@ -58,9 +58,9 @@ typedef struct s_plane
 {
 	t_vec3		coords;
 	t_vec3		color;
-	mlx_image_t *texture;
-	mlx_image_t *normal_map;
-	mlx_image_t *roughness_map;
+	mlx_image_t	*texture;
+	mlx_image_t	*normal_map;
+	mlx_image_t	*roughness_map;
 	double		default_rough;
 	t_vec3		normal;
 }	t_plane;
@@ -69,9 +69,9 @@ typedef struct s_cylinder
 {
 	t_vec3		coords;
 	t_vec3		color;
-	mlx_image_t *texture;
-	mlx_image_t *normal_map;
-	mlx_image_t *roughness_map;
+	mlx_image_t	*texture;
+	mlx_image_t	*normal_map;
+	mlx_image_t	*roughness_map;
 	double		default_rough;
 	t_vec3		axis;
 	double		radius;
@@ -82,9 +82,9 @@ typedef struct s_disc
 {
 	t_vec3		coords;
 	t_vec3		color;
-	mlx_image_t *texture;
-	mlx_image_t *normal_map;
-	mlx_image_t *roughness_map;
+	mlx_image_t	*texture;
+	mlx_image_t	*normal_map;
+	mlx_image_t	*roughness_map;
 	double		default_rough;
 	t_vec3		normal;
 	double		radius;
