@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/13 20:52:35 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/13 22:20:22 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,13 +128,17 @@ static t_vec3	phong(
 	shape_color = ray_data.shape->color;
 	shape_rough = ray_data.shape->default_rough;
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (ray_data.is_reflect != INFINITY)
-		shape_rough = ray_data.is_reflect;
-	else if (ray_data.shape->roughness_map)
+	//if (ray_data.is_reflect != INFINITY)
+	//	shape_rough = ray_data.is_reflect;
+	if (ray_data.shape->roughness_map)
 		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
-		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect != INFINITY)), shape_color);
-
+	{
+		if (ray_data.is_reflect == INFINITY)
+			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, 0), shape_color);
+		else
+			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, ray_data.is_reflect), shape_color);
+	}
 	surface = (t_vec3){};
 	i = (size_t) - 1;
 	while (++i < m->lights_length)
@@ -169,8 +173,8 @@ static t_vec3	phong(
 	// combine them somehow. Also, they will not be constants, but will be parsed for each
 	// shape later on.
 		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough), \
-		vec3_muls(m->lights[i].color, (1 - shape_rough) * \
-		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
+		vec3_muls(m->lights[i].color, \
+		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha * (1 - shape_rough)))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
@@ -236,20 +240,6 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 					V,
 					m))); (void)n;
 
-		// n = vec3_dot(data->dir, ((t_cylinder *)data->shape)->axis) \
-		// 	//+ vec3_dot(vec3_sub(data->start, data->shape->coords),
-		// 	+ vec3_dot(vec3_sub(data->start, C),
-		// 		((t_cylinder *)data->shape)->axis);
-		// normal = vec3_normalize(vec3_sub(
-		// 	//vec3_sub(ray, data->shape->coords),
-		// 	vec3_sub(ray, C),
-		// 	vec3_muls(((t_cylinder *)data->shape)->axis, n)));
-		// //if (vec3_dot(normal, ray) >= 0.)
-		// // if (vec3_dot(normal, data->dir) >= 0.)
-		// // {
-		// // 	normal = vec3_muls(normal, -1);
-		// // 	data->inside_shape = true;
-		// // }
 		if (vec3_dot(normal, data->dir) >= 0.)
 		{
 			normal = vec3_muls(normal, -1);
@@ -294,9 +284,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	{
 		normal = get_obj_normal(m, ray, &data);
 		main_color = vec3_add(vec3_muls(surface_color(m, data, true), (1 - reflect) / (1 + reflect * data.length * 16)), main_color);
-		main_color.r = fmin(fmax(main_color.r, 0), 1);
-		main_color.g = fmin(fmax(main_color.g, 0), 1);
-		main_color.b = fmin(fmax(main_color.b, 0), 1);
 	}
 	return (main_color);
 }
