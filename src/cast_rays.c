@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/13 01:10:45 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:39:39 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,7 +224,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	if (data.shape->roughness_map)
 		reflect = get_rough_value(ray, data.shape, data.shape_type);
 	data.is_reflect = reflect;
-	reflect = reflect/*/ (0.2 + reflect) * 1.2*/;
 	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
 	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
 	data.start = vec3_add(ray, vec3_muls(normal, 0.001));
