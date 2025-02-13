@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 19:19:34 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/13 10:55:13 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,8 +140,7 @@ static t_vec3	phong(
 		if (diffuse_reflection > 0)
 		{
 			light_ray = (t_ray){
-				.start = vec3_add(ray, vec3_muls(normal, .001)),
-				//.start = ray,
+				.start = vec3_add(ray, vec3_muls(normal, .0001)),
 				.dir = light_dir,
 				.length = INFINITY};
 			if (!ray_data.inverted_normal)
@@ -149,13 +148,9 @@ static t_vec3	phong(
 			else
 				get_shape_intersect_dist(m, &light_ray, NULL);
 			if (light_ray.length * light_ray.length <= vec3_dot(light, light))
-				diffuse_reflection = 0;
+                continue ;
+				//diffuse_reflection = 0;
 		}
-		else
-			mrt_print(light);
-		mrt_print(light);
-		mrt_print(normal);
-		mrt_print(vec3_dot(light, normal));
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
 			light_dir);
@@ -187,7 +182,6 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 		case SHAPE_DISC: printf("Disc: "); break;
 		case SHAPES_LENGTH:;
 	}
-	mrt_print(data->length);
 	ray = vec3_add(vec3_muls(data->dir, data->length), data->start);
 	if (data->shape_type == SHAPE_SPHERE)
 	{
@@ -259,7 +253,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	{
 		normal = get_obj_normal(m, ray, &data);
 		main_color = vec3_add(vec3_muls(surface_color(m, data, true), 1 / sqrt(data.length + 1) * reflect), main_color);
-		mrt_print(main_color);
 		main_color.r = fmin(fmax(main_color.r, 0), 1);
 		main_color.g = fmin(fmax(main_color.g, 0), 1);
 		main_color.b = fmin(fmax(main_color.b, 0), 1);
@@ -300,10 +293,7 @@ void	cast_rays(t_minirt *m)
 
 			get_shape_intersect_dist(m, &ray, NULL);
 			if (isinf(ray.length))
-			{
 				color = (t_vec3){};
-				mrt_print(color);
-			}
 			else
 			{
 				color = surface_color(m, ray, false);
