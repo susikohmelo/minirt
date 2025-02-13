@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 21:11:33 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 21:39:09 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:41:25 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 	if (uv.x > 1. || uv.x < 0. || uv.y > 1. || uv.y < 0.)
 		return (vec3(0, 0, 0));
 	img = shape->texture;
-	vect = get_texture_from_uv(img, uv.x, uv.y, blur / (0.2 + blur) * 1.2);
+	vect = get_texture_from_uv(img, uv.x, uv.y, blur / (0.4 + blur) * 1.4);
 	return (vect);
 }
 
