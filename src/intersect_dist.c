@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 18:32:28 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/13 18:15:00 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@ static void	min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere)
 	discriminant = b * b - 4 * 1 * c;
 	if (discriminant >= 0)
 	{
-		length = fabs(-b - sqrt(discriminant)) / (2. * 1);
-		if (length < ray->length)
+		length = (-b - sqrt(discriminant)) / (2. * 1);
+        if (vec3_dot(lstart, lstart) <= sphere->radius * sphere->radius)
+            length = (-b + sqrt(discriminant)) / (2. * 1);
+		if (length < ray->length && length >= 0)
 		{
 			ray->length = length;
 			ray->shape = (t_shape *)sphere;

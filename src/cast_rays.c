@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/13 10:55:13 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/13 20:52:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,18 @@ void	mrt_debug(t_minirt *mrt)
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
 {
-	if (!m->cursor_pointing)
+	(void)m; (void)name; (void)v;
+	//if (!m->cursor_pointing)
 		return ;
-	printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
+	//printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
 }
 
 void	mrt_print_double(t_minirt *m, const char *name, double x)
 {
-	if (!m->cursor_pointing)
+	(void)m; (void)name; (void)x;
+	//if (!m->cursor_pointing)
 		return ;
-	printf("%s = %g ; ", name, x);
+	//printf("%s = %g ; ", name, x);
 }
 
 static void	ray_to_cam_rot_pos(double m[3][3], t_ray *r)
@@ -111,7 +113,7 @@ static t_vec3	phong(
 {
 	const double	specular_reflection = 1;
 	double	diffuse_reflection;
-	const double	alpha = 100.0;
+	const double	alpha = 10.0;
 	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
@@ -119,6 +121,9 @@ static t_vec3	phong(
 	t_vec3			reflection;
 	size_t			i;
 	t_ray			light_ray;
+
+	// if (ray_data.shape_type == SHAPE_PLANE)
+	// 	printf("normal %g,%g,%g\n", normal.x, normal.y, normal.z);
 
 	shape_color = ray_data.shape->color;
 	shape_rough = 0.5;
@@ -137,19 +142,22 @@ static t_vec3	phong(
 		t_vec3 light = vec3_sub(m->lights[i].coords, ray);
 		light_dir = vec3_normalize(light);
 		diffuse_reflection = fmax(0, vec3_dot(light_dir, normal));
-		if (diffuse_reflection > 0)
+		// if (diffuse_reflection > 0)
 		{
 			light_ray = (t_ray){
 				.start = vec3_add(ray, vec3_muls(normal, .0001)),
 				.dir = light_dir,
 				.length = INFINITY};
-			if (!ray_data.inverted_normal)
-				get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-			else
+            // if (ray_data.inside_shape && ray_data.shape_type == SHAPE_SPHERE
+            //     && vec3_length(vec3_sub(ray_data.shape->coords, ray_data.start)) <= ((t_sphere *)(ray_data.shape))->radius)
+            //     continue ;
+            // else
+            if (!ray_data.inside_shape)
+                get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+            else
 				get_shape_intersect_dist(m, &light_ray, NULL);
 			if (light_ray.length * light_ray.length <= vec3_dot(light, light))
                 continue ;
-				//diffuse_reflection = 0;
 		}
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
@@ -186,30 +194,66 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 	if (data->shape_type == SHAPE_SPHERE)
 	{
 		normal = vec3_normalize(vec3_sub(ray, data->shape->coords));
-		if (vec3_dot(normal, ray) >= 0.)
+		//if (vec3_dot(normal, ray) >= 0.)
+		if (vec3_dot(normal, data->dir) >= 0.)
 		{
 			normal = vec3_muls(normal, -1);
-			data->inverted_normal = true;
+			data->inside_shape = true;
 		}
 	}
 	else if (data->shape_type == SHAPE_PLANE || data->shape_type == SHAPE_DISC)
 	{
 		normal = ((t_plane *)data->shape)->normal;
-		if (vec3_dot(normal, ray) >= 0.)
+		//if (vec3_dot(normal, ray) >= 0.0001)
+		if (vec3_dot(normal, data->dir) >= 0.0001)
+        {
 			normal = vec3_muls(normal, -1);
+            data->inside_shape = true;
+        }
 	}
 	else if (data->shape_type == SHAPE_CYLINDER)
 	{
-		n = vec3_dot(ray, ((t_cylinder *)data->shape)->axis) \
-			+ vec3_dot(vec3_sub(data->start, data->shape->coords), \
-				((t_cylinder *)data->shape)->axis);
-		normal = vec3_normalize(vec3_sub(vec3_sub( \
-			ray, data->shape->coords), vec3_muls(
-				((t_cylinder *)data->shape)->axis, n)));
-		if (vec3_dot(normal, ray) >= 0.)
+		t_vec3	C = vec3_add(
+			((t_cylinder *)data->shape)->coords,
+			vec3_muls(
+				((t_cylinder *)data->shape)->axis,
+				((t_cylinder *)data->shape)->height / 2));
+
+		t_vec3	P = ray;
+		t_vec3	D = data->dir;
+		t_vec3	V = ((t_cylinder *)data->shape)->axis;
+		t_vec3	X = vec3_sub(data->start, C);
+
+		double	t = data->length;
+		double	m = vec3_dot(D,V) * t + vec3_dot(X, V);
+		// ((P-C)-(V*m))
+		normal = vec3_normalize(
+			vec3_sub(
+				vec3_sub(
+					P,
+					C),
+				vec3_muls(
+					V,
+					m))); (void)n;
+
+		// n = vec3_dot(data->dir, ((t_cylinder *)data->shape)->axis) \
+		// 	//+ vec3_dot(vec3_sub(data->start, data->shape->coords),
+		// 	+ vec3_dot(vec3_sub(data->start, C),
+		// 		((t_cylinder *)data->shape)->axis);
+		// normal = vec3_normalize(vec3_sub(
+		// 	//vec3_sub(ray, data->shape->coords),
+		// 	vec3_sub(ray, C),
+		// 	vec3_muls(((t_cylinder *)data->shape)->axis, n)));
+		// //if (vec3_dot(normal, ray) >= 0.)
+		// // if (vec3_dot(normal, data->dir) >= 0.)
+		// // {
+		// // 	normal = vec3_muls(normal, -1);
+		// // 	data->inside_shape = true;
+		// // }
+		if (vec3_dot(normal, data->dir) >= 0.)
 		{
 			normal = vec3_muls(normal, -1);
-			data->inverted_normal = true;
+			data->inside_shape = true;
 		}
 	}
 	if (data->shape->normal_map)
