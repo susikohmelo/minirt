@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 15:46:18 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:45:22 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,11 @@
 # endif
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
-# define INIT_WIDTH 1470
+# define INIT_WIDTH 1480
 # define INIT_HEIGHT 1024
+
+# define MOUSE_SENSITIVITY 0.25
+# define MOVE_DISTANCE 0.3
 
 // in pixels
 # define CHAR_WIDTH 10
@@ -52,9 +55,11 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	bool			cursor_pointing;
 	bool			double_clicked;
+	bool			mouse_r_down;
+
 	t_shape_type	shape_type;
 	t_shape			*shape;
-	bool			valid_pixel[8];
+	bool			valid_pixel[32];
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_lines[32];
 	size_t			gui_lines_length;

@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 16:17:35 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:38:08 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,9 +287,8 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 		return ;
 	}
 	x = -1;
-	while (++x < 8 && row * m->img->width + col + x
-			< m->img->width * m->img->height
-			&& col + x < m->img->width)
+	while (++x < sizeof(m->valid_pixel) && row * m->img->width + col + x < m->img->width *
+			m->img->height && col + x < m->img->width)
 	{
 		m->img->pixels[4 * (indx + x) + 0] = 255 * clr.r;
 		m->img->pixels[4 * (indx + x) + 1] = 255 * clr.g;
@@ -305,7 +304,7 @@ static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
 	bool	cursor_in_range;
 
 	cursor_in_range = m->mouse_x >= (int)column
-		&& m->mouse_x <= (int)column + 8
+		&& (size_t) m->mouse_x <= column + sizeof(m->valid_pixel)
 		&& m->mouse_y == (int)row;
 	m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
 		&& row < m->img->height - 10 && column != m->img->width - 10 \
@@ -329,11 +328,11 @@ void	cast_rays(t_minirt *m)
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
-			set_cursor_pointing(m, column, row);
 			i_pixel = row * m->img->width + column;
 			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
 				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
 				continue;
+			set_cursor_pointing(m, column, row);
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
