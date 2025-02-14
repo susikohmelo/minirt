@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 13:33:21 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:24:54 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,12 +106,15 @@ void	mouse_hook(
 		}
 		else
 		{
-			if (140 <= m->mouse_x && m->mouse_x <= 160
-				&& 0 <= m->mouse_y && m->mouse_y <= 20)
-			{
+			if ((LINE_LENGTH - 1) * CHAR_WIDTH <= m->mouse_x
+				&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+				&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
+				&& m->shape_type != SHAPE_NO_SHAPE)
 				m->shape_type = SHAPE_NO_SHAPE;
-				m->selected_shape = NULL;
-			}
+			else if (0 <= m->mouse_x && m->mouse_x <= CHAR_WIDTH
+				&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
+				&& m->shape_type == SHAPE_NO_SHAPE)
+				m->shape_type = SHAPE_GLOBAL_ATTRIBUTES;
 		}
 		last_click_time = click_time;
 	}

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 12:14:22 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:46:18 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,14 @@
 # define INIT_WIDTH 1597
 # define INIT_HEIGHT 1200
 
+// in pixels
+# define CHAR_WIDTH 10
+# define CHAR_HEIGHT 20
+
+// in characters
+# define FLOAT_WIDTH 5
+# define LINE_LENGTH 32
+
 typedef struct s_light
 {
 	t_vec3	coords;
@@ -45,9 +53,11 @@ typedef struct s_minirt
 	bool			cursor_pointing;
 	bool			double_clicked;
 	t_shape_type	shape_type;
-	t_shape			*selected_shape;
+	t_shape			*shape;
 	bool			valid_pixel[8];
 	size_t			valid_pixel_i;
+	mlx_image_t		*gui_lines[32];
+	size_t			gui_lines_length;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;

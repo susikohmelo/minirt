@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 12:38:22 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:17:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,7 +304,7 @@ void	cast_rays(t_minirt *m)
 
 			if (m->double_clicked && m->cursor_pointing)
 			{
-				m->selected_shape = (t_shape *)ray.shape; // I don't like that cast
+				m->shape = (t_shape *)ray.shape;
 				m->shape_type = ray.shape_type;
 			}
 			if (isinf(ray.length))

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/13 15:45:52 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 13:36:34 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 typedef enum e_shape_type
 {
+	SHAPE_GLOBAL_ATTRIBUTES = -1,
 	SHAPE_NO_SHAPE,
 	SHAPE_SPHERE,
 	SHAPE_PLANE,
