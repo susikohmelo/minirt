@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 15:45:31 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:04:12 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,16 +105,24 @@ void	mrt_init(t_minirt *m, const char *path)
 	mrt_assert(m, m->img != NULL, "mlx_new_image() failed");
 	mrt_assert(m, mlx_image_to_window(m->mlx, m->img, 0, 0) != -1, \
 		"mlx_image_to_window() failed");
+	m->gui_text = mlx_new_image( \
+		m->mlx, CHAR_WIDTH * LINE_LENGTH, CHAR_HEIGHT * 32);
+	mrt_assert(m, m->gui_text != NULL, "mlx_new_image() failed");
+	mrt_assert(m, mlx_image_to_window(m->mlx, m->gui_text, 0, 0) != -1, \
+		"mlx_image_to_window() failed");
 	mlx_key_hook(m->mlx, key_hook, m);
 	mlx_resize_hook(m->mlx, resize_hook, m);
 	mlx_cursor_hook(m->mlx, cursor_hook, m);
 	mlx_mouse_hook(m->mlx, mouse_hook, m);
+
+	int32_t mxw, mxh;
+	mlx_get_monitor_size(0, &mxw, &mxh);
+	mlx_set_window_limit(m->mlx, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, mxw, mxh);
 }
 
 void	mrt_destroy(t_minirt *m)
 {
-	while (m->gui_lines_length != 0)
-		mlx_delete_image(m->mlx, m->gui_lines[--m->gui_lines_length]);
+	mlx_delete_image(m->mlx, m->gui_text);
 	free_textures(m);
 	if (m->mlx != NULL && m->img != NULL)
 		mlx_delete_image(m->mlx, m->img);
