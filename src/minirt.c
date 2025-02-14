@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 17:08:15 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:45:31 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,8 @@ void	mrt_init(t_minirt *m, const char *path)
 
 void	mrt_destroy(t_minirt *m)
 {
+	while (m->gui_lines_length != 0)
+		mlx_delete_image(m->mlx, m->gui_lines[--m->gui_lines_length]);
 	free_textures(m);
 	if (m->mlx != NULL && m->img != NULL)
 		mlx_delete_image(m->mlx, m->img);
