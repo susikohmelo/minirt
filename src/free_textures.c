@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 00:06:31 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/13 15:44:07 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 11:07:02 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ static inline void	free_discs(t_minirt *m)
 
 void	free_textures(t_minirt *m)
 {
+	if (m == NULL || m->mlx == NULL)
+		return ;
 	free_planes(m);
 	free_spheres(m);
 	free_cylinders(m);
