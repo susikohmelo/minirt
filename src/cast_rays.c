@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/13 20:52:35 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 12:38:22 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,20 @@ void	mrt_debug(t_minirt *mrt)
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
 {
-	(void)m; (void)name; (void)v;
-	//if (!m->cursor_pointing)
+	if (!m->cursor_pointing)
 		return ;
-	//printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
+	printf("\r                                                                 "
+		"                                                                  \r");
+	printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
 }
 
 void	mrt_print_double(t_minirt *m, const char *name, double x)
 {
-	(void)m; (void)name; (void)x;
-	//if (!m->cursor_pointing)
+	if (!m->cursor_pointing)
 		return ;
-	//printf("%s = %g ; ", name, x);
+	printf("\r                                                                 "
+		"                                                                  \r");
+	printf("%s = %g ; ", name, x);
 }
 
 static void	ray_to_cam_rot_pos(double m[3][3], t_ray *r)
@@ -122,9 +124,6 @@ static t_vec3	phong(
 	size_t			i;
 	t_ray			light_ray;
 
-	// if (ray_data.shape_type == SHAPE_PLANE)
-	// 	printf("normal %g,%g,%g\n", normal.x, normal.y, normal.z);
-
 	shape_color = ray_data.shape->color;
 	shape_rough = ray_data.shape->default_rough;
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
@@ -142,23 +141,18 @@ static t_vec3	phong(
 		t_vec3 light = vec3_sub(m->lights[i].coords, ray);
 		light_dir = vec3_normalize(light);
 		diffuse_reflection = fmax(0, vec3_dot(light_dir, normal));
-		// if (diffuse_reflection > 0)
-		{
-			light_ray = (t_ray){
-				.start = vec3_add(ray, vec3_muls(normal, .0001)),
-				.dir = light_dir,
-				.length = INFINITY};
-            // if (ray_data.inside_shape && ray_data.shape_type == SHAPE_SPHERE
-            //     && vec3_length(vec3_sub(ray_data.shape->coords, ray_data.start)) <= ((t_sphere *)(ray_data.shape))->radius)
-            //     continue ;
-            // else
-            if (!ray_data.inside_shape)
-                get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-            else
-				get_shape_intersect_dist(m, &light_ray, NULL);
-			if (light_ray.length * light_ray.length <= vec3_dot(light, light))
-                continue ;
-		}
+
+		light_ray = (t_ray){
+			.start = vec3_add(ray, vec3_muls(normal, .0001)),
+			.dir = light_dir,
+			.length = INFINITY};
+		if (!ray_data.inside_shape)
+			get_shape_intersect_dist(m, &light_ray, ray_data.shape);
+		else
+			get_shape_intersect_dist(m, &light_ray, NULL);
+		if (light_ray.length * light_ray.length <= vec3_dot(light, light))
+			continue ;
+
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
 			light_dir);
@@ -182,19 +176,11 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 	t_vec3			normal;
 	double			n;
 
-	if (m->cursor_pointing) switch (data->shape_type) {
-		case SHAPE_NO_SHAPE:;
-		case SHAPE_SPHERE: printf("Sphere: "); break;
-		case SHAPE_PLANE: printf("Plane: "); break;
-		case SHAPE_CYLINDER: printf("Cylinder: "); break;
-		case SHAPE_DISC: printf("Disc: "); break;
-		case SHAPES_LENGTH:;
-	}
+	(void)m; // TODO get rid of this
 	ray = vec3_add(vec3_muls(data->dir, data->length), data->start);
 	if (data->shape_type == SHAPE_SPHERE)
 	{
 		normal = vec3_normalize(vec3_sub(ray, data->shape->coords));
-		//if (vec3_dot(normal, ray) >= 0.)
 		if (vec3_dot(normal, data->dir) >= 0.)
 		{
 			normal = vec3_muls(normal, -1);
@@ -204,7 +190,6 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 	else if (data->shape_type == SHAPE_PLANE || data->shape_type == SHAPE_DISC)
 	{
 		normal = ((t_plane *)data->shape)->normal;
-		//if (vec3_dot(normal, ray) >= 0.0001)
 		if (vec3_dot(normal, data->dir) >= 0.0001)
         {
 			normal = vec3_muls(normal, -1);
@@ -226,7 +211,6 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 
 		double	t = data->length;
 		double	m = vec3_dot(D,V) * t + vec3_dot(X, V);
-		// ((P-C)-(V*m))
 		normal = vec3_normalize(
 			vec3_sub(
 				vec3_sub(
@@ -236,20 +220,6 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 					V,
 					m))); (void)n;
 
-		// n = vec3_dot(data->dir, ((t_cylinder *)data->shape)->axis) \
-		// 	//+ vec3_dot(vec3_sub(data->start, data->shape->coords),
-		// 	+ vec3_dot(vec3_sub(data->start, C),
-		// 		((t_cylinder *)data->shape)->axis);
-		// normal = vec3_normalize(vec3_sub(
-		// 	//vec3_sub(ray, data->shape->coords),
-		// 	vec3_sub(ray, C),
-		// 	vec3_muls(((t_cylinder *)data->shape)->axis, n)));
-		// //if (vec3_dot(normal, ray) >= 0.)
-		// // if (vec3_dot(normal, data->dir) >= 0.)
-		// // {
-		// // 	normal = vec3_muls(normal, -1);
-		// // 	data->inside_shape = true;
-		// // }
 		if (vec3_dot(normal, data->dir) >= 0.)
 		{
 			normal = vec3_muls(normal, -1);
@@ -309,8 +279,6 @@ void	cast_rays(t_minirt *m)
 	size_t	i_pixel;
 	t_vec3	color;
 
-	printf("\r                                                                 "
-		"                                                                  \r");
 	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
 	set_cam_rot_matrix(m);
 
@@ -320,25 +288,31 @@ void	cast_rays(t_minirt *m)
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
-			m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
-				&& row < m->img->height - 10 && column != m->img->width - 10 \
-				&& m->mouse_x == (int)column && m->mouse_y == (int)row;
-
 			i_pixel = row * m->img->width + column;
 			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
 				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
 				continue;
 
+			m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
+				&& row < m->img->height - 10 && column != m->img->width - 10 \
+				&& m->mouse_x == (int)column && m->mouse_y == (int)row;
+
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
 			get_shape_intersect_dist(m, &ray, NULL);
+
+			if (m->double_clicked && m->cursor_pointing)
+			{
+				m->selected_shape = (t_shape *)ray.shape; // I don't like that cast
+				m->shape_type = ray.shape_type;
+			}
 			if (isinf(ray.length))
 				color = (t_vec3){};
 			else
 			{
 				color = surface_color(m, ray, false);
-				mrt_print(color);
+				//mrt_print(color);
 				color.r = fmin(fmax(color.r, 0), 1);
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);

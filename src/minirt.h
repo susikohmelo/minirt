@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 15:45:35 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 12:14:22 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ typedef struct s_minirt
 	int32_t			mouse_x;
 	int32_t			mouse_y;
 	bool			cursor_pointing;
+	bool			double_clicked;
+	t_shape_type	shape_type;
+	t_shape			*selected_shape;
 	bool			valid_pixel[8];
 	size_t			valid_pixel_i;
 
