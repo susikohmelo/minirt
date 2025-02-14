@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 18:38:08 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 00:39:18 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,10 +115,11 @@ static t_vec3	phong(
 {
 	const double	specular_reflection = 1;
 	double	diffuse_reflection;
-	const double	alpha = 10.0;
+	const double	alpha = 1.0;
 	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
+	t_vec3			surface_speculars;
 	t_vec3			light_dir;
 	t_vec3			reflection;
 	size_t			i;
@@ -166,11 +167,12 @@ static t_vec3	phong(
 	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
 	// combine them somehow. Also, they will not be constants, but will be parsed for each
 	// shape later on.
-		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough), \
-		vec3_muls(m->lights[i].color, \
-		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha * (1 - shape_rough)))));
+		vec3_muls(m->lights[i].color, diffuse_reflection));
+		surface_speculars = vec3_add(surface_speculars, \
+			vec3_muls(m->lights[i].color, specular_reflection * (1 / pow(shape_rough + 0.88, 2) - 0.27) * \
+			pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha * (1 / pow(shape_rough + 0.01, 2) + 0.02))));
 	}
-	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
+	return (vec3_add(vec3_mul(vec3_add(m->ambient_light, surface), shape_color), surface_speculars));
 }
 
 t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
