@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 15:24:54 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:41:30 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,19 @@ t_vec3   axis_rotation(t_vec3 v, t_vec3 axis, double r)
     return (mat3_vec3(m, v));
 }
 
-static
-void rotate_camera(t_minirt *m, double dt, double dp)
+void	flush_image_black(mlx_image_t *img)
 {
-    m->camera_orientation = vec3_inverse_lookat(vec3_rotatex(vec3(0,0,1), dp), m->camera_orientation);
-    m->camera_orientation = vec3_inverse_lookat(vec3_rotatey(vec3(0,0,1), dt), m->camera_orientation);
+	size_t	row;
+	size_t	column;
+
+	ft_memset(img->pixels, 0, img->width * img->height * sizeof(int32_t));
+	row = (size_t) - 1;
+	while (++row < img->height)
+	{
+		column = (size_t) - 1;
+		while (++column < img->width)
+			img->pixels[4 * (row * img->width + column) + 3] = 255;
+	}
 }
 
 static t_vec3	perpendiculary(t_vec3 v)
@@ -51,30 +59,30 @@ static t_vec3	perpendiculary(t_vec3 v)
 
 void	key_hook(mlx_key_data_t key, void *minirt)
 {
-    t_minirt    *m;
-    t_vec3      dir;
+    t_minirt		*m;
+    t_vec3			dir;
+    t_vec3			cam_orient_no_y;
+	const double	d = MOVE_DISTANCE;
 
+	if (key.action == MLX_RELEASE)
+		return ;
     m = minirt;
     dir = m->camera_orientation;
-
 	if (key.key == MLX_KEY_ESCAPE)
 		mrt_exit(minirt, EXIT_SUCCESS);
-
+	cam_orient_no_y = vec3(m->camera_orientation.x, 0, m->camera_orientation.z);
+	cam_orient_no_y = vec3_normalize(cam_orient_no_y);
 	if (key.key == MLX_KEY_W || key.key == MLX_KEY_S)
 		m->camera_coords = vec3_add(m->camera_coords, vec3_muls( \
-			m->camera_orientation, .5 * (1 - 2 * (key.key != MLX_KEY_W))));
+			cam_orient_no_y, d * (1 - 2 * (key.key != MLX_KEY_W))));
 	if (key.key == MLX_KEY_A || key.key == MLX_KEY_D)
 		m->camera_coords = vec3_add(m->camera_coords, vec3_muls( \
-			perpendiculary(dir), .5 * (1 - 2 * (key.key != MLX_KEY_A))));
-	if (key.key == MLX_KEY_PAGE_UP || key.key == MLX_KEY_PAGE_DOWN)
-		m->camera_coords.y += .5 * (1 - 2 * (key.key != MLX_KEY_PAGE_UP));
-
-    if (key.key == MLX_KEY_UP || key.key == MLX_KEY_DOWN)
-        rotate_camera(m, 0, .125 * (1 - 2 * (key.key != MLX_KEY_UP)));
-    if (key.key == MLX_KEY_LEFT || key.key == MLX_KEY_RIGHT)
-        rotate_camera(m, .125 * (1 - 2 * (key.key != MLX_KEY_LEFT)), 0);
-
+			perpendiculary(dir), d * (1 - 2 * (key.key != MLX_KEY_A))));
+	if (key.key == MLX_KEY_SPACE || key.key == MLX_KEY_LEFT_SHIFT)
+		m->camera_coords.y += d * (1 - 2 * (key.key != MLX_KEY_SPACE));
     ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
+	m->valid_pixel_i = 0;
 }
 
 void	resize_hook(int w, int h, void *minirt)
@@ -84,6 +92,8 @@ void	resize_hook(int w, int h, void *minirt)
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
 	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
+	m->valid_pixel_i = 0;
 	m->resizing = true;
 }
 
@@ -103,6 +113,8 @@ void	mouse_hook(
 		{
 			m->double_clicked = true;
 			ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+			flush_image_black(m->img);
+			m->valid_pixel_i = 0;
 		}
 		else
 		{
@@ -118,15 +130,36 @@ void	mouse_hook(
 		}
 		last_click_time = click_time;
 	}
+	if (button == MLX_MOUSE_BUTTON_RIGHT && (action == MLX_PRESS
+			|| action == MLX_REPEAT))
+		m->mouse_r_down = true;
+	else
+		m->mouse_r_down = false;
 }
 
+// TODO vec3_rotatexy is not used anymore, at least in hooks.c
 void	cursor_hook(double x, double y, void *minirt)
 {
 	t_minirt	*m;
+	t_vec3		new_rot;
+	t_vec3		mouse_move_dir;
 
 	m = minirt;
-	if (m->double_clicked)
-		return ;
+	mouse_move_dir = vec3(m->mouse_x - x, m->mouse_y - y, 0);
+	if (m->mouse_r_down && (mouse_move_dir.x != 0 || mouse_move_dir.y != 0))
+	{
+		mouse_move_dir = vec3_muls(mouse_move_dir, MOUSE_SENSITIVITY / 100);
+		new_rot = vec3(0,0,1);
+		new_rot.x = new_rot.x + -mouse_move_dir.x;
+		if (m->camera_orientation.y + mouse_move_dir.y <= 1
+				&& m->camera_orientation.y + mouse_move_dir.y >= -1)
+			new_rot.y = new_rot.y + mouse_move_dir.y;
+		new_rot = vec3_normalize(new_rot);
+		m->camera_orientation = vec3_inverse_lookat(new_rot, m->camera_orientation);
+		ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+		flush_image_black(m->img);
+		m->valid_pixel_i = 0;
+	}
 	m->mouse_x = x;
 	m->mouse_y = y;
 }

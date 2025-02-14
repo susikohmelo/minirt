@@ -25,8 +25,11 @@
 # endif
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
-# define INIT_WIDTH 1597
-# define INIT_HEIGHT 1200
+# define INIT_WIDTH 1480
+# define INIT_HEIGHT 1024
+
+# define MOUSE_SENSITIVITY 0.25
+# define MOVE_DISTANCE 0.3
 
 // TODO actual values
 # define MIN_WINDOW_WIDTH 12
@@ -56,9 +59,11 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	bool			cursor_pointing;
 	bool			double_clicked;
+	bool			mouse_r_down;
+
 	t_shape_type	shape_type;
 	t_shape			*shape;
-	bool			valid_pixel[8];
+	bool			valid_pixel[32];
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
 
