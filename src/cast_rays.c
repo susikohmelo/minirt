@@ -127,13 +127,17 @@ static t_vec3	phong(
 	shape_color = ray_data.shape->color;
 	shape_rough = ray_data.shape->default_rough;
 	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	if (ray_data.is_reflect != INFINITY)
-		shape_rough = ray_data.is_reflect;
-	else if (ray_data.shape->roughness_map)
+	//if (ray_data.is_reflect != INFINITY)
+	//	shape_rough = ray_data.is_reflect;
+	if (ray_data.shape->roughness_map)
 		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
-		shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, shape_rough * (ray_data.is_reflect != INFINITY)), shape_color);
-
+	{
+		if (ray_data.is_reflect == INFINITY)
+			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, 0), shape_color);
+		else
+			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, ray_data.is_reflect), shape_color);
+	}
 	surface = (t_vec3){};
 	i = (size_t) - 1;
 	while (++i < m->lights_length)
@@ -163,8 +167,8 @@ static t_vec3	phong(
 	// combine them somehow. Also, they will not be constants, but will be parsed for each
 	// shape later on.
 		vec3_add(vec3_muls(m->lights[i].color, diffuse_reflection * shape_rough), \
-		vec3_muls(m->lights[i].color, (1 - shape_rough) * \
-		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha))));
+		vec3_muls(m->lights[i].color, \
+		specular_reflection * pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha * (1 - shape_rough)))));
 	}
 	return (vec3_mul(vec3_add(m->ambient_light, surface), shape_color));
 }
@@ -264,11 +268,48 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	{
 		normal = get_obj_normal(m, ray, &data);
 		main_color = vec3_add(vec3_muls(surface_color(m, data, true), (1 - reflect) / (1 + reflect * data.length * 16)), main_color);
-		main_color.r = fmin(fmax(main_color.r, 0), 1);
-		main_color.g = fmin(fmax(main_color.g, 0), 1);
-		main_color.b = fmin(fmax(main_color.b, 0), 1);
 	}
 	return (main_color);
+}
+
+void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
+{
+	size_t	x;
+	size_t	indx;
+
+	indx = row * m->img->width + col;
+	if (m->valid_pixel_i > 0)
+	{
+		m->img->pixels[4 * indx + 0] = 255 * clr.r;
+		m->img->pixels[4 * indx + 1] = 255 * clr.g;
+		m->img->pixels[4 * indx + 2] = 255 * clr.b;
+		m->img->pixels[4 * indx + 3] = 255;
+		return ;
+	}
+	x = -1;
+	while (++x < 8 && row * m->img->width + col + x
+			< m->img->width * m->img->height
+			&& col + x < m->img->width)
+	{
+		m->img->pixels[4 * (indx + x) + 0] = 255 * clr.r;
+		m->img->pixels[4 * (indx + x) + 1] = 255 * clr.g;
+		m->img->pixels[4 * (indx + x) + 2] = 255 * clr.b;
+		m->img->pixels[4 * (indx + x) + 3] = 255;
+	}
+}
+
+//TODO make sure window doesn't crash with under 8 pixels
+
+static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
+{
+	bool	cursor_in_range;
+
+	cursor_in_range = m->mouse_x >= (int)column
+		&& m->mouse_x <= (int)column + 8
+		&& m->mouse_y == (int)row;
+	m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
+		&& row < m->img->height - 10 && column != m->img->width - 10 \
+		&& cursor_in_range && m->valid_pixel_i == 0;
 }
 
 void	cast_rays(t_minirt *m)
@@ -288,15 +329,11 @@ void	cast_rays(t_minirt *m)
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
+			set_cursor_pointing(m, column, row);
 			i_pixel = row * m->img->width + column;
 			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
 				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
 				continue;
-
-			m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
-				&& row < m->img->height - 10 && column != m->img->width - 10 \
-				&& m->mouse_x == (int)column && m->mouse_y == (int)row;
-
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
@@ -317,10 +354,7 @@ void	cast_rays(t_minirt *m)
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);
 			}
-			m->img->pixels[4 * i_pixel + 0] = 255 * color.r;
-			m->img->pixels[4 * i_pixel + 1] = 255 * color.g;
-			m->img->pixels[4 * i_pixel + 2] = 255 * color.b;
-			m->img->pixels[4 * i_pixel + 3] = 255;
+			draw_scaled_pixel(m, color, column, row);
 		}
 	}
 	fflush(stdout); // TODO get rid of this!

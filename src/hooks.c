@@ -41,6 +41,20 @@ void rotate_camera(t_minirt *m, double dt, double dp)
     m->camera_orientation = vec3_inverse_lookat(vec3_rotatey(vec3(0,0,1), dt), m->camera_orientation);
 }
 
+void	flush_image_black(mlx_image_t *img)
+{
+	size_t	row;
+	size_t	column;
+
+	ft_memset(img->pixels, 0, img->width * img->height * sizeof(int32_t));
+	row = (size_t) - 1;
+	while (++row < img->height)
+	{
+		column = (size_t) - 1;
+		while (++column < img->width)
+			img->pixels[4 * (row * img->width + column) + 3] = 255;
+	}
+
 static t_vec3	perpendiculary(t_vec3 v)
 {
 	t_vec3	result;
@@ -75,6 +89,8 @@ void	key_hook(mlx_key_data_t key, void *minirt)
         rotate_camera(m, .125 * (1 - 2 * (key.key != MLX_KEY_LEFT)), 0);
 
     ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
+	m->valid_pixel_i = 0;
 }
 
 void	resize_hook(int w, int h, void *minirt)
@@ -84,6 +100,8 @@ void	resize_hook(int w, int h, void *minirt)
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
 	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
+	m->valid_pixel_i = 0;
 	m->resizing = true;
 }
 
@@ -103,6 +121,8 @@ void	mouse_hook(
 		{
 			m->double_clicked = true;
 			ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+      flush_image_black(m->img);
+      m->valid_pixel_i = 0;
 		}
 		else
 		{

@@ -25,8 +25,8 @@
 # endif
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
-# define INIT_WIDTH 1597
-# define INIT_HEIGHT 1200
+# define INIT_WIDTH 1470
+# define INIT_HEIGHT 1024
 
 // in pixels
 # define CHAR_WIDTH 10
