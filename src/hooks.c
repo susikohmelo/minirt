@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:41:30 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 01:41:46 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,19 @@ void	mouse_hook(
 		m->mouse_r_down = true;
 	else
 		m->mouse_r_down = false;
+}
+
+void	scroll_hook(double x_delta, double y_delta, void *minirt)
+{
+	t_minirt	*m;
+
+	m = minirt;
+	y_delta += x_delta;
+	m->camera_field_of_view -= y_delta;
+	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 179), 1);
+	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
+	m->valid_pixel_i = 0;
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
