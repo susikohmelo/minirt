@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 18:00:23 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:57:58 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ void	render_value(t_minirt *m, const char *value_name, double value)
 	char	line[LINE_LENGTH + 1];
 	char	fbuf[32];
 
+	m = m + 0; // TODO TEMP WERROR WORKAROUND
 	f_to_str(fbuf, value)[FLOAT_WIDTH] = '\0';
 	ft_memset(line, ' ', sizeof line);
 	ft_memcpy(line, value_name, ft_strlen(value_name));
@@ -66,6 +67,7 @@ void	render_header(t_minirt *m, const char *header)
 {
 	char	line[LINE_LENGTH + 1];
 
+	m = m + 0; // TODO TEMP WERROR WORKAROUND
 	ft_memset(line, ' ', sizeof line);
 	ft_memcpy(line, header, ft_strlen(header));
 	line[LINE_LENGTH - 1] = 'X';
@@ -98,6 +100,7 @@ void	render_disc_text(t_minirt *m)
 
 void	render_default_text(t_minirt *m)
 {
+	m = m + 0; // TODO TEMP WERROR WORKAROUND
 }
 
 void	render_attributes_text(t_minirt *m)

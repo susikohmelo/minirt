@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 17:09:32 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:07:38 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:56:58 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	render_string(t_minirt *m, const char *str, int32_t x, int32_t y)
 	const size_t	len = ft_strlen(str);
 	size_t			i;
 
+	x = x + 0; y = y + 0; // TODO TEMP WERROR WORKAROUND
 	ft_strlcpy(buf, str, sizeof buf);
 	i = (size_t) - 1;
 	while (++i < len)

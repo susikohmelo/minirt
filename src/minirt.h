@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:01:19 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/14 19:04:15 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # endif
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
-# define INIT_WIDTH 1480
+# define INIT_WIDTH 1445
 # define INIT_HEIGHT 1024
 
 # define MOUSE_SENSITIVITY 0.25
