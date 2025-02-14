@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 18:31:22 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:00:23 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,6 @@ void	render_value(t_minirt *m, const char *value_name, double value)
 	ft_memcpy(line, value_name, ft_strlen(value_name));
 	ft_memcpy(line + LINE_LENGTH - FLOAT_WIDTH, fbuf, FLOAT_WIDTH);
 	line[LINE_LENGTH] = '\0';
-	m->gui_lines[m->gui_lines_length] = mlx_put_string( \
-		m->mlx, line, 0, (m->gui_lines_length + 1) * CHAR_HEIGHT);
-	m->gui_lines_length++;
 }
 
 void	render_common_shape_text(t_minirt *m)
@@ -73,7 +70,6 @@ void	render_header(t_minirt *m, const char *header)
 	ft_memcpy(line, header, ft_strlen(header));
 	line[LINE_LENGTH - 1] = 'X';
 	line[LINE_LENGTH - 0] = '\0';
-	m->gui_lines[m->gui_lines_length++] = mlx_put_string(m->mlx, line, 0, 0);
 }
 
 void	render_sphere_text(t_minirt *m)
@@ -102,12 +98,12 @@ void	render_disc_text(t_minirt *m)
 
 void	render_default_text(t_minirt *m)
 {
-	m->gui_lines[m->gui_lines_length++] = mlx_put_string(m->mlx, "o", 0, 0);
 }
 
 void	render_attributes_text(t_minirt *m)
 {
 	render_header(m, "Environment");
+
 }
 
 void	render_text(t_minirt *m)
@@ -130,15 +126,9 @@ void	render_frame(void *minirt)
 {
 	const char	ones[] = "\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1";
 	t_minirt	*m;
-	static mlx_image_t *text;
 
 	m = minirt;
-	mlx_delete_image(m->mlx, text);
-	while (m->gui_lines_length != 0)
-	{
-		m->gui_lines_length = 0;
-		//mlx_delete_image(m->mlx, m->gui_lines[--m->gui_lines_length]);
-	}
+
 	cast_rays(minirt);
 	m->valid_pixel[m->valid_pixel_i] = true;
 	m->valid_pixel_i = (m->valid_pixel_i + 5) & (sizeof m->valid_pixel - 1);
@@ -147,6 +137,5 @@ void	render_frame(void *minirt)
 		m->double_clicked = false;
 		m->resizing = false;
 	}
-	text = mlx_put_string(m->mlx, "FDSA", 30, 30);
 	render_text(m);
 }

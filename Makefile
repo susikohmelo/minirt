@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/12 21:32:09 by ljylhank         ###   ########.fr        #
+#    Updated: 2025/02/14 17:08:17 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ SRCS = main.c minirt.c vec3.c vec3_2.c vec3_scalar.c hooks.c \
 	get_next_line.c get_next_line_utils.c \
 	cast_rays.c render_frame.c intersect_dist.c texture_uv_functions.c \
 	parse_texture.c get_uv_coords.c free_textures.c parse_utils.c \
-	get_texture_color.c
+	get_texture_color.c font.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a

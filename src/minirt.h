@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:45:22 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:01:19 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@
 
 # define MOUSE_SENSITIVITY 0.25
 # define MOVE_DISTANCE 0.3
+
+// TODO actual values
+# define MIN_WINDOW_WIDTH 12
+# define MIN_WINDOW_HEIGHT 12
 
 // in pixels
 # define CHAR_WIDTH 10
@@ -61,8 +65,7 @@ typedef struct s_minirt
 	t_shape			*shape;
 	bool			valid_pixel[32];
 	size_t			valid_pixel_i;
-	mlx_image_t		*gui_lines[32];
-	size_t			gui_lines_length;
+	mlx_image_t		*gui_text;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
