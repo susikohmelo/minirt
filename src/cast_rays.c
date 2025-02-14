@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 15:36:45 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:48:43 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,36 +288,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	return (main_color);
 }
 
-/*
-void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
-{
-	size_t	x;
-	size_t	y;
-	size_t	ind;
-
-	ind = row * m->img->width + col;
-	if (m->valid_pixel_i > 0)
-	{
-		m->img->pixels[4 * ind + 0] = 255 * clr.r;
-		m->img->pixels[4 * ind + 1] = 255 * clr.g;
-		m->img->pixels[4 * ind + 2] = 255 * clr.b;
-		m->img->pixels[4 * ind + 3] = 255;
-		return ;
-	}
-	y = -1;
-	while (++y < 8)
-	{
-		x = -1;
-		while (++x < 8 && (row + y) * m->img->width + col + x < m->img->width * m->img->height)
-		{
-			m->img->pixels[4 * (ind + y * m->img->width + x) + 0] = 255 * clr.r;
-			m->img->pixels[4 * (ind + y * m->img->width + x) + 1] = 255 * clr.g;
-			m->img->pixels[4 * (ind + y * m->img->width + x) + 2] = 255 * clr.b;
-			m->img->pixels[4 * (ind + y * m->img->width + x) + 3] = 255;
-		}
-	}
-}
-*/
 void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 {
 	size_t	x;
@@ -333,7 +303,9 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 		return ;
 	}
 	x = -1;
-	while (++x < 8 && row * m->img->width + col + x < m->img->width * m->img->height)
+	while (++x < 8 && row * m->img->width + col + x
+			< m->img->width * m->img->height
+			&& col + x < m->img->width)
 	{
 		m->img->pixels[4 * (indx + x) + 0] = 255 * clr.r;
 		m->img->pixels[4 * (indx + x) + 1] = 255 * clr.g;
@@ -341,6 +313,7 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 		m->img->pixels[4 * (indx + x) + 3] = 255;
 	}
 }
+
 //TODO make sure window doesn't crash with under 8 pixels
 
 static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)

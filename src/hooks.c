@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 14:47:58 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:07:37 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,21 @@ void rotate_camera(t_minirt *m, double dt, double dp)
     m->camera_orientation = vec3_inverse_lookat(vec3_rotatey(vec3(0,0,1), dt), m->camera_orientation);
 }
 
+void	flush_image_black(mlx_image_t *img)
+{
+	size_t	row;
+	size_t	column;
+
+	ft_memset(img->pixels, 0, img->width * img->height * sizeof(int32_t));
+	row = (size_t) - 1;
+	while (++row < img->height)
+	{
+		column = (size_t) - 1;
+		while (++column < img->width)
+			img->pixels[4 * (row * img->width + column) + 3] = 255;
+	}
+}
+
 void	key_hook(mlx_key_data_t key, void *minirt)
 {
     t_minirt    *m;
@@ -119,6 +134,7 @@ void	key_hook(mlx_key_data_t key, void *minirt)
     //         (M_PI / 32) * (1 - 2 * (key.key != MLX_KEY_LEFT)));
 
     ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
 	m->valid_pixel_i = 0;
 }
 
@@ -129,6 +145,7 @@ void	resize_hook(int w, int h, void *minirt)
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
 	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
 	m->valid_pixel_i = 0;
 	m->resizing = true;
 }
@@ -143,6 +160,7 @@ void	mouse_hook(
 	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_PRESS)
 	{
 	 	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+		flush_image_black(m->img);
 		m->valid_pixel_i = 0;
 	}
 }

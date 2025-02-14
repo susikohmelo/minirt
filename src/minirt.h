@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 15:24:47 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:09:44 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@
 # endif
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
-# define INIT_WIDTH 1600
-# define INIT_HEIGHT 1200
+# define INIT_WIDTH 1470
+# define INIT_HEIGHT 1024
 
 typedef struct s_light
 {
