@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 21:36:05 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 17:10:53 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,14 +59,14 @@ static t_vec3	get_nearby_pixels(mlx_image_t *img, int targ_x, int targ_y)
 
 	clr = (t_vec3){};
 	counter = 0;
-	row = -4;
-	while (++row <= 3)
+	row = -5;
+	while (++row <= 4)
 	{
-		column = -4;
-		while (++column <= 3)
+		column = -5;
+		while (++column <= 4)
 		{
-			xy[0] = targ_x + column * 6;
-			xy[1] = targ_y + row * 6;
+			xy[0] = targ_x + column * round((double) img->width / 50);
+			xy[1] = targ_y + row * round((double) img->height / 50);
 			if (xy[0] < 0 || xy[1] < 0 || xy[0] > (int) img->width - 1
 				|| xy[1] > (int) img->height - 1)
 				continue ;

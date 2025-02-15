@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/15 00:39:18 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 19:30:13 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,13 +161,7 @@ static t_vec3	phong(
 		reflection = vec3_sub( \
 			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
 			light_dir);
-		surface = vec3_add(surface,
-	// All I've changed here is multiply diffuse by the roughness (reducing it for smooth stuff)
-	// and multiply the inverse (1 - roughness) for specular, (making it shinier for smooth stuff)
-	// TODO these parameters correspond to `specular_reflection` and `diffuse_reflection`,
-	// combine them somehow. Also, they will not be constants, but will be parsed for each
-	// shape later on.
-		vec3_muls(m->lights[i].color, diffuse_reflection));
+		surface = vec3_add(surface, vec3_muls(m->lights[i].color, diffuse_reflection));
 		surface_speculars = vec3_add(surface_speculars, \
 			vec3_muls(m->lights[i].color, specular_reflection * (1 / pow(shape_rough + 0.88, 2) - 0.27) * \
 			pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha * (1 / pow(shape_rough + 0.01, 2) + 0.02))));
@@ -242,34 +236,59 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 	return (normal);
 }
 
+static inline void	skybox_intersect_check(t_minirt *m, t_ray *data, t_vec3 normal)
+{
+	data->dir = normal;
+	data->length = INFINITY;
+	get_shape_intersect_dist(m, data, NULL);
+}
+
 t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 {
 	t_vec3			ray;
 	t_vec3			cmr_dir;
 	t_vec3			main_color;
+	t_vec3			shape_color;
+	t_vec3			skybox_color;
+	t_vec3			skybox_diffuse;
 	t_vec3			normal;
-	double			reflect;
+	double			roughness;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	normal = get_obj_normal(m, ray, &data);
 	if (is_reflection)
 		return phong(m, ray, normal, data);
 	main_color = phong(m, ray, normal, data);
-	reflect = data.shape->default_rough;
+	roughness = data.shape->default_rough;
 	if (data.shape->roughness_map)
-		reflect = get_rough_value(ray, data.shape, data.shape_type);
-	data.is_reflect = reflect;
+		roughness = get_rough_value(ray, data.shape, data.shape_type);
+	data.is_reflect = roughness;
 	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
 	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
 	data.start = vec3_add(ray, vec3_muls(normal, 0.001));
 	data.length = INFINITY;
+
 	get_shape_intersect_dist(m, &data, NULL);
 	if (isinf(data.length) || data.length < 0.0001)
-		return (main_color);
+	{
+		if (data.shape->texture)
+			shape_color = vec3_mul(get_albedo_blur(ray, data.shape, data.shape_type, 0), data.shape->color);
+		else
+			shape_color = data.shape->color;
+		skybox_color = get_skybox_color(m, data.dir, roughness);
+		skybox_diffuse = vec3_mul(skybox_color, shape_color);
+		skybox_color = vec3_add(vec3_muls(skybox_diffuse, roughness), vec3_muls(skybox_color, 1 - roughness));
+		skybox_color = vec3_sub(skybox_color, vec3_mul(m->ambient_light, shape_color));
+
+		//TODO function for this, the same thing is used in cast_rays() too
+		skybox_color.r = fmin(fmax(skybox_color.r, 0), 1);
+		skybox_color.g = fmin(fmax(skybox_color.g, 0), 1);
+		skybox_color.b = fmin(fmax(skybox_color.b, 0), 1);
+		return (vec3_add(main_color, skybox_color));
+	}
 	else
 	{
-		normal = get_obj_normal(m, ray, &data);
-		main_color = vec3_add(vec3_muls(surface_color(m, data, true), (1 - reflect) / (1 + reflect * data.length * 16)), main_color);
+		main_color = vec3_add(vec3_muls(surface_color(m, data, true), (1 - roughness) / (1 + roughness * data.length * 16)), main_color);
 	}
 	return (main_color);
 }
@@ -346,7 +365,7 @@ void	cast_rays(t_minirt *m)
 				m->shape_type = ray.shape_type;
 			}
 			if (isinf(ray.length))
-				color = (t_vec3){};
+				color = get_skybox_color(m, ray.dir, 0);
 			else
 			{
 				color = surface_color(m, ray, false);
