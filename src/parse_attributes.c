@@ -14,21 +14,21 @@
 
 bool	parse_ambient_light(t_minirt *m, const char *line)
 {
-	double	ratio;
-
 	line = trim_left(line);
-	line = parse_float(m, &ratio, line, ' ');
-	expect_range(m, vec3(ratio, 0., 1.), "Ambient lighting ratio");
-	line = parse_float(m, &m->ambient_light.r, line, ',');
-	expect_range(m, vec3(m->ambient_light.r, 0, 255), \
+	line = parse_float(m, &m->ambient_light_ratio, line, ' ');
+	expect_range( \
+		m, vec3(m->ambient_light_ratio, 0., 1.), "Ambient lighting ratio");
+	line = parse_float(m, &m->ambient_light_color.r, line, ',');
+	expect_range(m, vec3(m->ambient_light_color.r, 0, 255), \
 		"Ambient light red component");
-	line = parse_float(m, &m->ambient_light.g, line, ',');
-	expect_range(m, vec3(m->ambient_light.g, 0, 255), \
+	line = parse_float(m, &m->ambient_light_color.g, line, ',');
+	expect_range(m, vec3(m->ambient_light_color.g, 0, 255), \
 		"Ambient light green component");
-	line = parse_float(m, &m->ambient_light.b, line, '\0');
-	expect_range(m, vec3(m->ambient_light.b, 0, 255), \
+	line = parse_float(m, &m->ambient_light_color.b, line, '\0');
+	expect_range(m, vec3(m->ambient_light_color.b, 0, 255), \
 		"Ambient light blue component");
-	m->ambient_light = vec3_muls(m->ambient_light, ratio / 255);
+	m->ambient_light_color = vec3_divs(m->ambient_light_color, 255);
+	m->ambient_light = vec3_muls(m->ambient_light_color, m->ambient_light_ratio);
 	return (true);
 }
 
@@ -58,21 +58,21 @@ bool	parse_camera(t_minirt *m, const char *line)
 bool	parse_light(t_minirt *m, const char *line)
 {
 	t_light	light;
-	double	ratio;
 
 	line = trim_left(line);
 	line = parse_float(m, &light.coords.x, line, ',');
 	line = parse_float(m, &light.coords.y, line, ',');
 	line = parse_float(m, &light.coords.z, line, ' ');
-	line = parse_float(m, &ratio, line, ' ');
-	expect_range(m, vec3(ratio, 0., 1.), "Light brightness ratio");
-	line = parse_float(m, &light.color.r, line, ',');
-	expect_range(m, vec3(light.color.r, 0, 255), "Light red component");
-	line = parse_float(m, &light.color.g, line, ',');
-	expect_range(m, vec3(light.color.g, 0, 255), "Light green component");
-	line = parse_float(m, &light.color.b, line, '\0');
-	expect_range(m, vec3(light.color.b, 0, 255), "Light blue component");
-	light.color = vec3_muls(light.color, ratio / 255);
+	line = parse_float(m, &light.brightness, line, ' ');
+	expect_range(m, vec3(light.brightness, 0., 1.), "Light brightness light.brightness");
+	line = parse_float(m, &light.color_value.r, line, ',');
+	expect_range(m, vec3(light.color_value.r, 0, 255), "Light red component");
+	line = parse_float(m, &light.color_value.g, line, ',');
+	expect_range(m, vec3(light.color_value.g, 0, 255), "Light green component");
+	line = parse_float(m, &light.color_value.b, line, '\0');
+	expect_range(m, vec3(light.color_value.b, 0, 255), "Light blue component");
+	light.color_value = vec3_divs(light.color_value, 255);
+	light.color = vec3_muls(light.color_value, light.brightness);
 	m->lights[m->lights_length++] = light;
 	return (true);
 }

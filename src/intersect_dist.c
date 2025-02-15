@@ -83,13 +83,8 @@ static void	min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder)
 	if (discriminant >= 0)
 	{
 		double b_term = b <= 0. ? -b + sqrt(discriminant) : -b - sqrt(discriminant);
-		#if 1
 		double hit1 = b_term / (2. * a);
 		double hit2 = (2. * c) / b_term;
-		#else
-		double hit1 = fabs(b_term / (2. * a));
-		double hit2 = fabs((2. * c) / b_term);
-		#endif
 
 		t_vec3 hitp1 = vec3_add(ray->start, vec3_muls(ray->dir, hit1));
 		t_vec3 hitp2 = vec3_add(ray->start, vec3_muls(ray->dir, hit2));

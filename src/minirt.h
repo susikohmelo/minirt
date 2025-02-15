@@ -45,12 +45,6 @@
 
 # define SCALE 8
 
-typedef struct s_light
-{
-	t_vec3	coords;
-	t_vec3	color;
-}	t_light;
-
 typedef struct s_minirt
 {
 	mlx_t			*mlx;
@@ -62,6 +56,7 @@ typedef struct s_minirt
 	bool			cursor_pointing;
 	bool			double_clicked;
 	bool			mouse_r_down;
+	bool			show_lights;
 
 	t_shape_type	shape_type;
 	t_shape			*shape;
@@ -70,6 +65,8 @@ typedef struct s_minirt
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
 
+	double			ambient_light_ratio;
+	t_vec3			ambient_light_color;
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
 	t_vec3			camera_orientation;

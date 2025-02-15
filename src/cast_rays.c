@@ -314,6 +314,51 @@ static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
 		&& cursor_in_range && m->valid_pixel_i == 0;
 }
 
+static void min_light_intersect_dist(t_ray *ray, const t_light *light)
+{
+	t_vec3	lstart;
+	double	b;
+	double	c;
+	double	discriminant;
+	double	length;
+
+	lstart = vec3_sub(ray->start, light->coords);
+	b = 2 * vec3_dot(ray->dir, lstart);
+	c = vec3_dot(lstart, lstart) - (light->brightness + .5);
+	discriminant = b * b - 4 * 1 * c;
+	if (discriminant >= 0)
+	{
+		length = (-b - sqrt(discriminant)) / (2. * 1);
+		if (length < ray->length && length >= 0)
+		{
+			ray->length = length;
+			ray->shape = NULL;
+			ray->shape_type = SHAPE_LIGHT;
+		}
+	}
+}
+
+void	get_light_intersect_dist(t_minirt *m, t_ray *ray)
+{
+	size_t	i;
+
+	i = (size_t) - 1;
+	while (++i < m->lights_length)
+		min_light_intersect_dist(ray, &m->lights[i]);
+}
+
+static void	precalculate(t_minirt *m)
+{
+	size_t	i;
+
+	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
+	m->ambient_light = vec3_muls(m->ambient_light_color, m->ambient_light_ratio);
+	i = (size_t) - 1;
+	while (i < m->lights_length)
+		m->lights[i].color = vec3_muls( \
+			m->lights[i].color_value, m->lights[i].brightness);
+}
+
 void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
@@ -322,7 +367,7 @@ void	cast_rays(t_minirt *m)
 	size_t	i_pixel;
 	t_vec3	color;
 
-	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
+	precalculate(m);
 	set_cam_rot_matrix(m);
 
 	row = (size_t) - 1;
@@ -340,6 +385,7 @@ void	cast_rays(t_minirt *m)
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
 			get_shape_intersect_dist(m, &ray, NULL);
+			//get_light_intersect_dist(m, &ray);
 
 			if (m->double_clicked && m->cursor_pointing
 				&& ray.shape_type != SHAPE_NO_SHAPE)
@@ -358,13 +404,15 @@ void	cast_rays(t_minirt *m)
 			}
 			if (isinf(ray.length))
 				color = (t_vec3){};
-			else
+			else if (true || ray.shape_type != SHAPE_LIGHT)
 			{
 				color = surface_color(m, ray, false);
 				color.r = fmin(fmax(color.r, 0), 1);
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);
 			}
+			else
+				color = vec3(1, 1, 1);
 			draw_scaled_pixel(m, color, column, row);
 		}
 	}

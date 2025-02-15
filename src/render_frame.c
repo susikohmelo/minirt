@@ -39,27 +39,20 @@ static void	render_slider2(t_minirt *m, double value)
 	y = m->gui_line * CHAR_HEIGHT - 1;
 	while (++y < (m->gui_line + 1) * CHAR_HEIGHT)
 	{
-		if (value >= 0)
+		x = (1 + (value < 0) * value) * LINE_LENGTH * CHAR_WIDTH / 2 - 1;
+		while (++x < (.5 * value + .5) * LINE_LENGTH * CHAR_WIDTH)
 		{
-			x = LINE_LENGTH * CHAR_WIDTH / 2 - 1;
-			while (++x < (.5 * value + .5) * LINE_LENGTH * CHAR_WIDTH)
-			{
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
-			}
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
 		}
-		else
+		while (++x < LINE_LENGTH * CHAR_WIDTH / 2)
 		{
-			x = (1 + value) * LINE_LENGTH * CHAR_WIDTH / 2 - 1;
-			while (++x < LINE_LENGTH * CHAR_WIDTH / 2)
-			{
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
-				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
-			}
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
 		}
 	}
 }
@@ -168,8 +161,21 @@ void	render_default_text(t_minirt *m)
 
 void	render_attributes_text(t_minirt *m)
 {
-	render_header(m, "Environment");
+	char	line[LINE_LENGTH + 1];
 
+	render_header(m, "Environment");
+	render_value(m, "Ambient light ratio", m->ambient_light_ratio, 1);
+	render_value(m, "Ambient light red", m->ambient_light_color.r, 255);
+	render_value(m, "Ambient light green", m->ambient_light_color.g, 255);
+	render_value(m, "Ambient light blue", m->ambient_light_color.b, 255);
+	render_value(m, "Field of view", m->camera_field_of_view / 180, 180);
+	ft_memset(line, ' ', sizeof line);
+	ft_memcpy(line, "Show lights", ft_strlen("Show lights"));
+	if (m->show_lights)
+		ft_memcpy(line + LINE_LENGTH - ft_strlen("yes"), "yes", sizeof "yes");
+	else
+		ft_memcpy(line + LINE_LENGTH - ft_strlen("no"), "no", sizeof "no");
+	render_string(m, line);
 }
 
 void	render_text(t_minirt *m)

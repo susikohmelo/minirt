@@ -18,6 +18,7 @@
 
 typedef enum e_shape_type
 {
+	SHAPE_LIGHT = -2,
 	SHAPE_GLOBAL_ATTRIBUTES = -1,
 	SHAPE_NO_SHAPE,
 	SHAPE_SPHERE,
@@ -90,5 +91,13 @@ typedef struct s_disc
 	t_vec3		normal;
 	double		radius;
 }	t_disc;
+
+typedef struct s_light
+{
+	t_vec3	coords;
+	t_vec3	color;
+	double	brightness;
+	t_vec3	color_value;
+}	t_light;
 
 #endif
