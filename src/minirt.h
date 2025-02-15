@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/15 21:39:58 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 00:50:33 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 	Maximum times a ray can reflect off of a surface.
 	Minimum bounces is 1, even if the max is lower than 1.
 */
-# define DEFAULT_MAX_RAY_BOUNCES 2
+# define DEFAULT_MAX_RAY_BOUNCES 3
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
 # define INIT_WIDTH 1445
