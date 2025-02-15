@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/16 00:52:10 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:11:19 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -283,14 +283,15 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	t_vec3			normal;
 	double			roughness;
 	double			temp_rough;
-	size_t			i;
+	int				i;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	normal = get_obj_normal(m, ray, &data);
 	main_color = phong(m, ray, normal, data);
 
 	// If we are being called through recursion, kill the cycle here
-	if (is_reflection)
+	// Or we don't want reflections at all
+	if (is_reflection || m->max_ray_bounces == 0)
 		return (main_color);
 	roughness = get_shape_roughness(&data, &ray);
 	data.is_reflect = roughness;

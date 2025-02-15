@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/16 00:50:33 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:14:40 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,14 @@
 
 /*
 	Maximum times a ray can reflect off of a surface.
-	Minimum bounces is 1, even if the max is lower than 1.
+	This includes the initial reflection,
+	meaning 0 Will disable all reflections.
 */
 # define DEFAULT_MAX_RAY_BOUNCES 3
 
-// Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
+/*
+	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
+*/
 # define INIT_WIDTH 1445
 # define INIT_HEIGHT 1024
 
@@ -86,7 +89,7 @@ typedef struct s_minirt
 	bool			double_clicked;
 	bool			mouse_r_down;
 
-	size_t			max_ray_bounces;
+	int				max_ray_bounces;
 
 	t_shape_type	shape_type;
 	t_shape			*shape;
