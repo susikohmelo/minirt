@@ -27,6 +27,7 @@ CFLAGS = -Iinclude -Wall -Wextra -Werror
 LFLAGS = -lm -lpthread
 ifeq ($(MSYS_VERSION), 0)
 LFLAGS += -lglfw -ldl
+SANITIZERS = -fsanitize=address -fsanitize=leak -fsanitize=undefined
 else
 LFLAGS += -lglfw3
 FIX_MLX = cd MLX42 \
@@ -77,7 +78,7 @@ re:
 	make all
 
 debug: CFLAGS += -ggdb3 -gdwarf -DMRT_FATAL_EXPECT=0
-debug: CFLAGS += -fsanitize=address -fsanitize=undefined -fsanitize=leak
+debug: CFLAGS += $(SANITIZERS)
 debug: $(NAME)
 
 rebug:

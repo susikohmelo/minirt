@@ -122,10 +122,14 @@ void	mrt_init(t_minirt *m, const char *path)
 
 void	mrt_destroy(t_minirt *m)
 {
-	mlx_delete_image(m->mlx, m->gui_text);
+	if (m->mlx != NULL)
+	{
+		if (m->img != NULL)
+			mlx_delete_image(m->mlx, m->img);
+		if (m->gui_text != NULL)
+			mlx_delete_image(m->mlx, m->gui_text);
+	}
 	free_textures(m);
-	if (m->mlx != NULL && m->img != NULL)
-		mlx_delete_image(m->mlx, m->img);
 	free(m->mlx);
 	free(m->line);
 	ft_arena_clear(&m->arena);

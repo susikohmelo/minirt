@@ -344,8 +344,17 @@ void	cast_rays(t_minirt *m)
 			if (m->double_clicked && m->cursor_pointing
 				&& ray.shape_type != SHAPE_NO_SHAPE)
 			{
-				m->shape = (t_shape *)ray.shape;
-				m->shape_type = ray.shape_type;
+				if (ray.shape_type == SHAPE_DISC)
+				{
+					m->shape = (t_shape *) \
+						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
+					m->shape_type = SHAPE_CYLINDER;
+				}
+				else
+				{
+					m->shape = (t_shape *)ray.shape;
+					m->shape_type = ray.shape_type;
+				}
 			}
 			if (isinf(ray.length))
 				color = (t_vec3){};

@@ -43,6 +43,8 @@
 # define FLOAT_WIDTH 5
 # define LINE_LENGTH 32
 
+# define SCALE 8
+
 typedef struct s_light
 {
 	t_vec3	coords;

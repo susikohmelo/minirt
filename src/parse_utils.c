@@ -43,13 +43,20 @@ double	str_to_f(const char *str)
 
 char	*f_to_str(char buf[static 32], double f)
 {
-	int		i;
+	int64_t	i;
 
 	i = f;
 	ft_i_to_str(buf, i);
-	if (fabs(f - i) < .000001)
+	if (fabs(f - i) < .0001)
 		return (buf);
-	ft_i_to_str(ft_memcpy(buf + ft_strlen(buf), ".", 2) + 1, (f - i) * 1000000);
+	if (-1 < f && f < 0)
+		buf[0] = '-';
+	if (f < 0)
+	{
+		f = -f;
+		i = -i;
+	}
+	ft_i_to_str(ft_memcpy(buf + ft_strlen(buf), ".", 2) + 1, (f - i) * 10000);
 	while (buf[ft_strlen(buf) - 1] != '.' && buf[ft_strlen(buf) - 1] == '0')
 		buf[ft_strlen(buf) - 1] = '\0';
 	if (buf[ft_strlen(buf) - 1] == '.')

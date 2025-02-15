@@ -12,7 +12,7 @@
 
 #include "minirt.h"
 
-static void	draw_slider(t_minirt *m, double value)
+static void	render_slider(t_minirt *m, double value)
 {
 	size_t	x;
 	size_t	y;
@@ -31,19 +31,86 @@ static void	draw_slider(t_minirt *m, double value)
 	}
 }
 
+static void	render_slider2(t_minirt *m, double value)
+{
+	size_t	x;
+	size_t	y;
+
+	y = m->gui_line * CHAR_HEIGHT - 1;
+	while (++y < (m->gui_line + 1) * CHAR_HEIGHT)
+	{
+		if (value >= 0)
+		{
+			x = LINE_LENGTH * CHAR_WIDTH / 2 - 1;
+			while (++x < (.5 * value + .5) * LINE_LENGTH * CHAR_WIDTH)
+			{
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
+			}
+		}
+		else
+		{
+			x = (1 + value) * LINE_LENGTH * CHAR_WIDTH / 2 - 1;
+			while (++x < LINE_LENGTH * CHAR_WIDTH / 2)
+			{
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
+				m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
+			}
+		}
+	}
+}
+
 static void	render_value(
 	t_minirt *m, const char *value_name, double value, double scale)
 {
 	char	line[LINE_LENGTH + 1];
 	char	fbuf[32];
 
-	draw_slider(m, value);
+	render_slider(m, value);
 	f_to_str(fbuf, scale * value)[FLOAT_WIDTH] = '\0';
 	ft_memset(line, ' ', sizeof line);
 	ft_memcpy(line, value_name, ft_strlen(value_name));
 	ft_memcpy(line + LINE_LENGTH - ft_strlen(fbuf), fbuf, FLOAT_WIDTH);
 	line[LINE_LENGTH] = '\0';
 	render_string(m, line);
+}
+
+static void	render_normalized_value(
+	t_minirt *m, const char *value_name, double value)
+{
+	char	line[LINE_LENGTH + 1];
+	char	fbuf[32];
+
+	mrt_debug(m);
+	render_slider2(m, value);
+	f_to_str(fbuf, value)[FLOAT_WIDTH] = '\0';
+	ft_memset(line, ' ', sizeof line);
+	ft_memcpy(line, value_name, ft_strlen(value_name));
+	ft_memcpy(line + LINE_LENGTH - ft_strlen(fbuf), fbuf, FLOAT_WIDTH);
+	line[LINE_LENGTH] = '\0';
+	render_string(m, line);
+}
+
+static void	render_normalized_vector_value(
+	t_minirt *m, const char *value_name, t_vec3 value)
+{
+	char	name[LINE_LENGTH + 1];
+	size_t	name_length;
+
+	name_length = ft_strlen(value_name);
+	ft_memcpy(name, value_name, name_length);
+	name[name_length + 0] = ' ';
+	name[name_length + 2] = '\0';
+	name[name_length + 1] = 'X';
+	render_normalized_value(m, name, value.x);
+	name[name_length + 1] = 'Y';
+	render_normalized_value(m, name, value.y);
+	name[name_length + 1] = 'Z';
+	render_normalized_value(m, name, value.z);
 }
 
 void	render_common_shape_text(t_minirt *m)
@@ -70,24 +137,28 @@ void	render_sphere_text(t_minirt *m)
 {
 	render_header(m, "Sphere");
 	render_common_shape_text(m);
+	render_value(m, "Radius",  ((t_sphere *)m->shape)->radius / SCALE, SCALE);
 }
 
 void	render_plane_text(t_minirt *m)
 {
 	render_header(m, "Plane");
 	render_common_shape_text(m);
+	render_normalized_vector_value(m, "Normal", ((t_plane *)m->shape)->normal);
 }
 
 void	render_cylinder_text(t_minirt *m)
 {
 	render_header(m, "Cylinder");
 	render_common_shape_text(m);
+	render_normalized_vector_value(m, "Axis", ((t_cylinder *)m->shape)->axis);
+	render_value(m, "Radius", ((t_cylinder *)m->shape)->radius / SCALE, SCALE);
+	render_value(m, "Height", ((t_cylinder *)m->shape)->height / SCALE, SCALE);
 }
 
 void	render_disc_text(t_minirt *m)
 {
-	render_header(m, "Cylinder");
-	render_common_shape_text(m);
+	mrt_assert(m, 0, "Unreachable!");
 }
 
 void	render_default_text(t_minirt *m)
