@@ -332,7 +332,7 @@ static void min_light_intersect_dist(t_ray *ray, const t_light *light)
 		if (length < ray->length && length >= 0)
 		{
 			ray->length = length;
-			ray->shape = NULL;
+			ray->shape = (t_shape *)light;
 			ray->shape_type = SHAPE_LIGHT;
 		}
 	}
@@ -385,7 +385,8 @@ void	cast_rays(t_minirt *m)
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
 			get_shape_intersect_dist(m, &ray, NULL);
-			//get_light_intersect_dist(m, &ray);
+			if (m->show_lights)
+				get_light_intersect_dist(m, &ray);
 
 			if (m->double_clicked && m->cursor_pointing
 				&& ray.shape_type != SHAPE_NO_SHAPE)
@@ -404,7 +405,7 @@ void	cast_rays(t_minirt *m)
 			}
 			if (isinf(ray.length))
 				color = (t_vec3){};
-			else if (true || ray.shape_type != SHAPE_LIGHT)
+			else if (ray.shape_type != SHAPE_LIGHT)
 			{
 				color = surface_color(m, ray, false);
 				color.r = fmin(fmax(color.r, 0), 1);
@@ -412,7 +413,7 @@ void	cast_rays(t_minirt *m)
 				color.b = fmin(fmax(color.b, 0), 1);
 			}
 			else
-				color = vec3(1, 1, 1);
+				color = ((t_light *)ray.shape)->color_value;
 			draw_scaled_pixel(m, color, column, row);
 		}
 	}

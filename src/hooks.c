@@ -34,19 +34,21 @@ t_vec3   axis_rotation(t_vec3 v, t_vec3 axis, double r)
     return (mat3_vec3(m, v));
 }
 
-void	flush_image_black(mlx_image_t *img)
+void	redraw(t_minirt *m)
 {
 	size_t	row;
 	size_t	column;
 
-	ft_memset(img->pixels, 0, img->width * img->height * sizeof(int32_t));
+	ft_memset(m->img->pixels, 0, m->img->width * m->img->height * 4);
 	row = (size_t) - 1;
-	while (++row < img->height)
+	while (++row < m->img->height)
 	{
 		column = (size_t) - 1;
-		while (++column < img->width)
-			img->pixels[4 * (row * img->width + column) + 3] = 255;
+		while (++column < m->img->width)
+			m->img->pixels[4 * (row * m->img->width + column) + 3] = 255;
 	}
+    ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	m->valid_pixel_i = 0;
 }
 
 static t_vec3	perpendiculary(t_vec3 v)
@@ -80,9 +82,7 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 			perpendiculary(dir), d * (1 - 2 * (key.key != MLX_KEY_A))));
 	if (key.key == MLX_KEY_SPACE || key.key == MLX_KEY_LEFT_SHIFT)
 		m->camera_coords.y += d * (1 - 2 * (key.key != MLX_KEY_SPACE));
-    ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
-	flush_image_black(m->img);
-	m->valid_pixel_i = 0;
+	redraw(m);
 }
 
 void	resize_hook(int w, int h, void *minirt)
@@ -91,9 +91,7 @@ void	resize_hook(int w, int h, void *minirt)
 
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
-	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
-	flush_image_black(m->img);
-	m->valid_pixel_i = 0;
+	redraw(m);
 	m->resizing = true;
 }
 
@@ -112,9 +110,7 @@ void	mouse_hook(
 		if (click_time - last_click_time < .2)
 		{
 			m->double_clicked = true;
-			ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
-			flush_image_black(m->img);
-			m->valid_pixel_i = 0;
+			redraw(m);
 		}
 		else
 		{
@@ -127,9 +123,20 @@ void	mouse_hook(
 				&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
 				&& m->shape_type == SHAPE_NO_SHAPE)
 				m->shape_type = SHAPE_GLOBAL_ATTRIBUTES;
+			else if ((LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
+				&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+				&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
+				&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT
+				&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
+			{
+				m->show_lights = !m->show_lights;
+				redraw(m);
+			}
 		}
 		last_click_time = click_time;
 	}
+	m->mouse_l_down = MLX_MOUSE_BUTTON_LEFT \
+		&& (action == MLX_PRESS || action == MLX_REPEAT);
 	if (button == MLX_MOUSE_BUTTON_RIGHT && (action == MLX_PRESS
 			|| action == MLX_REPEAT))
 		m->mouse_r_down = true;
@@ -156,10 +163,12 @@ void	cursor_hook(double x, double y, void *minirt)
 			new_rot.y = new_rot.y + mouse_move_dir.y;
 		new_rot = vec3_normalize(new_rot);
 		m->camera_orientation = vec3_inverse_lookat(new_rot, m->camera_orientation);
-		ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
-		flush_image_black(m->img);
-		m->valid_pixel_i = 0;
+		redraw(m);
 	}
+	if (m->mouse_l_down && m->shape != SHAPE_NO_SHAPE && mouse_move_dir.x != 0
+		&& x < LINE_LENGTH * CHAR_WIDTH && y < m->gui_line * CHAR_HEIGHT)
+		{}; // TODO
+
 	m->mouse_x = x;
 	m->mouse_y = y;
 }

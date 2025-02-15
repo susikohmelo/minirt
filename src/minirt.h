@@ -55,6 +55,7 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	bool			cursor_pointing;
 	bool			double_clicked;
+	bool			mouse_l_down;
 	bool			mouse_r_down;
 	bool			show_lights;
 
