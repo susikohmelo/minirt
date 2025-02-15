@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 04:22:45 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/15 18:04:18 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:31:27 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ t_vec3	get_skybox_color(t_minirt *m, t_vec3 dir, double blur)
 	t_vec3		normal;
 	t_vec2		uv;
 
+	if (m->disable_skybox)
+		return ((t_vec3){});
 	sky_img = choose_skybox_img(m, dir, &normal, &ray_len);
 	if (!sky_img)
 		return (vec3(0,1,0));

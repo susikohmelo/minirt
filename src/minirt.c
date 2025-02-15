@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/15 21:41:25 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:52:23 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ static void	load_skybox(t_minirt *m)
 	mrt_assert(m, m->skybox.back, error_message);
 	m->skybox.down = load_texture(m, "skybox/skybox.down.xpm42", ALBEDO);
 	mrt_assert(m, m->skybox.down, error_message);
+	m->max_ray_bounces = DEFAULT_MAX_RAY_BOUNCES;
+	m->disable_skybox = SKYBOX_DISABLED_BY_DEFAULT;
 }
 static void	load_textures(t_minirt *m)
 {
@@ -115,7 +117,6 @@ void	mrt_init(t_minirt *m, const char *path)
 		&m->arena, sizes[SHAPE_CYLINDER], sizeof m->cylinders[0]);
 	m->discs = ft_arena_calloc( \
 		&m->arena, 2 * sizes[SHAPE_CYLINDER], sizeof m->discs[0]);
-	m->max_ray_bounces = DEFAULT_MAX_RAY_BOUNCES;
 	parse_input(m, path);
 	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
 	load_textures(m);

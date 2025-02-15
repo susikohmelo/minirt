@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/16 01:14:40 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:55:05 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,15 @@
 
 /*
 	Maximum times a ray can reflect off of a surface.
-	This includes the initial reflection,
-	meaning 0 Will disable all reflections.
+	This includes the initial reflection,meaning 0 disables all reflections.
+	Keys 1 and 2 can adjust bounces in real time.
 */
+
 # define DEFAULT_MAX_RAY_BOUNCES 3
+/*
+	Key 3 can also enable/disable this at any time in the program
+*/
+# define SKYBOX_DISABLED_BY_DEFAULT 1
 
 /*
 	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
@@ -90,6 +95,7 @@ typedef struct s_minirt
 	bool			mouse_r_down;
 
 	int				max_ray_bounces;
+	bool			disable_skybox;
 
 	t_shape_type	shape_type;
 	t_shape			*shape;
