@@ -149,16 +149,6 @@ void	render_cylinder_text(t_minirt *m)
 	render_value(m, "Height", ((t_cylinder *)m->shape)->height / SCALE, SCALE);
 }
 
-void	render_disc_text(t_minirt *m)
-{
-	mrt_assert(m, 0, "Unreachable!");
-}
-
-void	render_default_text(t_minirt *m)
-{
-	render_string(m, "o");
-}
-
 void	render_attributes_text(t_minirt *m)
 {
 	char	line[LINE_LENGTH + 1];
@@ -178,6 +168,15 @@ void	render_attributes_text(t_minirt *m)
 	render_string(m, line);
 }
 
+void	render_light_text(t_minirt *m)
+{
+	render_header(m, "Light");
+	render_value(m, "Brightness", ((t_light *)m->shape)->brightness, 1);
+	render_value(m, "Red", ((t_light *)m->shape)->color_value.r, 255);
+	render_value(m, "Green", ((t_light *)m->shape)->color_value.g, 255);
+	render_value(m, "Blue", ((t_light *)m->shape)->color_value.b, 255);
+}
+
 void	render_text(t_minirt *m)
 {
 	render_string(m, NULL);
@@ -187,12 +186,12 @@ void	render_text(t_minirt *m)
 		render_plane_text(m);
 	else if (m->shape_type == SHAPE_CYLINDER)
 		render_cylinder_text(m);
-	else if (m->shape_type == SHAPE_DISC)
-		render_disc_text(m);
+	else if (m->shape_type == SHAPE_LIGHT)
+		render_light_text(m);
 	else if (m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
 		render_attributes_text(m);
 	else
-		render_default_text(m);
+		render_string(m, "o");
 }
 
 void	render_frame(void *minirt)
