@@ -129,8 +129,9 @@ void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);
 void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
-void	cast_rays(t_minirt *minirt);
+void	render_string(t_minirt *m, const char *str);
 
+void	cast_rays(t_minirt *minirt);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);

@@ -338,7 +338,8 @@ void	cast_rays(t_minirt *m)
 
 			get_shape_intersect_dist(m, &ray, NULL);
 
-			if (m->double_clicked && m->cursor_pointing)
+			if (m->double_clicked && m->cursor_pointing
+				&& ray.shape_type != SHAPE_NO_SHAPE)
 			{
 				m->shape = (t_shape *)ray.shape;
 				m->shape_type = ray.shape_type;
@@ -348,7 +349,6 @@ void	cast_rays(t_minirt *m)
 			else
 			{
 				color = surface_color(m, ray, false);
-				//mrt_print(color);
 				color.r = fmin(fmax(color.r, 0), 1);
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);
