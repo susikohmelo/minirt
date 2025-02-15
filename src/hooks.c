@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/15 01:41:46 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 21:48:24 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,9 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 			perpendiculary(dir), d * (1 - 2 * (key.key != MLX_KEY_A))));
 	if (key.key == MLX_KEY_SPACE || key.key == MLX_KEY_LEFT_SHIFT)
 		m->camera_coords.y += d * (1 - 2 * (key.key != MLX_KEY_SPACE));
+	if (key.key == MLX_KEY_1 || key.key == MLX_KEY_2)
+		m->max_ray_bounces = fmax(fmin(m->max_ray_bounces
+			+ (1 - 2 * (key.key != MLX_KEY_2)), 1024), 1);
     ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
 	flush_image_black(m->img);
 	m->valid_pixel_i = 0;

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/15 15:40:10 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 21:39:58 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@
 # ifndef MRT_FATAL_EXPECT
 #  define MRT_FATAL_EXPECT 1
 # endif
+
+/*
+	Maximum times a ray can reflect off of a surface.
+	Minimum bounces is 1, even if the max is lower than 1.
+*/
+# define DEFAULT_MAX_RAY_BOUNCES 2
 
 // Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
 # define INIT_WIDTH 1445
@@ -79,6 +85,8 @@ typedef struct s_minirt
 	bool			cursor_pointing;
 	bool			double_clicked;
 	bool			mouse_r_down;
+
+	size_t			max_ray_bounces;
 
 	t_shape_type	shape_type;
 	t_shape			*shape;

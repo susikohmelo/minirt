@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/15 19:30:13 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 23:22:37 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,59 +236,114 @@ t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
 	return (normal);
 }
 
-static inline void	skybox_intersect_check(t_minirt *m, t_ray *data, t_vec3 normal)
+static inline double	get_shape_roughness(t_ray *data, t_vec3 *ray)
 {
-	data->dir = normal;
-	data->length = INFINITY;
-	get_shape_intersect_dist(m, data, NULL);
+	if (data->shape->roughness_map)
+		return (get_rough_value(*ray, data->shape, data->shape_type));
+	else
+		return (data->shape->default_rough);
+}
+
+static inline t_vec3	get_shape_color(t_ray *data, t_vec3 *ray)
+{
+	if (data->shape->texture)
+		return (vec3_mul(get_albedo_blur(*ray,
+			data->shape, data->shape_type, 0), data->shape->color));
+	else
+		return (data->shape->color);
+}
+
+static inline t_vec3	skybox_color(t_minirt *m, t_ray data,
+							t_vec3 ray, double roughness)
+{
+	t_vec3			shape_color;
+	t_vec3			skybox_color;
+	t_vec3			skybox_diffuse;
+
+	shape_color = get_shape_color(&data, &ray);
+	skybox_color = get_skybox_color(m, data.dir, roughness);
+	skybox_diffuse = vec3_mul(skybox_color, shape_color);
+	skybox_color = vec3_add(vec3_muls(skybox_diffuse, roughness), vec3_muls(skybox_color, 1 - roughness));
+	skybox_color = vec3_sub(skybox_color, vec3_mul(m->ambient_light, shape_color));
+
+	//TODO function for this, the same thing is used in cast_rays() too
+	skybox_color.r = fmin(fmax(skybox_color.r, 0), 1);
+	skybox_color.g = fmin(fmax(skybox_color.g, 0), 1);
+	skybox_color.b = fmin(fmax(skybox_color.b, 0), 1);
+	return (skybox_color);
 }
 
 t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 {
 	t_vec3			ray;
-	t_vec3			cmr_dir;
+	t_vec3			view_dir;
 	t_vec3			main_color;
 	t_vec3			shape_color;
-	t_vec3			skybox_color;
-	t_vec3			skybox_diffuse;
+	t_vec3			shape_diffuse;
 	t_vec3			normal;
 	double			roughness;
+	size_t			i;
 
 	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
 	normal = get_obj_normal(m, ray, &data);
-	if (is_reflection)
-		return phong(m, ray, normal, data);
 	main_color = phong(m, ray, normal, data);
-	roughness = data.shape->default_rough;
-	if (data.shape->roughness_map)
-		roughness = get_rough_value(ray, data.shape, data.shape_type);
+
+	// If we are being called through recursion, kill the cycle here
+	if (is_reflection)
+		return (main_color);
+	roughness = get_shape_roughness(&data, &ray);
 	data.is_reflect = roughness;
-	cmr_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
-	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(cmr_dir, normal)), cmr_dir);
+
+	// Set new ray to point to the reflection direction and check collision
+	view_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
+	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(view_dir, normal)), view_dir);
 	data.start = vec3_add(ray, vec3_muls(normal, 0.001));
 	data.length = INFINITY;
-
 	get_shape_intersect_dist(m, &data, NULL);
-	if (isinf(data.length) || data.length < 0.0001)
-	{
-		if (data.shape->texture)
-			shape_color = vec3_mul(get_albedo_blur(ray, data.shape, data.shape_type, 0), data.shape->color);
-		else
-			shape_color = data.shape->color;
-		skybox_color = get_skybox_color(m, data.dir, roughness);
-		skybox_diffuse = vec3_mul(skybox_color, shape_color);
-		skybox_color = vec3_add(vec3_muls(skybox_diffuse, roughness), vec3_muls(skybox_color, 1 - roughness));
-		skybox_color = vec3_sub(skybox_color, vec3_mul(m->ambient_light, shape_color));
 
-		//TODO function for this, the same thing is used in cast_rays() too
-		skybox_color.r = fmin(fmax(skybox_color.r, 0), 1);
-		skybox_color.g = fmin(fmax(skybox_color.g, 0), 1);
-		skybox_color.b = fmin(fmax(skybox_color.b, 0), 1);
-		return (vec3_add(main_color, skybox_color));
-	}
+	// If we hit nothing, just get the skybox color and return
+	if (isinf(data.length) || data.length < 0.0001)
+		return (vec3_add(main_color, skybox_color(m, data, ray, roughness)));
 	else
 	{
-		main_color = vec3_add(vec3_muls(surface_color(m, data, true), (1 - roughness) / (1 + roughness * data.length * 16)), main_color);
+		// Get color of the object we hit via recursion
+		main_color = vec3_add(main_color, vec3_muls(surface_color(m, data, true),
+			(1 - roughness) / (1 + roughness * data.length * 16)));
+
+		// This is a loop for any further reflections of reflections of reflections etc...
+		i = 0;
+		while (++i < m->max_ray_bounces)
+		{
+			// Set ray to point to new reflected direction from the object we hit last time
+			normal = get_obj_normal(m, ray, &data);
+			ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
+			data.start = vec3_add(ray, vec3_muls(normal, 0.001));
+			view_dir = vec3_muls(data.dir, -1);
+			data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(view_dir, normal)), view_dir);
+			data.length = INFINITY;
+			get_shape_intersect_dist(m, &data, NULL);
+
+			// If we hit something, add the new color via recursion,
+			// continue the cycle to check for more reflections
+			if (!isinf(data.length))
+			{
+				data.is_reflect = roughness;
+				main_color = vec3_add(main_color,
+					vec3_muls(surface_color(m, data, true),
+					(1 - roughness) / (1 + roughness * data.length * 16)));
+				continue ;
+			}
+
+			// If we do not hit an object, kill the loop and get the skybox color
+			// Mix color with roughness/color of the object we last hit
+			ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
+			roughness = (get_shape_roughness(&data, &ray) + roughness) / 2;
+			shape_color = skybox_color(m, data, ray, roughness);
+			shape_diffuse = vec3_mul(shape_color, get_shape_color(&data, &ray));
+			shape_color = vec3_add(vec3_muls(shape_color, 1 - roughness),
+				vec3_muls(shape_diffuse, roughness));
+			return (vec3_add(main_color, shape_color));
+		}
 	}
 	return (main_color);
 }
