@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/15 23:22:37 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/15 23:35:00 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,7 +312,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 
 		// This is a loop for any further reflections of reflections of reflections etc...
 		i = 0;
-		while (++i < m->max_ray_bounces)
+		while (++i < m->max_ray_bounces || roughness < 1)
 		{
 			// Set ray to point to new reflected direction from the object we hit last time
 			normal = get_obj_normal(m, ray, &data);
@@ -331,13 +331,15 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 				main_color = vec3_add(main_color,
 					vec3_muls(surface_color(m, data, true),
 					(1 - roughness) / (1 + roughness * data.length * 16)));
+				ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
+				roughness = fmax(get_shape_roughness(&data, &ray), 1);
 				continue ;
 			}
 
 			// If we do not hit an object, kill the loop and get the skybox color
 			// Mix color with roughness/color of the object we last hit
-			ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-			roughness = (get_shape_roughness(&data, &ray) + roughness) / 2;
+			//ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
+			roughness = fmax(roughness + get_shape_roughness(&data, &ray), 1);
 			shape_color = skybox_color(m, data, ray, roughness);
 			shape_diffuse = vec3_mul(shape_color, get_shape_color(&data, &ray));
 			shape_color = vec3_add(vec3_muls(shape_color, 1 - roughness),
