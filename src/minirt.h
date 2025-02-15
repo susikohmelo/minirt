@@ -66,6 +66,7 @@ typedef struct s_minirt
 	bool			valid_pixel[32];
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
+	size_t			gui_line;
 
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;

@@ -130,7 +130,10 @@ static t_vec3	phong(
 	//if (ray_data.is_reflect != INFINITY)
 	//	shape_rough = ray_data.is_reflect;
 	if (ray_data.shape->roughness_map)
-		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
+		// shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
+		shape_rough = fmax(0, 2 * ray_data.shape->default_rough - 1) \
+			+ (1 - fabs(2 * ray_data.shape->default_rough - 1)) \
+				* get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
 	{
 		if (ray_data.is_reflect == INFINITY)

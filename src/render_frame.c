@@ -12,12 +12,33 @@
 
 #include "minirt.h"
 
-void	render_value(t_minirt *m, const char *value_name, double value)
+static void	draw_slider(t_minirt *m, double value)
+{
+	size_t	x;
+	size_t	y;
+
+	y = m->gui_line * CHAR_HEIGHT - 1;
+	while (++y < (m->gui_line + 1) * CHAR_HEIGHT)
+	{
+		x = -1;
+		while (++x < value * LINE_LENGTH * CHAR_WIDTH)
+		{
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 0] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 1] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 2] = 0x60;
+			m->gui_text->pixels[4 * (y * m->gui_text->width + x) + 3] = 0xFF;
+		}
+	}
+}
+
+static void	render_value(
+	t_minirt *m, const char *value_name, double value, double scale)
 {
 	char	line[LINE_LENGTH + 1];
 	char	fbuf[32];
 
-	f_to_str(fbuf, value)[FLOAT_WIDTH] = '\0';
+	draw_slider(m, value);
+	f_to_str(fbuf, scale * value)[FLOAT_WIDTH] = '\0';
 	ft_memset(line, ' ', sizeof line);
 	ft_memcpy(line, value_name, ft_strlen(value_name));
 	ft_memcpy(line + LINE_LENGTH - ft_strlen(fbuf), fbuf, FLOAT_WIDTH);
@@ -27,9 +48,10 @@ void	render_value(t_minirt *m, const char *value_name, double value)
 
 void	render_common_shape_text(t_minirt *m)
 {
-	render_value(m, "Red", m->shape->color.r);
-	render_value(m, "Green", m->shape->color.g);
-	render_value(m, "Blue", m->shape->color.b);
+	render_value(m, "Red", m->shape->color.r, 255);
+	render_value(m, "Green", m->shape->color.g, 255);
+	render_value(m, "Blue", m->shape->color.b, 255);
+	render_value(m, "Roughness", m->shape->default_rough, 1);
 }
 
 void	render_header(t_minirt *m, const char *header)
@@ -98,18 +120,21 @@ void	render_text(t_minirt *m)
 
 void	render_frame(void *minirt)
 {
-	const char	ones[] = "\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1";
+	static bool	trues[1024];
 	t_minirt	*m;
 
 	m = minirt;
 
+	if (trues[0] == false)
+		ft_memset(trues, true, sizeof trues);
 	cast_rays(minirt);
 	m->valid_pixel[m->valid_pixel_i] = true;
 	m->valid_pixel_i = (m->valid_pixel_i + 5) & (sizeof m->valid_pixel - 1);
-	if (ft_memcmp(m->valid_pixel, ones, sizeof m->valid_pixel) == 0)
+	if (ft_memcmp(m->valid_pixel, trues, sizeof m->valid_pixel) == 0)
 	{
-		m->double_clicked = false;
 		m->resizing = false;
+		// TODO now with better optimizations, should this be elsewhere?
+		m->double_clicked = false;
 	}
 	render_text(m);
 }
