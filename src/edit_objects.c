@@ -3,7 +3,7 @@
 #include "minirt.h"
 #include <math.h>
 
-static void	edit_shape(t_minirt *m, t_shape *s, double x)
+static void	edit_common_shape_attributes(t_minirt *m, t_shape *s, double x)
 {
 	if (m->moving_slider == 1)
 		s->color.r = x;
@@ -17,28 +17,41 @@ static void	edit_shape(t_minirt *m, t_shape *s, double x)
 
 static void	edit_sphere(t_minirt *m, t_shape *s, double x)
 {
-	edit_shape(m, s, x);
+	edit_common_shape_attributes(m, s, x);
 	if (m->moving_slider == 5)
 		((t_sphere *)s)->radius = SCALE * x;
 }
 
-static void	edit_plane(t_minirt *m, t_shape *p, double value)
+static void	edit_plane(t_minirt *m, t_shape *plane, double val)
 {
-	edit_shape(m, p, value);
-	value = 2 * value - 1;
+	double	t;
+	t_vec3	*n;
+
+	edit_common_shape_attributes(m, plane, val);
+	val = 2 * val - 1;
+	n = &((t_plane *)plane)->normal;
+	if (fabs(val) == 1 || fabs(n->x) == 1 || fabs(n->y) == 1 || fabs(n->z) == 1)
+	{
+		t = sqrt((1 - val * val) / 2);
+		n->x = (m->moving_slider == 5) * val + (m->moving_slider != 5) * t;
+		n->y = (m->moving_slider == 6) * val + (m->moving_slider != 6) * t;
+		n->z = (m->moving_slider == 7) * val + (m->moving_slider != 7) * t;
+		return ;
+	}
 	if (m->moving_slider == 5)
-		((t_plane *)p)->normal.x = value;
-	if (m->moving_slider == 6)
-		((t_plane *)p)->normal.y = value;
-	if (m->moving_slider == 7)
-		((t_plane *)p)->normal.z = value;
-	if (5 <= m->moving_slider && m->moving_slider <= 7)
-		((t_plane *)p)->normal = vec3_normalize(((t_plane *)p)->normal);
+		t = sqrt((1 - val * val) / (n->y * n->y + n->z * n->z));
+	else if (m->moving_slider == 6)
+		t = sqrt((1 - val * val) / (n->x * n->x + n->z * n->z));
+	else
+		t = sqrt((1 - val * val) / (n->x * n->x + n->y * n->y));
+	n->x = (m->moving_slider == 5) * val + (m->moving_slider != 5) * t * n->x;
+	n->y = (m->moving_slider == 6) * val + (m->moving_slider != 6) * t * n->y;
+	n->z = (m->moving_slider == 7) * val + (m->moving_slider != 7) * t * n->z;
 }
 
 static void	edit_cylinder(t_minirt *m, t_shape *cylinder, double x)
 {
-	t_cylinder *c;
+	t_cylinder	*c;
 	size_t		i;
 
 	edit_plane(m, cylinder, x);
@@ -74,7 +87,7 @@ static void	edit_light(t_minirt *m, t_light *light, double x)
 	light->color = vec3_muls(light->color_value, light->brightness);
 }
 
-static void	edit_attributes(t_minirt *m, double x)
+static void	edit_global_attributes(t_minirt *m, double x)
 {
 	if (m->moving_slider == 1)
 		m->ambient_light_ratio = x;
@@ -103,6 +116,6 @@ void	edit_objects(t_minirt *m, double x)
 	if (m->shape_type == SHAPE_LIGHT)
 		edit_light(m, (t_light *)m->shape, x);
 	if (m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
-		edit_attributes(m, x);
+		edit_global_attributes(m, x);
 	redraw(m);
 }

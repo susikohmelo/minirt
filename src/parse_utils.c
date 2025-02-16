@@ -43,8 +43,11 @@ double	str_to_f(const char *str)
 
 char	*f_to_str(char buf[static 32], double f)
 {
-	int64_t	i;
+	static const char	specials[4][5] = {"inf", "-inf", "nan", "-nan"};
+	int64_t				i;
 
+	if (isinf(f) || isnan(f))
+		return (ft_memcpy(buf, specials[!!signbit(f) + 2 * !!isnan(f)], 5));
 	i = f;
 	ft_i_to_str(buf, i);
 	if (fabs(f - i) < .0001)
