@@ -402,6 +402,7 @@ void	cast_rays(t_minirt *m)
 					m->shape = (t_shape *)ray.shape;
 					m->shape_type = ray.shape_type;
 				}
+				m->double_clicked = false;
 			}
 			if (isinf(ray.length))
 				color = (t_vec3){};

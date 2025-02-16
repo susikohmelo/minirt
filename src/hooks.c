@@ -110,7 +110,7 @@ void	mouse_hook(
 	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_PRESS)
 	{
 		click_time = mlx_get_time();
-		if (click_time - last_click_time < .2 && !clicked_slider)
+		if (!m->double_clicked && click_time - last_click_time < .2 && !clicked_slider)
 		{
 			m->double_clicked = true;
 			redraw(m);

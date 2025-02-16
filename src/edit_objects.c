@@ -26,7 +26,6 @@ static void	edit_plane(t_minirt *m, t_shape *p, double value)
 {
 	edit_shape(m, p, value);
 	value = 2 * value - 1;
-	value = tan(value);
 	if (m->moving_slider == 5)
 		((t_plane *)p)->normal.x = value;
 	if (m->moving_slider == 6)

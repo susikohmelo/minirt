@@ -212,7 +212,6 @@ void	render_frame(void *minirt)
 	if (ft_memcmp(m->valid_pixel, trues, sizeof m->valid_pixel) == 0)
 	{
 		m->resizing = false;
-		// TODO now with better optimizations, should this be elsewhere?
 		m->double_clicked = false;
 	}
 	render_text(m);
