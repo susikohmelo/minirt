@@ -47,7 +47,7 @@ static void	edit_cylinder(t_minirt *m, t_shape *cylinder, double x)
 		c->radius = SCALE * x;
 	if (m->moving_slider == 9)
 		c->height = SCALE * x;
-	i = c - m->cylinders;
+	i = 2 * (c - m->cylinders);
 	m->discs[i].coords = vec3_add(c->coords, vec3_muls(c->axis, c->height / 2));
 	m->discs[i].color = c->color;
 	m->discs[i].default_rough = c->default_rough;
