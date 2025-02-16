@@ -11,12 +11,14 @@
 /* ************************************************************************** */
 
 #include "minirt.h"
+#include <math.h>
 
 static void	render_slider(t_minirt *m, double value)
 {
 	size_t	x;
 	size_t	y;
 
+	value = fmin(fmax(value, 0), 1);
 	y = m->gui_line * CHAR_HEIGHT - 1;
 	while (++y < (m->gui_line + 1) * CHAR_HEIGHT)
 	{
@@ -36,6 +38,7 @@ static void	render_slider2(t_minirt *m, double value)
 	size_t	x;
 	size_t	y;
 
+	value = fmin(fmax(value, -1), 1);
 	y = m->gui_line * CHAR_HEIGHT - 1;
 	while (++y < (m->gui_line + 1) * CHAR_HEIGHT)
 	{

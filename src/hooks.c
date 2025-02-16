@@ -98,50 +98,55 @@ void	resize_hook(int w, int h, void *minirt)
 void	mouse_hook(
 	mouse_key_t button, action_t action, modifier_key_t mods, void *minirt)
 {
-	t_minirt		*m;
+	t_minirt		*const m = minirt;
 	static double	last_click_time;
 	double			click_time;
+	const bool		clicked_slider = m->shape_type != SHAPE_NO_SHAPE
+		&& 0 <= m->mouse_x && m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+		&& 2 * CHAR_HEIGHT <= m->mouse_y
+		&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT;
 
 	(void)mods;
-	m = minirt;
 	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_PRESS)
 	{
 		click_time = mlx_get_time();
-		if (click_time - last_click_time < .2)
+		if (click_time - last_click_time < .2 && !clicked_slider)
 		{
 			m->double_clicked = true;
 			redraw(m);
 		}
-		else
+		else if ((LINE_LENGTH - 1) * CHAR_WIDTH <= m->mouse_x
+			&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+			&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
+			&& m->shape_type != SHAPE_NO_SHAPE)
+			m->shape_type = SHAPE_NO_SHAPE;
+		else if (0 <= m->mouse_x && m->mouse_x <= CHAR_WIDTH
+			&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
+			&& m->shape_type == SHAPE_NO_SHAPE)
+			m->shape_type = SHAPE_GLOBAL_ATTRIBUTES;
+		else if ((LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
+			&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+			&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
+			&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT
+			&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
 		{
-			if ((LINE_LENGTH - 1) * CHAR_WIDTH <= m->mouse_x
-				&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
-				&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
-				&& m->shape_type != SHAPE_NO_SHAPE)
-				m->shape_type = SHAPE_NO_SHAPE;
-			else if (0 <= m->mouse_x && m->mouse_x <= CHAR_WIDTH
-				&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
-				&& m->shape_type == SHAPE_NO_SHAPE)
-				m->shape_type = SHAPE_GLOBAL_ATTRIBUTES;
-			else if ((LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
-				&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
-				&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
-				&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT
-				&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
-			{
-				m->show_lights = !m->show_lights;
-				redraw(m);
-			}
+			m->show_lights = !m->show_lights;
+			redraw(m);
+		}
+		else if (clicked_slider)
+		{
+			m->moving_slider = m->mouse_y / CHAR_HEIGHT - 1;
+			edit_objects(m, m->mouse_x);
 		}
 		last_click_time = click_time;
 	}
-	m->mouse_l_down = MLX_MOUSE_BUTTON_LEFT \
-		&& (action == MLX_PRESS || action == MLX_REPEAT);
 	if (button == MLX_MOUSE_BUTTON_RIGHT && (action == MLX_PRESS
 			|| action == MLX_REPEAT))
 		m->mouse_r_down = true;
 	else
 		m->mouse_r_down = false;
+	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_RELEASE)
+		m->moving_slider = false;
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
@@ -165,10 +170,9 @@ void	cursor_hook(double x, double y, void *minirt)
 		m->camera_orientation = vec3_inverse_lookat(new_rot, m->camera_orientation);
 		redraw(m);
 	}
-	if (m->mouse_l_down && m->shape != SHAPE_NO_SHAPE && mouse_move_dir.x != 0
-		&& x < LINE_LENGTH * CHAR_WIDTH && y < m->gui_line * CHAR_HEIGHT)
-		{}; // TODO
-
+	//if (m->moving_slider && mouse_move_dir.x != 0)
+	if (m->moving_slider)
+		edit_objects(m, x);
 	m->mouse_x = x;
 	m->mouse_y = y;
 }

@@ -58,6 +58,8 @@ typedef struct s_minirt
 	bool			mouse_l_down;
 	bool			mouse_r_down;
 	bool			show_lights;
+	bool			resizing;
+	uint8_t			moving_slider;
 
 	t_shape_type	shape_type;
 	t_shape			*shape;
@@ -86,8 +88,6 @@ typedef struct s_minirt
 	size_t			cylinders_length;
 	t_disc			*discs;
 	size_t			discs_length;
-
-	bool			resizing;
 }	t_minirt;
 
 void		mrt_init(t_minirt *m, const char *path);
@@ -125,12 +125,14 @@ double	get_rough_value(t_vec3 r,
 t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
 
+void	redraw(t_minirt *m);
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);
 void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	render_string(t_minirt *m, const char *str);
+void	edit_objects(t_minirt *m, double x);
 
 void	cast_rays(t_minirt *minirt);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);

@@ -17,7 +17,7 @@ SRCS = main.c minirt.c vec3.c vec3_2.c vec3_scalar.c hooks.c \
 	get_next_line.c get_next_line_utils.c \
 	cast_rays.c render_frame.c intersect_dist.c texture_uv_functions.c \
 	parse_texture.c get_uv_coords.c free_textures.c parse_utils.c \
-	get_texture_color.c font.c
+	get_texture_color.c font.c edit_objects.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
