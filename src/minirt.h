@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/15 01:32:44 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:55:05 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,21 @@
 #  define MRT_FATAL_EXPECT 1
 # endif
 
-// Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
+/*
+	Maximum times a ray can reflect off of a surface.
+	This includes the initial reflection,meaning 0 disables all reflections.
+	Keys 1 and 2 can adjust bounces in real time.
+*/
+
+# define DEFAULT_MAX_RAY_BOUNCES 3
+/*
+	Key 3 can also enable/disable this at any time in the program
+*/
+# define SKYBOX_DISABLED_BY_DEFAULT 1
+
+/*
+	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
+*/
 # define INIT_WIDTH 1445
 # define INIT_HEIGHT 1024
 
@@ -49,6 +63,25 @@ typedef struct s_light
 	t_vec3	color;
 }	t_light;
 
+/*
+	Do not reorder these, the order:
+	left, front, right, up, back, down
+	is accessed via indexing in the get_skybox_color function
+*/
+typedef union s_skybox
+{
+	struct
+	{
+		mlx_image_t	*left;
+		mlx_image_t	*front;
+		mlx_image_t	*right;
+		mlx_image_t	*up;
+		mlx_image_t	*back;
+		mlx_image_t	*down;
+	};
+	mlx_image_t	*sky_array[6];
+}	t_skybox;
+
 typedef struct s_minirt
 {
 	mlx_t			*mlx;
@@ -61,12 +94,16 @@ typedef struct s_minirt
 	bool			double_clicked;
 	bool			mouse_r_down;
 
+	int				max_ray_bounces;
+	bool			disable_skybox;
+
 	t_shape_type	shape_type;
 	t_shape			*shape;
 	bool			valid_pixel[32];
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
 
+	t_skybox		skybox;
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
 	t_vec3			camera_orientation;
@@ -123,6 +160,7 @@ double	get_rough_value(t_vec3 r,
 			const t_shape *shape, int shape_type);
 t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
+t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);

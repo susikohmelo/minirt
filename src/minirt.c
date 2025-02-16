@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:04:12 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/16 01:52:23 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,25 @@ static void	load_shape_texture(t_minirt *m, t_shape *shape)
 	shape->roughness_map = load_texture(m, filename, ROUGHNESS_MAP);
 }
 
+static void	load_skybox(t_minirt *m)
+{
+	const char	error_message[] = "loading skybox failed";
+
+	m->skybox.left = load_texture(m, "skybox/skybox.left.xpm42", ALBEDO);
+	mrt_assert(m, m->skybox.left, error_message);
+	m->skybox.front = load_texture(m, "skybox/skybox.front.xpm42", ALBEDO);
+	mrt_assert(m, m->skybox.front, error_message);
+	m->skybox.right = load_texture(m, "skybox/skybox.right.xpm42", ALBEDO);
+	mrt_assert(m, m->skybox.right, error_message);
+	m->skybox.up = load_texture(m, "skybox/skybox.up.xpm42", ALBEDO);
+	mrt_assert(m, m->skybox.up, error_message);
+	m->skybox.back = load_texture(m, "skybox/skybox.back.xpm42", ALBEDO);
+	mrt_assert(m, m->skybox.back, error_message);
+	m->skybox.down = load_texture(m, "skybox/skybox.down.xpm42", ALBEDO);
+	mrt_assert(m, m->skybox.down, error_message);
+	m->max_ray_bounces = DEFAULT_MAX_RAY_BOUNCES;
+	m->disable_skybox = SKYBOX_DISABLED_BY_DEFAULT;
+}
 static void	load_textures(t_minirt *m)
 {
 	size_t	i;
@@ -80,6 +99,7 @@ static void	load_textures(t_minirt *m)
 	i = (size_t) - 1;
 	while (++i < m->discs_length)
 		load_shape_texture(m, (t_shape *)&m->discs[i]);
+	load_skybox(m);
 }
 
 void	mrt_init(t_minirt *m, const char *path)
