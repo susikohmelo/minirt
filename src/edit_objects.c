@@ -62,6 +62,19 @@ static void	edit_cylinder(t_minirt *m, t_shape *cylinder, double x)
 	m->discs[i].radius = c->radius;
 }
 
+static void	edit_light(t_minirt *m, t_light *light, double x)
+{
+	if (m->moving_slider == 1)
+		light->brightness = x;
+	if (m->moving_slider == 2)
+		light->color_value.r = x;
+	if (m->moving_slider == 3)
+		light->color_value.g = x;
+	if (m->moving_slider == 4)
+		light->color_value.b = x;
+	light->color = vec3_muls(light->color_value, light->brightness);
+}
+
 void	edit_objects(t_minirt *m, double x)
 {
 	x = fmin(fmax(x / (LINE_LENGTH * CHAR_WIDTH), 0), 1);
@@ -72,6 +85,6 @@ void	edit_objects(t_minirt *m, double x)
 	if (m->shape_type == SHAPE_CYLINDER)
 		edit_cylinder(m, m->shape, x);
 	if (m->shape_type == SHAPE_LIGHT)
-		edit_shape(m, m->shape, x);
+		edit_light(m, (t_light *)m->shape, x);
 	redraw(m);
 }
