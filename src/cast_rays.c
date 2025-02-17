@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/16 01:11:19 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 16:14:38 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ static t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
 	const double	specular_reflection = 1;
-	double	diffuse_reflection;
+	double			diffuse_reflection;
 	const double	alpha = 1.0;
 	double			shape_rough;
 	t_vec3			shape_color;
@@ -140,6 +140,7 @@ static t_vec3	phong(
 			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, ray_data.is_reflect), shape_color);
 	}
 	surface = (t_vec3){};
+	surface_speculars = (t_vec3){};
 	i = (size_t) - 1;
 	while (++i < m->lights_length)
 	{
