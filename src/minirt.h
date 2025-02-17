@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/16 01:55:05 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 13:37:40 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,6 @@
 # define MOUSE_SENSITIVITY 0.25
 # define MOVE_DISTANCE 0.3
 
-// TODO actual values
-# define MIN_WINDOW_WIDTH 12
-# define MIN_WINDOW_HEIGHT 12
-
 // in pixels
 # define CHAR_WIDTH 10
 # define CHAR_HEIGHT 20
@@ -57,11 +53,8 @@
 # define FLOAT_WIDTH 5
 # define LINE_LENGTH 32
 
-typedef struct s_light
-{
-	t_vec3	coords;
-	t_vec3	color;
-}	t_light;
+// Max value for some attributes like sphere radius
+# define SCALE 8
 
 /*
 	Do not reorder these, the order:
@@ -90,10 +83,19 @@ typedef struct s_minirt
 	char			*line;
 	int32_t			mouse_x;
 	int32_t			mouse_y;
+	double			click_x;
+	double			click_y;
 	bool			cursor_pointing;
 	bool			double_clicked;
+	bool			clicked_world;
 	bool			mouse_r_down;
+	bool			show_lights;
+	bool			resizing;
+	uint8_t			moving_slider;
 
+	t_shape			*moving_shape;
+	t_vec3			moving_shape_start;
+  
 	int				max_ray_bounces;
 	bool			disable_skybox;
 
@@ -102,8 +104,14 @@ typedef struct s_minirt
 	bool			valid_pixel[32];
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
+	size_t			gui_line;
+
+
+	double			ambient_light_ratio;
+	t_vec3			ambient_light_color;
 
 	t_skybox		skybox;
+
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
 	t_vec3			camera_orientation;
@@ -122,8 +130,6 @@ typedef struct s_minirt
 	size_t			cylinders_length;
 	t_disc			*discs;
 	size_t			discs_length;
-
-	bool			resizing;
 }	t_minirt;
 
 void		mrt_init(t_minirt *m, const char *path);
@@ -162,14 +168,20 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
+void	redraw(t_minirt *m);
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);
 void	scroll_hook(double x_delta, double y_delta, void *minirt);
 void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
-void	cast_rays(t_minirt *minirt);
+void	render_string(t_minirt *m, const char *str);
+void	edit_objects(t_minirt *m, double x);
+void	move_shape(t_minirt *m, double x, double y);
+t_vec3	perpendiculary(t_vec3 v);
+t_vec3	perpendicularx(t_vec3 v);
 
+void	cast_rays(t_minirt *minirt);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);

@@ -12,7 +12,6 @@
 
 #include "minirt.h"
 #include <stdlib.h>
-#include <math.h>
 
 static inline void	null_and_trim(t_shape *shape, const char **line)
 {
@@ -33,7 +32,7 @@ char	*parse_texture(t_minirt *m, const char *line, t_shape *shape)
 	null_and_trim(shape, &line);
 	if (ft_isdigit(*line) || *line == '+' || *line == '-' || *line == '.')
 		line = parse_float(m, &shape->default_rough, line, -1);
-	shape->default_rough = fmax(fmin(shape->default_rough, 1), 0);
+	expect_range(m, vec3(shape->default_rough, 0, 1), "Roughness");
 	i = 0;
 	name_is_empty = true;
 	while (line[i] && i < 199)

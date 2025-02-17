@@ -36,10 +36,16 @@ typedef struct s_vec3
 		double	z;
 		double	b;
 	};
-	double		_;
+	union
+	{
+		double	w;
+		double	a;
+	};
 }	t_vec3;
 
 t_vec3	vec3(double x, double y, double z)__attribute__((warn_unused_result));
+t_vec3	vec4(double r, double g, double b, double a) \
+	__attribute__((warn_unused_result));
 
 t_vec3	vec3_add(t_vec3 v1, t_vec3 v2)__attribute__((warn_unused_result));
 t_vec3	vec3_sub(t_vec3 v1, t_vec3 v2)__attribute__((warn_unused_result));

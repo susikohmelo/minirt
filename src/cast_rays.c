@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 16:14:38 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 13:39:58 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,10 @@ static t_vec3	phong(
 	//if (ray_data.is_reflect != INFINITY)
 	//	shape_rough = ray_data.is_reflect;
 	if (ray_data.shape->roughness_map)
-		shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
+		// shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
+		shape_rough = fmax(0, 2 * ray_data.shape->default_rough - 1) \
+			+ (1 - fabs(2 * ray_data.shape->default_rough - 1)) \
+				* get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 	if (ray_data.shape->texture)
 	{
 		if (ray_data.is_reflect == INFINITY)
@@ -399,6 +402,51 @@ static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
 		&& cursor_in_range && m->valid_pixel_i == 0;
 }
 
+static void min_light_intersect_dist(t_ray *ray, const t_light *light)
+{
+	t_vec3	lstart;
+	double	b;
+	double	c;
+	double	discriminant;
+	double	length;
+
+	lstart = vec3_sub(ray->start, light->coords);
+	b = 2 * vec3_dot(ray->dir, lstart);
+	c = vec3_dot(lstart, lstart) - (light->brightness + .5);
+	discriminant = b * b - 4 * 1 * c;
+	if (discriminant >= 0)
+	{
+		length = (-b - sqrt(discriminant)) / (2. * 1);
+		if (length < ray->length && length >= 0)
+		{
+			ray->length = length;
+			ray->shape = (t_shape *)light;
+			ray->shape_type = SHAPE_LIGHT;
+		}
+	}
+}
+
+void	get_light_intersect_dist(t_minirt *m, t_ray *ray)
+{
+	size_t	i;
+
+	i = (size_t) - 1;
+	while (++i < m->lights_length)
+		min_light_intersect_dist(ray, &m->lights[i]);
+}
+
+static void	precalculate(t_minirt *m)
+{
+	size_t	i;
+
+	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
+	m->ambient_light = vec3_muls(m->ambient_light_color, m->ambient_light_ratio);
+	i = (size_t) - 1;
+	while (i < m->lights_length)
+		m->lights[i].color = vec3_muls( \
+			m->lights[i].color_value, m->lights[i].brightness);
+}
+
 void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
@@ -407,7 +455,7 @@ void	cast_rays(t_minirt *m)
 	size_t	i_pixel;
 	t_vec3	color;
 
-	m->aspect_ratio = (double) m->img->width / (double) m->img->height;
+	precalculate(m);
 	set_cam_rot_matrix(m);
 
 	row = (size_t) - 1;
@@ -425,22 +473,45 @@ void	cast_rays(t_minirt *m)
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
 
 			get_shape_intersect_dist(m, &ray, NULL);
+			if (m->show_lights)
+				get_light_intersect_dist(m, &ray);
 
-			if (m->double_clicked && m->cursor_pointing)
+			if (m->double_clicked && m->cursor_pointing
+				&& ray.shape_type != SHAPE_NO_SHAPE)
 			{
-				m->shape = (t_shape *)ray.shape;
-				m->shape_type = ray.shape_type;
+				if (ray.shape_type == SHAPE_DISC)
+				{
+					m->shape = (t_shape *) \
+						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
+					m->shape_type = SHAPE_CYLINDER;
+				}
+				else
+				{
+					m->shape = (t_shape *)ray.shape;
+					m->shape_type = ray.shape_type;
+				}
+				m->double_clicked = false;
+			}
+			if (m->clicked_world && m->cursor_pointing && !m->moving_shape)
+			{
+				m->moving_shape = (t_shape *)ray.shape;
+				if (ray.shape_type == SHAPE_DISC)
+					m->moving_shape = (t_shape *) \
+						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
+				m->moving_shape_start = ray.shape->coords;
+				m->clicked_world = false;
 			}
 			if (isinf(ray.length))
 				color = get_skybox_color(m, ray.dir, 0);
-			else
+			else if (ray.shape_type != SHAPE_LIGHT)
 			{
 				color = surface_color(m, ray, false);
-				//mrt_print(color);
 				color.r = fmin(fmax(color.r, 0), 1);
 				color.g = fmin(fmax(color.g, 0), 1);
 				color.b = fmin(fmax(color.b, 0), 1);
 			}
+			else
+				color = ((t_light *)ray.shape)->color_value;
 			draw_scaled_pixel(m, color, column, row);
 		}
 	}

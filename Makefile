@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/15 05:21:11 by ljylhank         ###   ########.fr        #
+#    Updated: 2025/02/17 11:49:46 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ SRCS = main.c minirt.c vec3.c vec3_2.c vec3_scalar.c hooks.c \
 	get_next_line.c get_next_line_utils.c \
 	cast_rays.c render_frame.c intersect_dist.c texture_uv_functions.c \
 	parse_texture.c get_uv_coords.c free_textures.c parse_utils.c \
-	get_texture_color.c font.c get_skybox_color.c
+	get_texture_color.c font.c edit_objects.c move_shape.c get_skybox_color.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
@@ -27,6 +27,7 @@ CFLAGS = -Iinclude -Wall -Wextra -Werror
 LFLAGS = -lm -lpthread
 ifeq ($(MSYS_VERSION), 0)
 LFLAGS += -lglfw -ldl
+SANITIZERS = -fsanitize=address -fsanitize=leak -fsanitize=undefined
 else
 LFLAGS += -lglfw3
 FIX_MLX = cd MLX42 \
@@ -77,7 +78,7 @@ re:
 	make all
 
 debug: CFLAGS += -ggdb3 -gdwarf -DMRT_FATAL_EXPECT=0
-debug: CFLAGS += -fsanitize=address -fsanitize=undefined -fsanitize=leak
+debug: CFLAGS += $(SANITIZERS)
 debug: $(NAME)
 
 rebug:

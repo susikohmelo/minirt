@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/16 01:52:23 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 11:15:53 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ static void	load_textures(t_minirt *m)
 
 void	mrt_init(t_minirt *m, const char *path)
 {
+	int32_t max_w;
+	int32_t	max_h;
 	size_t	sizes[SHAPES_LENGTH];
 
 	ft_memset(sizes, 0, sizeof sizes);
@@ -135,17 +137,21 @@ void	mrt_init(t_minirt *m, const char *path)
 	mlx_cursor_hook(m->mlx, cursor_hook, m);
 	mlx_mouse_hook(m->mlx, mouse_hook, m);
 
-	int32_t mxw, mxh;
-	mlx_get_monitor_size(0, &mxw, &mxh);
-	mlx_set_window_limit(m->mlx, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, mxw, mxh);
+	mlx_get_monitor_size(0, &max_w, &max_h);
+	mlx_set_window_limit( \
+		m->mlx, CHAR_WIDTH * LINE_LENGTH, CHAR_HEIGHT * 11, max_w, max_h);
 }
 
 void	mrt_destroy(t_minirt *m)
 {
-	mlx_delete_image(m->mlx, m->gui_text);
+	if (m->mlx != NULL)
+	{
+		if (m->img != NULL)
+			mlx_delete_image(m->mlx, m->img);
+		if (m->gui_text != NULL)
+			mlx_delete_image(m->mlx, m->gui_text);
+	}
 	free_textures(m);
-	if (m->mlx != NULL && m->img != NULL)
-		mlx_delete_image(m->mlx, m->img);
 	free(m->mlx);
 	free(m->line);
 	ft_arena_clear(&m->arena);
