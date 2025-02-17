@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 18:28:32 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 21:08:32 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,17 +200,18 @@ void	render_text(t_minirt *m)
 
 void	render_frame(void *minirt)
 {
-	static bool	trues[2048];
 	t_minirt	*m;
 
 	m = minirt;
 
-	if (trues[0] == false)
-		ft_memset(trues, true, sizeof trues);
 	cast_rays(minirt);
-	m->valid_pixel[m->valid_pixel_i] = true;
-	m->valid_pixel_i = (m->valid_pixel_i + 5) & (sizeof m->valid_pixel - 1);
-	if (ft_memcmp(m->valid_pixel, trues, sizeof m->valid_pixel) == 0)
+	m->valid_pixel_x += (m->valid_pixel_x <= m->valid_pixel_len);
+	if (m->valid_pixel_x > m->valid_pixel_len)
+	{
+		m->valid_pixel_y += (m->valid_pixel_y <= m->valid_pixel_len);
+		m->valid_pixel_x = 0;
+	}
+	if (m->valid_pixel_y > m->valid_pixel_len)
 	{
 		m->resizing = false;
 		m->double_clicked = false;

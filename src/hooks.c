@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 18:38:59 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 21:28:04 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ void	redraw(t_minirt *m, bool flush_black)
 				m->img->pixels[4 * (row * m->img->width + column) + 3] = 255;
 		}
 	}
-    ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
-	m->valid_pixel_i = 0;
+	m->valid_pixel_x = 0;
+	m->valid_pixel_y = 0;
 }
 
 t_vec3	perpendiculary(t_vec3 v)
@@ -93,9 +93,12 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 			perpendiculary(dir), d * (1 - 2 * (key.key != MLX_KEY_A))));
 	if (key.key == MLX_KEY_SPACE || key.key == MLX_KEY_LEFT_SHIFT)
 		m->camera_coords.y += d * (1 - 2 * (key.key != MLX_KEY_SPACE));
-  if (key.key == MLX_KEY_1 || key.key == MLX_KEY_2)
+	if (key.key == MLX_KEY_1 || key.key == MLX_KEY_2)
 		m->max_ray_bounces = fmax(fmin(m->max_ray_bounces
 			+ (1 - 2 * (key.key != MLX_KEY_2)), 1024), 0);
+	if (key.key == MLX_KEY_UP || key.key == MLX_KEY_DOWN)
+		m->valid_pixel_len = fmax(fmin((int) m->valid_pixel_len
+					+ (1 - 2 * (key.key != MLX_KEY_DOWN)), 1024), 0);
 	if (key.key == MLX_KEY_3)
 		m->disable_skybox = m->disable_skybox != 1;
 	redraw(m, true);
@@ -187,6 +190,7 @@ void	scroll_hook(double x_delta, double y_delta, void *minirt)
 		m->moving_shape->coords = vec3_add(m->moving_shape->coords, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
 		m->moving_shape_start = vec3_add(m->moving_shape_start, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
 		m->mouse_moved_this_frame = true;
+		redraw(m, true);
 		return ;
 	}
 	y_delta += x_delta;
