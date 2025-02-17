@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 13:37:40 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 19:21:11 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,11 @@
 /*
 	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
 */
-# define INIT_WIDTH 1445
+# define INIT_WIDTH 1447
 # define INIT_HEIGHT 1024
 
 # define MOUSE_SENSITIVITY 0.25
+# define SCROLL_SENSITIVITY 0.25
 # define MOVE_DISTANCE 0.3
 
 // in pixels
@@ -85,6 +86,7 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	double			click_x;
 	double			click_y;
+	bool			mouse_moved_this_frame;
 	bool			cursor_pointing;
 	bool			double_clicked;
 	bool			clicked_world;
@@ -168,7 +170,7 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
-void	redraw(t_minirt *m);
+void	redraw(t_minirt *m, bool flush_black);
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);

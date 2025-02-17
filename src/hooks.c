@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 17:12:16 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 18:38:59 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,21 @@ t_vec3   axis_rotation(t_vec3 v, t_vec3 axis, double r)
     return (mat3_vec3(m, v));
 }
 
-void	redraw(t_minirt *m)
+void	redraw(t_minirt *m, bool flush_black)
 {
 	size_t	row;
 	size_t	column;
 
-	ft_memset(m->img->pixels, 0, m->img->width * m->img->height * 4);
-	row = (size_t) - 1;
-	while (++row < m->img->height)
+	if (flush_black)
 	{
-		column = (size_t) - 1;
-		while (++column < m->img->width)
-			m->img->pixels[4 * (row * m->img->width + column) + 3] = 255;
+		ft_memset(m->img->pixels, 0, m->img->width * m->img->height * 4);
+		row = (size_t) - 1;
+		while (++row < m->img->height)
+		{
+			column = (size_t) - 1;
+			while (++column < m->img->width)
+				m->img->pixels[4 * (row * m->img->width + column) + 3] = 255;
+		}
 	}
     ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
 	m->valid_pixel_i = 0;
@@ -95,7 +98,7 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 			+ (1 - 2 * (key.key != MLX_KEY_2)), 1024), 0);
 	if (key.key == MLX_KEY_3)
 		m->disable_skybox = m->disable_skybox != 1;
-	redraw(m);
+	redraw(m, true);
 }
 
 void	resize_hook(int w, int h, void *minirt)
@@ -104,7 +107,7 @@ void	resize_hook(int w, int h, void *minirt)
 
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
-	redraw(m);
+	redraw(m, true);
 	m->resizing = true;
 }
 
@@ -126,7 +129,7 @@ void	mouse_hook(
 		if (!m->double_clicked && click_time - last_click_time < .2 && !clicked_slider)
 		{
 			m->double_clicked = true;
-			redraw(m);
+			redraw(m, false);
 		}
 		else if ((LINE_LENGTH - 1) * CHAR_WIDTH <= m->mouse_x
 			&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
@@ -144,7 +147,7 @@ void	mouse_hook(
 			&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
 		{
 			m->show_lights = !m->show_lights;
-			redraw(m);
+			redraw(m, false);
 		}
 		else if (clicked_slider)
 		{
@@ -157,7 +160,7 @@ void	mouse_hook(
 			m->click_x = 2. * m->mouse_x / m->img->width - 1;
 			m->click_y = 2. * m->mouse_y / m->img->height - 1;
 			m->click_x *= m->aspect_ratio;
-			redraw(m);
+			redraw(m, false);
 		}
 		last_click_time = click_time;
 	}
@@ -179,10 +182,17 @@ void	scroll_hook(double x_delta, double y_delta, void *minirt)
 	t_minirt	*m;
 
 	m = minirt;
+	if (m->moving_shape)
+	{
+		m->moving_shape->coords = vec3_add(m->moving_shape->coords, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
+		m->moving_shape_start = vec3_add(m->moving_shape_start, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
+		m->mouse_moved_this_frame = true;
+		return ;
+	}
 	y_delta += x_delta;
 	m->camera_field_of_view -= y_delta;
 	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 179), 1);
-	redraw(m);
+	redraw(m, true);
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
@@ -194,7 +204,9 @@ void	cursor_hook(double x, double y, void *minirt)
 
 	m = minirt;
 	mouse_move_dir = vec3(m->mouse_x - x, m->mouse_y - y, 0);
-	if (m->mouse_r_down && (mouse_move_dir.x != 0 || mouse_move_dir.y != 0))
+	if (mouse_move_dir.x != 0 || mouse_move_dir.y != 0)
+		m->mouse_moved_this_frame = true;
+	if (m->mouse_r_down && m->mouse_moved_this_frame)
 	{
 		mouse_move_dir = vec3_muls(mouse_move_dir, MOUSE_SENSITIVITY / 100);
 		new_rot = vec3(0,0,1);
@@ -204,11 +216,11 @@ void	cursor_hook(double x, double y, void *minirt)
 			new_rot.y = new_rot.y + mouse_move_dir.y;
 		new_rot = vec3_normalize(new_rot);
 		m->camera_orientation = vec3_inverse_lookat(new_rot, m->camera_orientation);
-		redraw(m);
+		redraw(m, true);
 	}
 	if (m->moving_slider)
 		edit_objects(m, x);
-	if (m->moving_shape && (mouse_move_dir.x != 0 || mouse_move_dir.y != 0))
+	if (m->moving_shape && m->mouse_moved_this_frame)
 		move_shape(m, x, y);
 	m->mouse_x = x;
 	m->mouse_y = y;

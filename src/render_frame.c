@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 12:02:29 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 18:28:32 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,7 @@ void	render_frame(void *minirt)
 		m->resizing = false;
 		m->double_clicked = false;
 		m->clicked_world = false;
+		m->mouse_moved_this_frame = false;
 	}
 	render_text(m);
 }

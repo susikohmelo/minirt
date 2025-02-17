@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 11:37:09 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 13:46:18 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 18:17:15 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,5 @@ void	move_shape(t_minirt *m, double x, double y)
 		m->discs[i + 0].coords = vec3_add(m->discs[i + 0].coords, delta);
 		m->discs[i + 1].coords = vec3_add(m->discs[i + 1].coords, delta);
 	}
-	redraw(m);
+	redraw(m, true);
 }
