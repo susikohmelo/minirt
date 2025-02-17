@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 18:00:23 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 12:02:29 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,7 +199,7 @@ void	render_text(t_minirt *m)
 
 void	render_frame(void *minirt)
 {
-	static bool	trues[1024];
+	static bool	trues[2048];
 	t_minirt	*m;
 
 	m = minirt;
@@ -213,6 +213,7 @@ void	render_frame(void *minirt)
 	{
 		m->resizing = false;
 		m->double_clicked = false;
+		m->clicked_world = false;
 	}
 	render_text(m);
 }

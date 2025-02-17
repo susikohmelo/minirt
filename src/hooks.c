@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:41:30 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 13:44:47 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,19 @@ void	redraw(t_minirt *m)
 	m->valid_pixel_i = 0;
 }
 
-static t_vec3	perpendiculary(t_vec3 v)
+t_vec3	perpendiculary(t_vec3 v)
 {
 	t_vec3	result;
 
 	result = vec3_cross(v, vec3(0, 1, 0));
+	return (vec3_normalize(result));
+}
+
+t_vec3	perpendicularx(t_vec3 v)
+{
+	t_vec3	result;
+
+	result = vec3_cross(v, vec3(1, 0, 0));
 	return (vec3_normalize(result));
 }
 
@@ -138,6 +146,14 @@ void	mouse_hook(
 			m->moving_slider = m->mouse_y / CHAR_HEIGHT - 1;
 			edit_objects(m, m->mouse_x);
 		}
+		else
+		{
+			m->clicked_world = true;
+			m->click_x = 2. * m->mouse_x / m->img->width - 1;
+			m->click_y = 2. * m->mouse_y / m->img->height - 1;
+			m->click_x *= m->aspect_ratio;
+			redraw(m);
+		}
 		last_click_time = click_time;
 	}
 	if (button == MLX_MOUSE_BUTTON_RIGHT && (action == MLX_PRESS
@@ -146,15 +162,19 @@ void	mouse_hook(
 	else
 		m->mouse_r_down = false;
 	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_RELEASE)
+	{
 		m->moving_slider = false;
+		m->moving_shape = NULL;
+		m->clicked_world = false;
+	}
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
 void	cursor_hook(double x, double y, void *minirt)
 {
-	t_minirt	*m;
-	t_vec3		new_rot;
-	t_vec3		mouse_move_dir;
+	t_minirt		*m;
+	t_vec3			new_rot;
+	t_vec3			mouse_move_dir;
 
 	m = minirt;
 	mouse_move_dir = vec3(m->mouse_x - x, m->mouse_y - y, 0);
@@ -170,9 +190,10 @@ void	cursor_hook(double x, double y, void *minirt)
 		m->camera_orientation = vec3_inverse_lookat(new_rot, m->camera_orientation);
 		redraw(m);
 	}
-	//if (m->moving_slider && mouse_move_dir.x != 0)
 	if (m->moving_slider)
 		edit_objects(m, x);
+	if (m->moving_shape && (mouse_move_dir.x != 0 || mouse_move_dir.y != 0))
+		move_shape(m, x, y);
 	m->mouse_x = x;
 	m->mouse_y = y;
 }

@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 18:38:08 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 13:39:58 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -403,6 +403,15 @@ void	cast_rays(t_minirt *m)
 					m->shape_type = ray.shape_type;
 				}
 				m->double_clicked = false;
+			}
+			if (m->clicked_world && m->cursor_pointing && !m->moving_shape)
+			{
+				m->moving_shape = (t_shape *)ray.shape;
+				if (ray.shape_type == SHAPE_DISC)
+					m->moving_shape = (t_shape *) \
+						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
+				m->moving_shape_start = ray.shape->coords;
+				m->clicked_world = false;
 			}
 			if (isinf(ray.length))
 				color = (t_vec3){};

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:01:19 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 13:37:40 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,6 @@
 # define MOUSE_SENSITIVITY 0.25
 # define MOVE_DISTANCE 0.3
 
-// TODO actual values
-# define MIN_WINDOW_WIDTH 12
-# define MIN_WINDOW_HEIGHT 12
-
 // in pixels
 # define CHAR_WIDTH 10
 # define CHAR_HEIGHT 20
@@ -43,6 +39,7 @@
 # define FLOAT_WIDTH 5
 # define LINE_LENGTH 32
 
+// Max value for some attributes like sphere radius
 # define SCALE 8
 
 typedef struct s_minirt
@@ -53,14 +50,18 @@ typedef struct s_minirt
 	char			*line;
 	int32_t			mouse_x;
 	int32_t			mouse_y;
+	double			click_x;
+	double			click_y;
 	bool			cursor_pointing;
 	bool			double_clicked;
-	bool			mouse_l_down;
+	bool			clicked_world;
 	bool			mouse_r_down;
 	bool			show_lights;
 	bool			resizing;
 	uint8_t			moving_slider;
 
+	t_shape			*moving_shape;
+	t_vec3			moving_shape_start;
 	t_shape_type	shape_type;
 	t_shape			*shape;
 	bool			valid_pixel[32];
@@ -133,6 +134,9 @@ void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	render_string(t_minirt *m, const char *str);
 void	edit_objects(t_minirt *m, double x);
+void	move_shape(t_minirt *m, double x, double y);
+t_vec3	perpendiculary(t_vec3 v);
+t_vec3	perpendicularx(t_vec3 v);
 
 void	cast_rays(t_minirt *minirt);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
