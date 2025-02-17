@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 22:13:50 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 23:46:34 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -478,7 +478,7 @@ void	cast_rays(t_minirt *m)
 	while (++row < m->img->height)
 	{
 		i_pixel[0] = (i_pixel[0] + 1) * (i_pixel[0] < m->valid_pixel_len);
-		if (i_pixel[0] != m->valid_pixel_y)
+		if (m->valid_pixel_y == 0 && i_pixel[0] != m->valid_pixel_y)
 			continue ;
 		i_pixel[1] = (size_t) - 1;
 		column = (size_t) - 1;

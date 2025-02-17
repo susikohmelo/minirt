@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 21:08:32 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 23:45:49 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,12 +206,12 @@ void	render_frame(void *minirt)
 
 	cast_rays(minirt);
 	m->valid_pixel_x += (m->valid_pixel_x <= m->valid_pixel_len);
-	if (m->valid_pixel_x > m->valid_pixel_len)
+	if (m->valid_pixel_y <= 1 && m->valid_pixel_x > m->valid_pixel_len)
 	{
-		m->valid_pixel_y += (m->valid_pixel_y <= m->valid_pixel_len);
+		++m->valid_pixel_y;
 		m->valid_pixel_x = 0;
 	}
-	if (m->valid_pixel_y > m->valid_pixel_len)
+	if (m->valid_pixel_y > 1)
 	{
 		m->resizing = false;
 		m->double_clicked = false;
