@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 13:39:58 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 18:28:43 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,12 +388,13 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 	}
 }
 
-//TODO make sure window doesn't crash with under 8 pixels
+//TODO make sure window doesn't crash with under 32 pixels
 
 static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
 {
 	bool	cursor_in_range;
 
+	column = fmax(column - sizeof(m->valid_pixel) / 2, 0);
 	cursor_in_range = m->mouse_x >= (int)column
 		&& (size_t) m->mouse_x <= column + sizeof(m->valid_pixel)
 		&& m->mouse_y == (int)row;
@@ -491,6 +492,7 @@ void	cast_rays(t_minirt *m)
 					m->shape_type = ray.shape_type;
 				}
 				m->double_clicked = false;
+				return ;
 			}
 			if (m->clicked_world && m->cursor_pointing && !m->moving_shape)
 			{
@@ -499,8 +501,9 @@ void	cast_rays(t_minirt *m)
 					m->moving_shape = (t_shape *) \
 						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
 				m->moving_shape_start = ray.shape->coords;
-				m->clicked_world = false;
 			}
+			if (!m->mouse_moved_this_frame && (m->clicked_world || m->double_clicked))
+				continue ;
 			if (isinf(ray.length))
 				color = get_skybox_color(m, ray.dir, 0);
 			else if (ray.shape_type != SHAPE_LIGHT)
