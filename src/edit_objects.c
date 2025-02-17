@@ -1,4 +1,14 @@
-// TODO stdheader
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   edit_objects.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/17 10:44:57 by lfiestas          #+#    #+#             */
+/*   Updated: 2025/02/17 11:00:01 by lfiestas         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
@@ -28,6 +38,8 @@ static void	edit_plane(t_minirt *m, t_shape *plane, double val)
 	t_vec3	*n;
 
 	edit_common_shape_attributes(m, plane, val);
+	if (!(5 <= m->moving_slider && m->moving_slider <= 7))
+		return ;
 	val = 2 * val - 1;
 	n = &((t_plane *)plane)->normal;
 	if (fabs(val) == 1 || fabs(n->x) == 1 || fabs(n->y) == 1 || fabs(n->z) == 1)

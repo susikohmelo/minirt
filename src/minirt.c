@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:04:12 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 10:50:53 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ void	mrt_init(t_minirt *m, const char *path)
 
 	int32_t mxw, mxh;
 	mlx_get_monitor_size(0, &mxw, &mxh);
-	mlx_set_window_limit(m->mlx, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, mxw, mxh);
+	mlx_set_window_limit(m->mlx, CHAR_WIDTH * LINE_LENGTH, CHAR_HEIGHT * 11, mxw, mxh);
 }
 
 void	mrt_destroy(t_minirt *m)
