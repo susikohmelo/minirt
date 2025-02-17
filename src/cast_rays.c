@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 21:32:10 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 21:41:28 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -369,7 +369,7 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 	size_t	y;
 	size_t	idx;
 	size_t	img_len;
-	size_t	row_len;
+	size_t	const_lens[2];
 
 	idx = row * m->img->width + col;
 	if (m->valid_pixel_y > 0 || m->valid_pixel_x > 0)
@@ -384,15 +384,16 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 	y = (size_t) - 1;
 	while (++y <= m->valid_pixel_len)
 	{
-		row_len = (row + y) * m->img->width;
+		const_lens[0] = (row + y) * m->img->width;
 		x = (size_t) - 1;
-		while (++x <= m->valid_pixel_len && row_len + col + x
+		while (++x <= m->valid_pixel_len && const_lens[0] + col + x
 				< img_len && col + x < m->img->width)
 		{
-			m->img->pixels[4 * (idx + y * m->img->width + x) + 0] = 255 * clr.r;
-			m->img->pixels[4 * (idx + y * m->img->width + x) + 1] = 255 * clr.g;
-			m->img->pixels[4 * (idx + y * m->img->width + x) + 2] = 255 * clr.b;
-			m->img->pixels[4 * (idx + y * m->img->width + x) + 3] = 255;
+			const_lens[1] = 4 * (idx + y * m->img->width + x);
+			m->img->pixels[const_lens[1] + 0] = 255 * clr.r;
+			m->img->pixels[const_lens[1] + 1] = 255 * clr.g;
+			m->img->pixels[const_lens[1] + 2] = 255 * clr.b;
+			m->img->pixels[const_lens[1] + 3] = 255;
 		}
 	}
 }
