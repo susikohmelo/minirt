@@ -121,6 +121,7 @@ void	render_header(t_minirt *m, const char *header)
 {
 	char	line[LINE_LENGTH + 1];
 
+	m = m + 0; // TODO TEMP WERROR WORKAROUND
 	ft_memset(line, ' ', sizeof line);
 	ft_memcpy(line, header, ft_strlen(header));
 	line[LINE_LENGTH - 1] = 'X';

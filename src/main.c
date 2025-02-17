@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:28:44 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 15:42:52 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/15 01:36:44 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int	main(int argc, char **argv)
 		"You must pass a file with `.rt` file extension");
 	mrt_init(&m, argv[1]);
 	mlx_loop_hook(m.mlx, render_frame, &m);
+	mlx_scroll_hook(m.mlx, *scroll_hook, &m);
 	mlx_loop(m.mlx);
 	mrt_destroy(&m);
 }

@@ -24,8 +24,22 @@
 #  define MRT_FATAL_EXPECT 1
 # endif
 
-// Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
-# define INIT_WIDTH 1480
+/*
+	Maximum times a ray can reflect off of a surface.
+	This includes the initial reflection,meaning 0 disables all reflections.
+	Keys 1 and 2 can adjust bounces in real time.
+*/
+
+# define DEFAULT_MAX_RAY_BOUNCES 3
+/*
+	Key 3 can also enable/disable this at any time in the program
+*/
+# define SKYBOX_DISABLED_BY_DEFAULT 1
+
+/*
+	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
+*/
+# define INIT_WIDTH 1445
 # define INIT_HEIGHT 1024
 
 # define MOUSE_SENSITIVITY 0.25
@@ -41,6 +55,25 @@
 
 // Max value for some attributes like sphere radius
 # define SCALE 8
+
+/*
+	Do not reorder these, the order:
+	left, front, right, up, back, down
+	is accessed via indexing in the get_skybox_color function
+*/
+typedef union s_skybox
+{
+	struct
+	{
+		mlx_image_t	*left;
+		mlx_image_t	*front;
+		mlx_image_t	*right;
+		mlx_image_t	*up;
+		mlx_image_t	*back;
+		mlx_image_t	*down;
+	};
+	mlx_image_t	*sky_array[6];
+}	t_skybox;
 
 typedef struct s_minirt
 {
@@ -62,6 +95,10 @@ typedef struct s_minirt
 
 	t_shape			*moving_shape;
 	t_vec3			moving_shape_start;
+  
+	int				max_ray_bounces;
+	bool			disable_skybox;
+
 	t_shape_type	shape_type;
 	t_shape			*shape;
 	bool			valid_pixel[32];
@@ -69,8 +106,12 @@ typedef struct s_minirt
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
 
+
 	double			ambient_light_ratio;
 	t_vec3			ambient_light_color;
+
+	t_skybox		skybox;
+
 	t_vec3			ambient_light;
 	t_vec3			camera_coords;
 	t_vec3			camera_orientation;
@@ -125,11 +166,13 @@ double	get_rough_value(t_vec3 r,
 			const t_shape *shape, int shape_type);
 t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
+t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
 void	redraw(t_minirt *m);
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);
+void	scroll_hook(double x_delta, double y_delta, void *minirt);
 void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 void	render_frame(void *rt_voidptr);
 void	render_string(t_minirt *m, const char *str);

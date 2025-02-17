@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 00:06:31 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/14 11:07:02 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/15 05:56:57 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,16 @@ void	free_textures(t_minirt *m)
 	free_spheres(m);
 	free_cylinders(m);
 	free_discs(m);
+	if (m->skybox.left)
+		mlx_delete_image(m->mlx, m->skybox.left);
+	if (m->skybox.front)
+		mlx_delete_image(m->mlx, m->skybox.front);
+	if (m->skybox.right)
+		mlx_delete_image(m->mlx, m->skybox.right);
+	if (m->skybox.up)
+		mlx_delete_image(m->mlx, m->skybox.up);
+	if (m->skybox.back)
+		mlx_delete_image(m->mlx, m->skybox.back);
+	if (m->skybox.down)
+		mlx_delete_image(m->mlx, m->skybox.down);
 }

@@ -90,6 +90,11 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 			perpendiculary(dir), d * (1 - 2 * (key.key != MLX_KEY_A))));
 	if (key.key == MLX_KEY_SPACE || key.key == MLX_KEY_LEFT_SHIFT)
 		m->camera_coords.y += d * (1 - 2 * (key.key != MLX_KEY_SPACE));
+  if (key.key == MLX_KEY_1 || key.key == MLX_KEY_2)
+		m->max_ray_bounces = fmax(fmin(m->max_ray_bounces
+			+ (1 - 2 * (key.key != MLX_KEY_2)), 1024), 0);
+	if (key.key == MLX_KEY_3)
+		m->disable_skybox = m->disable_skybox != 1;
 	redraw(m);
 }
 
@@ -167,6 +172,19 @@ void	mouse_hook(
 		m->moving_shape = NULL;
 		m->clicked_world = false;
 	}
+}
+
+void	scroll_hook(double x_delta, double y_delta, void *minirt)
+{
+	t_minirt	*m;
+
+	m = minirt;
+	y_delta += x_delta;
+	m->camera_field_of_view -= y_delta;
+	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 179), 1);
+	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	flush_image_black(m->img);
+	m->valid_pixel_i = 0;
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
