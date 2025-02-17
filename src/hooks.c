@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 13:44:47 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/17 17:12:16 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,9 +182,7 @@ void	scroll_hook(double x_delta, double y_delta, void *minirt)
 	y_delta += x_delta;
 	m->camera_field_of_view -= y_delta;
 	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 179), 1);
-	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
-	flush_image_black(m->img);
-	m->valid_pixel_i = 0;
+	redraw(m);
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
