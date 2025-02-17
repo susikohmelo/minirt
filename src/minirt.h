@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 21:14:42 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 22:15:21 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@
 # define INIT_WIDTH 1440
 # define INIT_HEIGHT 1024
 
-# define DEFAULT_PIXEL_DIVISION 8
+# define DEFAULT_PIXEL_DIVISION 5
 
 # define MOUSE_SENSITIVITY 0.25
 # define SCROLL_SENSITIVITY 0.25

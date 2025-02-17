@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 21:41:28 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/17 22:13:50 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -368,8 +368,8 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 	size_t	x;
 	size_t	y;
 	size_t	idx;
-	size_t	img_len;
-	size_t	const_lens[2];
+	size_t	const_lens[3];
+	int		offset;
 
 	idx = row * m->img->width + col;
 	if (m->valid_pixel_y > 0 || m->valid_pixel_x > 0)
@@ -380,20 +380,21 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 		m->img->pixels[4 * idx + 3] = 255;
 		return ;
 	}
-	img_len = m->img->width * m->img->height;
+	const_lens[0] = m->img->width * m->img->height;
 	y = (size_t) - 1;
 	while (++y <= m->valid_pixel_len)
 	{
-		const_lens[0] = (row + y) * m->img->width;
+		offset = -1 * m->valid_pixel_len * (y % 2 != 0);
+		const_lens[1] = (row + y) * m->img->width;
+		const_lens[2] = 4 * (idx + y * m->img->width);
 		x = (size_t) - 1;
-		while (++x <= m->valid_pixel_len && const_lens[0] + col + x
-				< img_len && col + x < m->img->width)
+		while (++x <= m->valid_pixel_len && const_lens[1] + col + x + offset
+				< const_lens[0] && col + x + offset < m->img->width)
 		{
-			const_lens[1] = 4 * (idx + y * m->img->width + x);
-			m->img->pixels[const_lens[1] + 0] = 255 * clr.r;
-			m->img->pixels[const_lens[1] + 1] = 255 * clr.g;
-			m->img->pixels[const_lens[1] + 2] = 255 * clr.b;
-			m->img->pixels[const_lens[1] + 3] = 255;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 0] = 255 * clr.r;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 1] = 255 * clr.g;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 2] = 255 * clr.b;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 3] = 255;
 		}
 	}
 }
