@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 20:41:40 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 23:26:46 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ t_vec3	phong(
 	return (vec3_add(vec3_mul(vec3_add(m->ambient_light, surface), shape_color), surface_speculars));
 }
 
-static void inline	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
+static inline void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 {
 	size_t	i;
 	size_t	x;

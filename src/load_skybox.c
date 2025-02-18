@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 19:34:58 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 19:42:16 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 23:27:17 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,7 @@ static inline void	append_paths(char *path1, char *path2, char *new_path)
 {
 	size_t	i;
 	size_t	i2;
-	size_t	path2_len;
 
-	path2_len = ft_strlen(path2);
 	i = (size_t) - 1;
 	while (path1[++i])
 		new_path[i] = path1[i];
