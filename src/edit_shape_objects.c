@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:19:12 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 17:22:02 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:18:25 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,3 @@ void	edit_cylinder(t_minirt *m, t_shape *cylinder, double x)
 	m->discs[i].normal = c->axis;
 	m->discs[i].radius = c->radius;
 }
-

@@ -6,14 +6,15 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/18 19:36:10 by ljylhank         ###   ########.fr        #
+#    Updated: 2025/02/18 20:45:28 by ljylhank         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = miniRT
 
-SRCS = main.c minirt.c vec3.c vec3_2.c vec3_scalar.c hooks.c \
-	parser.c parse_attributes.c parse_shapes.c \
+SRCS = main.c minirt.c vec3.c vec3_dot_cross_clamp_length_normalize.c \
+	vec3_matrices.c vec3_scalar.c hooks.c surface_color.c get_object_normal.c \
+	surface_get_colors.c parser.c parse_attributes.c parse_shapes.c \
 	get_next_line.c get_next_line_utils.c \
 	cast_rays.c render_frame.c intersect_dist.c texture_uv_functions.c \
 	parse_texture.c get_uv_coords.c free_textures.c parse_utils.c \

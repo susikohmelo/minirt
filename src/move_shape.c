@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 11:37:09 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 19:52:04 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:29:17 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	move_shape(t_minirt *m, double x, double y)
 	y = 2 * y / m->img->height - 1;
 	x *= m->aspect_ratio;
 	delta_x = vec3_muls(perpendiculary(m->camera_orientation), m->click_x - x);
-	delta_y = vec3_muls(vec3(0,1,0), m->click_y - y);
+	delta_y = vec3_muls(vec3(0, 1, 0), m->click_y - y);
 	delta = vec3_add(delta_x, delta_y);
 	length = vec3_length(vec3_sub(m->moving_shape_start, m->camera_coords));
 	delta = vec3_muls(delta, length / sqrt(2));
