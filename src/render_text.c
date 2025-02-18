@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:43:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 17:46:47 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:27:52 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,3 @@ void	render_text(t_minirt *m)
 	else
 		render_string(m, "o");
 }
-

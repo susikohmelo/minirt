@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 17:51:21 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/12 21:12:04 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:12:43 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 static double	wrap_coords(double coord)
 {
+	if (coord != coord)
+		return (0);
 	coord = coord - (int) coord;
 	if (coord < 0)
 		coord = 1 + coord;

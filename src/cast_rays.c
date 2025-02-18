@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 17:48:12 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:41:40 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	return (new_ray);
 }
 
-static t_vec3	phong(
+t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
 	const double	specular_reflection = 1;
@@ -139,193 +139,6 @@ static t_vec3	phong(
 	return (vec3_add(vec3_mul(vec3_add(m->ambient_light, surface), shape_color), surface_speculars));
 }
 
-t_vec3	get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data)
-{
-	const double	normal_strength = 1;
-	t_vec3			map_normal;
-	t_vec3			normal;
-	double			n;
-
-	(void)m; // TODO get rid of this
-	ray = vec3_add(vec3_muls(data->dir, data->length), data->start);
-	if (data->shape_type == SHAPE_SPHERE)
-	{
-		normal = vec3_normalize(vec3_sub(ray, data->shape->coords));
-		if (vec3_dot(normal, data->dir) >= 0.)
-		{
-			normal = vec3_muls(normal, -1);
-			data->inside_shape = true;
-		}
-	}
-	else if (data->shape_type == SHAPE_PLANE || data->shape_type == SHAPE_DISC)
-	{
-		normal = ((t_plane *)data->shape)->normal;
-		if (vec3_dot(normal, data->dir) >= 0.0001)
-        {
-			normal = vec3_muls(normal, -1);
-            data->inside_shape = true;
-        }
-	}
-	else if (data->shape_type == SHAPE_CYLINDER)
-	{
-		t_vec3	C = vec3_add(
-			((t_cylinder *)data->shape)->coords,
-			vec3_muls(
-				((t_cylinder *)data->shape)->axis,
-				((t_cylinder *)data->shape)->height / 2));
-
-		t_vec3	P = ray;
-		t_vec3	D = data->dir;
-		t_vec3	V = ((t_cylinder *)data->shape)->axis;
-		t_vec3	X = vec3_sub(data->start, C);
-
-		double	t = data->length;
-		double	m = vec3_dot(D,V) * t + vec3_dot(X, V);
-		normal = vec3_normalize(
-			vec3_sub(
-				vec3_sub(
-					P,
-					C),
-				vec3_muls(
-					V,
-					m))); (void)n;
-
-		if (vec3_dot(normal, data->dir) >= 0.)
-		{
-			normal = vec3_muls(normal, -1);
-			data->inside_shape = true;
-		}
-	}
-	if (data->shape->normal_map)
-	{
-		map_normal = vec3_inverse_lookat(get_texture_color( \
-			ray, NORMAL_MAP, data->shape, data->shape_type), normal);
-		normal = vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
-			vec3_muls(map_normal, normal_strength)));
-	}
-	return (normal);
-}
-
-static inline double	get_shape_roughness(t_ray *data, t_vec3 *ray)
-{
-	if (data->shape->roughness_map)
-		return (get_rough_value(*ray, data->shape, data->shape_type));
-	else
-		return (data->shape->default_rough);
-}
-
-static inline t_vec3	get_shape_color(t_ray *data, t_vec3 *ray)
-{
-	if (data->shape->texture)
-		return (vec3_mul(get_albedo_blur(*ray,
-			data->shape, data->shape_type, 0), data->shape->color));
-	else
-		return (data->shape->color);
-}
-
-static inline t_vec3	skybox_color(t_minirt *m, t_ray data,
-							t_vec3 ray, double roughness)
-{
-	t_vec3			shape_color;
-	t_vec3			skybox_color;
-	t_vec3			skybox_diffuse;
-
-	shape_color = get_shape_color(&data, &ray);
-	skybox_color = get_skybox_color(m, data.dir, roughness);
-	skybox_diffuse = vec3_mul(skybox_color, shape_color);
-	skybox_color = vec3_add(vec3_muls(skybox_diffuse, roughness), vec3_muls(skybox_color, 1 - roughness));
-	skybox_color = vec3_sub(skybox_color, vec3_mul(m->ambient_light, shape_color));
-
-	skybox_color = vec3_clamp(skybox_color, 0, 1);
-	return (skybox_color);
-}
-
-t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
-{
-	t_vec3			ray;
-	t_vec3			view_dir;
-	t_vec3			main_color;
-	t_vec3			shape_color;
-	t_vec3			shape_diffuse;
-	t_vec3			normal;
-	double			roughness;
-	double			temp_rough;
-	int				i;
-
-	ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-	normal = get_obj_normal(m, ray, &data);
-	main_color = phong(m, ray, normal, data);
-
-	// If we are being called through recursion, kill the cycle here
-	// Or we don't want reflections at all
-	if (is_reflection || m->max_ray_bounces == 0)
-		return (main_color);
-	roughness = get_shape_roughness(&data, &ray);
-	data.is_reflect = roughness;
-
-	// Set new ray to point to the reflection direction and check collision
-	view_dir = vec3_normalize(vec3_sub(m->camera_coords, ray));
-	data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(view_dir, normal)), view_dir);
-	data.start = vec3_add(ray, vec3_muls(normal, 0.001));
-	data.length = INFINITY;
-	get_shape_intersect_dist(m, &data, NULL);
-
-	// If we hit nothing, just get the skybox color and return
-	if (isinf(data.length) || data.length < 0.0001)
-		return (vec3_add(main_color, skybox_color(m, data, ray, roughness)));
-	else
-	{
-		// Get color of the object we hit via recursion
-		main_color = vec3_add(main_color, vec3_muls(surface_color(m, data, true),
-			(1 - roughness) / (1 + roughness * data.length * 16)));
-
-		// This is a loop for any further reflections of reflections of reflections etc...
-		// Loop is killed if the light ray hits nothing, max bounces are reached or roughness is 1
-		i = 0;
-		while (++i < m->max_ray_bounces && roughness < 1)
-		{
-			// Set ray to point to new reflected direction from the object we hit last time
-			normal = get_obj_normal(m, ray, &data);
-			ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-			roughness = fmin(roughness + get_shape_roughness(&data, &ray), 1);
-			data.start = vec3_add(ray, vec3_muls(normal, 0.001));
-			view_dir = vec3_muls(data.dir, -1);
-			data.dir = vec3_sub(vec3_muls(normal, 2 * vec3_dot(view_dir, normal)), view_dir);
-			data.length = INFINITY;
-			get_shape_intersect_dist(m, &data, NULL);
-
-			// If we hit something, add the new color via recursion,
-			// continue the cycle to check for more reflections
-			if (!isinf(data.length))
-			{
-				ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-				temp_rough = get_shape_roughness(&data, &ray);
-				data.is_reflect = temp_rough;
-
-				//TODO This mixing of specular / difuse can definitely be put into it's
-				// own function, it is used 2 or 3 times
-				shape_color = vec3_muls(surface_color(m, data, true),
-					(1 - temp_rough) / (1 + temp_rough * data.length * 16));
-				shape_diffuse = vec3_mul(shape_color, get_shape_color(&data, &ray));
-				shape_color = vec3_add(vec3_muls(shape_color, 1 - temp_rough),
-					vec3_muls(shape_diffuse, temp_rough));
-				main_color = vec3_add(main_color, vec3_muls(shape_color, 1 - roughness));
-				continue ;
-			}
-
-			// If we do not hit an object, kill the loop and get the skybox color
-			// Mix color with roughness/color of the object we last hit
-			ray = vec3_add(vec3_muls(data.dir, data.length), data.start);
-			shape_color = skybox_color(m, data, ray, roughness);
-			shape_diffuse = vec3_mul(shape_color, get_shape_color(&data, &ray));
-			shape_color = vec3_add(vec3_muls(shape_color, 1 - roughness),
-				vec3_muls(shape_diffuse, roughness));
-			return (vec3_add(main_color, shape_color));
-		}
-	}
-	return (main_color);
-}
-
 static void inline	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 {
 	size_t	i;
@@ -335,8 +148,8 @@ static void inline	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t
 	clr = vec3_muls(clr, 255);
 	i = row * m->img->width + col;
 	x = (size_t) - 1;
-	while (++x < sizeof m->valid_pixel
-		&& !m->valid_pixel[(m->valid_pixel_i + x) & (sizeof m->valid_pixel - 1)]
+	while (++x < m->valid_pixel_len
+		&& !m->valid_pixel[(m->valid_pixel_i + x) & (m->valid_pixel_len - 1)]
 		&& col + x < m->img->width)
 	{
 		ix = (i + x) * 4;
@@ -429,8 +242,8 @@ void	cast_rays(t_minirt *m, size_t tid)
 		while (++column < m->img->width)
 		{
 			i_pixel = row * m->img->width + column;
-			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
-				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
+			if (m->valid_pixel[i_pixel & (m->valid_pixel_len - 1)]
+				|| (i_pixel & (m->valid_pixel_len - 1)) != m->valid_pixel_i)
 				continue;
 			ray = cast_ray(m, column, row);
 

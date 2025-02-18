@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 18:26:16 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:45:13 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 # define INIT_WIDTH 1447
 # define INIT_HEIGHT 1024
 
-# define DEFAULT_PIXEL_DIVISION 5
+# define DEFAULT_VALID_PIXEL_LEN 16
 
 # define MOUSE_SENSITIVITY 0.25
 # define SCROLL_SENSITIVITY 0.25
@@ -114,7 +114,8 @@ typedef struct s_minirt
 	int				max_ray_bounces;
 	bool			disable_skybox;
 
-	bool			valid_pixel[16];
+	bool			valid_pixel[2048];
+	size_t			valid_pixel_len;
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
@@ -203,6 +204,14 @@ double		get_rough_value(t_vec3 r, const t_shape *shape, int shape_type);
 t_vec3		get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 				int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
+
+
+double		get_shape_roughness(t_ray *data, t_vec3 *ray);
+t_vec3		get_shape_color(t_ray *data, t_vec3 *ray);
+t_vec3		skybox_color(t_minirt *m, t_ray data, t_vec3 ray, double roughness);
+t_vec3		get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data);
+t_vec3		surface_color(t_minirt *m, t_ray data, bool is_reflection);
+t_vec3		phong(t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data);
 
 void		key_hook(mlx_key_data_t key, void *minirt);
 void		resize_hook(int w, int h, void *minirt);

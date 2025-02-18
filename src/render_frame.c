@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 17:50:42 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:52:47 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ void	render_frame(void *minirt)
 		while (!m->thrds_data[i].done)
 			usleep(10);
 	m->valid_pixel[m->valid_pixel_i] = true;
-	m->valid_pixel_i = (m->valid_pixel_i + 5) & (sizeof m->valid_pixel - 1);
-	if (ft_memcmp(m->valid_pixel, trues, sizeof m->valid_pixel) == 0)
+	m->valid_pixel_i = (m->valid_pixel_i + 5) & (m->valid_pixel_len - 1);
+	if (ft_memcmp(m->valid_pixel, trues, m->valid_pixel_len) == 0)
 		m->resizing = false;
 	render_text(m);
 	t = mlx_get_time();
