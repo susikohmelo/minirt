@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 16:07:06 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:07:34 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,12 @@ void	key_hook(mlx_key_data_t key, void *minirt)
 	if (key.key == MLX_KEY_1 || key.key == MLX_KEY_2)
 		m->max_ray_bounces = fmax(fmin(m->max_ray_bounces
 			+ (1 - 2 * (key.key != MLX_KEY_2)), 1024), 0);
+	if (key.key == MLX_KEY_UP || key.key == MLX_KEY_DOWN)
+		m->valid_pixel_len = fmax(fmin(m->valid_pixel_len
+					* (2 - 1.5 * (key.key == MLX_KEY_UP)), 2048), 2);
 	if (key.key == MLX_KEY_3)
 		m->disable_skybox = m->disable_skybox != 1;
-	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 }
 
 void	resize_hook(int w, int h, void *minirt)
@@ -88,7 +91,7 @@ void	resize_hook(int w, int h, void *minirt)
 	m = minirt;
 	mrt_assert(m, mlx_resize_image(m->img, w, h), "mlx_resize_image() failed");
 	m->resizing = true;
-	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 }
 
 void	mouse_hook(
@@ -144,7 +147,7 @@ void	mouse_hook(
 		else if (clicked_show_lights)
 		{
 			m->show_lights = !m->show_lights;
-			ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+			ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 		}
 		else if (clicked_slider)
 		{
@@ -163,7 +166,7 @@ void	mouse_hook(
 					&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
 			if (ray.shape != NULL)
 				m->moving_shape_start = ray.shape->coords;
-			ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+			ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 		}
 		last_click_time = click_time;
 	}
@@ -188,13 +191,13 @@ void	scroll_hook(double x_delta, double y_delta, void *minirt)
 	{
 		m->moving_shape->coords = vec3_add(m->moving_shape->coords, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
 		m->moving_shape_start = vec3_add(m->moving_shape_start, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
-		ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+		ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 		return ;
 	}
 	y_delta += x_delta;
 	m->camera_field_of_view -= y_delta;
 	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 179), 1);
-	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 }
 
 // TODO vec3_rotatexy is not used anymore, at least in hooks.c
@@ -218,7 +221,7 @@ void	cursor_hook(double x, double y, void *minirt)
 			new_rot.y = new_rot.y + mouse_move_dir.y;
 		new_rot = vec3_normalize(new_rot);
 		m->camera_orientation = vec3_inverse_lookat(new_rot, m->camera_orientation);
-		ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+		ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 	}
 	if (m->moving_slider)
 		edit_objects(m, x);

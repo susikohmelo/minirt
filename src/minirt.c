@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 19:35:15 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:54:34 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ void	mrt_init(t_minirt *m, const char *exec_path, const char *path)
 	size_t	i;
 
 	ft_memset(sizes, 0, sizeof sizes);
+	m->valid_pixel_len = DEFAULT_VALID_PIXEL_LEN;
 	get_shape_buf_sizes(m, sizes, path);
 	m->lights = ft_arena_calloc(&m->arena, sizes[0], sizeof m->lights[0]);
 	m->spheres = ft_arena_calloc( \

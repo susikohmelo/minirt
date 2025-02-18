@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 11:37:09 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 16:07:22 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:52:04 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,5 +44,5 @@ void	move_shape(t_minirt *m, double x, double y)
 	delta = vec3_muls(delta, length / sqrt(2));
 	m->moving_shape->coords = vec3_add(m->moving_shape_start, delta);
 	move_cylinder_caps(m, (t_cylinder *)m->moving_shape, delta);
-	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
+	ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 }

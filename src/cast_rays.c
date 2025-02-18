@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 17:48:12 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:50:26 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -335,8 +335,8 @@ static void inline	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t
 	clr = vec3_muls(clr, 255);
 	i = row * m->img->width + col;
 	x = (size_t) - 1;
-	while (++x < sizeof m->valid_pixel
-		&& !m->valid_pixel[(m->valid_pixel_i + x) & (sizeof m->valid_pixel - 1)]
+	while (++x < m->valid_pixel_len
+		&& !m->valid_pixel[(m->valid_pixel_i + x) & (m->valid_pixel_len - 1)]
 		&& col + x < m->img->width)
 	{
 		ix = (i + x) * 4;
@@ -429,8 +429,8 @@ void	cast_rays(t_minirt *m, size_t tid)
 		while (++column < m->img->width)
 		{
 			i_pixel = row * m->img->width + column;
-			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
-				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
+			if (m->valid_pixel[i_pixel & (m->valid_pixel_len - 1)]
+				|| (i_pixel & (m->valid_pixel_len - 1)) != m->valid_pixel_i)
 				continue;
 			ray = cast_ray(m, column, row);
 

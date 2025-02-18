@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 18:26:16 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:09:30 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 # define INIT_WIDTH 1447
 # define INIT_HEIGHT 1024
 
-# define DEFAULT_PIXEL_DIVISION 5
+# define DEFAULT_VALID_PIXEL_LEN 16
 
 # define MOUSE_SENSITIVITY 0.25
 # define SCROLL_SENSITIVITY 0.25
@@ -114,7 +114,8 @@ typedef struct s_minirt
 	int				max_ray_bounces;
 	bool			disable_skybox;
 
-	bool			valid_pixel[16];
+	bool			valid_pixel[2048];
+	size_t			valid_pixel_len;
 	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
