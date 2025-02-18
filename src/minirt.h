@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 17:06:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:35:47 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ typedef struct s_minirt
 	size_t			discs_length;
 }	t_minirt;
 
-void		mrt_init(t_minirt *m, const char *path);
+void		mrt_init(t_minirt *m, const char *exec_path, const char *path);
 void		mrt_destroy(t_minirt *m);
 void		mrt_exit(t_minirt *m, int status);
 bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
@@ -173,6 +173,7 @@ t_vec2		get_sphere_uv(t_vec3 intersect, t_sphere *sphere);
 t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v,
 				double blur);
 mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type);
+void		load_skybox(t_minirt *m, const char *exec_path);
 t_vec3		get_texture_color(t_vec3 r, int texture_type,
 				const t_shape *shape, int shape_type);
 double	get_rough_value(t_vec3 r,
