@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 12:42:23 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/13 13:07:03 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:24:53 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,8 @@ double	vec3_dot(t_vec3 v1, t_vec3 v2)__attribute__((warn_unused_result));
 t_vec3	vec3_cross(t_vec3 v1, t_vec3 v2)__attribute__((warn_unused_result));
 double	vec3_length(t_vec3 v)__attribute__((warn_unused_result));
 t_vec3	vec3_normalize(t_vec3 v)__attribute__((warn_unused_result));
-
-t_vec3	vec3_normalize(t_vec3 v)__attribute__((warn_unused_result));
+t_vec3	vec3_clamp(t_vec3 v, double min, double max) \
+	__attribute__((warn_unused_result));
 
 t_vec3	vec3_rotate_to_camera(t_vec3 v)__attribute__((warn_unused_result));
 t_vec3	vec3_inverse_lookat(t_vec3 v1, t_vec3 v2)__attribute__((warn_unused_result));

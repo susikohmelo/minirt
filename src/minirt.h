@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 22:15:21 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 17:06:01 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <libft.h>
 # include <stdbool.h>
 # include <stdint.h>
+# include <pthread.h>
 
 # ifndef MRT_FATAL_EXPECT
 #  define MRT_FATAL_EXPECT 1
@@ -39,7 +40,7 @@
 /*
 	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
 */
-# define INIT_WIDTH 1440
+# define INIT_WIDTH 1447
 # define INIT_HEIGHT 1024
 
 # define DEFAULT_PIXEL_DIVISION 5
@@ -58,6 +59,8 @@
 
 // Max value for some attributes like sphere radius
 # define SCALE 8
+
+# define THREADS 16
 
 /*
 	Do not reorder these, the order:
@@ -78,6 +81,13 @@ typedef union s_skybox
 	mlx_image_t	*sky_array[6];
 }	t_skybox;
 
+typedef struct s_thread_data
+{
+	struct s_minirt	*minirt;
+	size_t			id;
+	_Atomic bool	done;
+}	t_thread_data;
+
 typedef struct s_minirt
 {
 	mlx_t			*mlx;
@@ -88,26 +98,24 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	double			click_x;
 	double			click_y;
-	bool			mouse_moved_this_frame;
-	bool			cursor_pointing;
-	bool			double_clicked;
-	bool			clicked_world;
 	bool			mouse_r_down;
 	bool			show_lights;
 	bool			resizing;
 	uint8_t			moving_slider;
+	pthread_t		thrds[THREADS];
+	t_thread_data	thrds_data[THREADS];
+	_Atomic bool	should_quit;
 
 	t_shape			*moving_shape;
 	t_vec3			moving_shape_start;
-  
+	t_shape_type	shape_type;
+	t_shape			*shape;
+
 	int				max_ray_bounces;
 	bool			disable_skybox;
 
-	t_shape_type	shape_type;
-	t_shape			*shape;
-	size_t			valid_pixel_len;
-	size_t			valid_pixel_x;
-	size_t			valid_pixel_y;
+	bool			valid_pixel[16];
+	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
 
@@ -173,7 +181,6 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
-void	redraw(t_minirt *m, bool flush_black);
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);
@@ -186,19 +193,9 @@ void	move_shape(t_minirt *m, double x, double y);
 t_vec3	perpendiculary(t_vec3 v);
 t_vec3	perpendicularx(t_vec3 v);
 
-void	cast_rays(t_minirt *minirt);
+void	*cast_some_rays(void *thread_data);
+void	cast_rays(t_minirt *m, size_t thread_id);
+t_ray	cast_ray(t_minirt *m, size_t column, size_t row);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
-
-void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
-void	mrt_print_double(t_minirt *m, const char *name, double x);
-#define mrt_print(X) _Generic(X, \
-	t_vec3: mrt_print_vec3, \
-	double: mrt_print_double)(m, #X, X)
-
-// To debug a specific pixel with GDB, call `mrt_debug()` wherever you want to
-// debug. Then, put a breakpoint on `mrt_break()` and click the pixel you want
-// to debug.
-void	mrt_debug(t_minirt *m);
-void	mrt_break(void);
 
 #endif

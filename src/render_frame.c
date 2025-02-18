@@ -6,12 +6,14 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 23:45:49 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 15:08:52 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
+#include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 
 static void	render_slider(t_minirt *m, double value)
 {
@@ -81,7 +83,6 @@ static void	render_normalized_value(
 	char	line[LINE_LENGTH + 1];
 	char	fbuf[32];
 
-	mrt_debug(m);
 	render_slider2(m, value);
 	f_to_str(fbuf, value)[FLOAT_WIDTH] = '\0';
 	ft_memset(line, ' ', sizeof line);
@@ -198,25 +199,66 @@ void	render_text(t_minirt *m)
 		render_string(m, "o");
 }
 
+static double	moving_average(double x)
+{
+	static double	xs[16];
+	static size_t	i;
+	static double	sum;
+
+	sum += x - xs[i];
+	xs[i++] = x;
+	if (i >= sizeof xs / sizeof xs[0])
+		i = 0;
+	return (sum / ((double)sizeof xs / sizeof xs[0]));
+}
+
+void *cast_some_rays(void *thread_data)
+{
+	t_thread_data	*td;
+
+	td = thread_data;
+	while (!td->minirt->should_quit)
+	{
+		if (!td->done)
+		{
+			cast_rays(td->minirt, td->id);
+			td->done = true;
+		}
+		usleep(10);
+	}
+	return (NULL);
+}
+
 void	render_frame(void *minirt)
 {
-	t_minirt	*m;
+	static bool		trues[2048];
+	t_minirt		*m;
+	static double	t1;
+	double			t;
+	size_t			i;
 
+	if (trues[0] == false)
+		ft_memset(trues, true, sizeof trues);
 	m = minirt;
-
-	cast_rays(minirt);
-	m->valid_pixel_x += (m->valid_pixel_x <= m->valid_pixel_len);
-	if (m->valid_pixel_y <= 1 && m->valid_pixel_x > m->valid_pixel_len)
-	{
-		++m->valid_pixel_y;
-		m->valid_pixel_x = 0;
-	}
-	if (m->valid_pixel_y > 1)
-	{
+	#if !THREADS
+	(void)i;
+	cast_rays(m, 0);
+	#else
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		m->thrds_data[i].done = false;
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		while (!m->thrds_data[i].done)
+			usleep(10);
+	#endif
+	m->valid_pixel[m->valid_pixel_i] = true;
+	m->valid_pixel_i = (m->valid_pixel_i + 5) & (sizeof m->valid_pixel - 1);
+	if (ft_memcmp(m->valid_pixel, trues, sizeof m->valid_pixel) == 0)
 		m->resizing = false;
-		m->double_clicked = false;
-		m->clicked_world = false;
-		m->mouse_moved_this_frame = false;
-	}
 	render_text(m);
+	t = mlx_get_time();
+	printf("                                                     \r" \
+		"FPS: %g\e[1A\n", moving_average(1 / (t - t1)));
+	t1 = t;
 }

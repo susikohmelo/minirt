@@ -6,47 +6,13 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 09:59:06 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 17:12:07 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ray.h"
 #include "minirt.h"
 #include <math.h>
-
-
-
-#include <stdio.h>
-
-// Does nothing, works just as a placeholder to but breakpoints into.
-void	mrt_break(void)
-{
-	(void)0;
-}
-
-void	mrt_debug(t_minirt *mrt)
-{
-	if (mrt->cursor_pointing)
-		mrt_break();
-}
-
-void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
-{
-	if (!m->cursor_pointing)
-		return ;
-	printf("\r                                                                 "
-		"                                                                  \r");
-	printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
-}
-
-void	mrt_print_double(t_minirt *m, const char *name, double x)
-{
-	if (!m->cursor_pointing)
-		return ;
-	printf("\r                                                                 "
-		"                                                                  \r");
-	printf("%s = %g ; ", name, x);
-}
 
 static void	ray_to_cam_rot_pos(double m[3][3], t_ray *r)
 {
@@ -270,10 +236,7 @@ static inline t_vec3	skybox_color(t_minirt *m, t_ray data,
 	skybox_color = vec3_add(vec3_muls(skybox_diffuse, roughness), vec3_muls(skybox_color, 1 - roughness));
 	skybox_color = vec3_sub(skybox_color, vec3_mul(m->ambient_light, shape_color));
 
-	//TODO function for this, the same thing is used in cast_rays() too
-	skybox_color.r = fmin(fmax(skybox_color.r, 0), 1);
-	skybox_color.g = fmin(fmax(skybox_color.g, 0), 1);
-	skybox_color.b = fmin(fmax(skybox_color.b, 0), 1);
+	skybox_color = vec3_clamp(skybox_color, 0, 1);
 	return (skybox_color);
 }
 
@@ -365,56 +328,20 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 
 void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 {
+	size_t	i;
 	size_t	x;
-	size_t	y;
-	size_t	idx;
-	size_t	const_lens[3];
-	int		offset;
 
-	idx = row * m->img->width + col;
-	if (m->valid_pixel_y > 0 || m->valid_pixel_x > 0)
+	i = row * m->img->width + col;
+	x = (size_t) - 1;
+	while (++x < sizeof m->valid_pixel
+		&& !m->valid_pixel[(m->valid_pixel_i + x) & (sizeof m->valid_pixel - 1)]
+		&& col + x < m->img->width)
 	{
-		m->img->pixels[4 * idx + 0] = 255 * clr.r;
-		m->img->pixels[4 * idx + 1] = 255 * clr.g;
-		m->img->pixels[4 * idx + 2] = 255 * clr.b;
-		m->img->pixels[4 * idx + 3] = 255;
-		return ;
+		m->img->pixels[4 * (i + x) + 0] = 255 * clr.r;
+		m->img->pixels[4 * (i + x) + 1] = 255 * clr.g;
+		m->img->pixels[4 * (i + x) + 2] = 255 * clr.b;
+		m->img->pixels[4 * (i + x) + 3] = 255;
 	}
-	const_lens[0] = m->img->width * m->img->height;
-	y = (size_t) - 1;
-	while (++y <= m->valid_pixel_len)
-	{
-		offset = -1 * m->valid_pixel_len * (y % 2 != 0);
-		const_lens[1] = (row + y) * m->img->width;
-		const_lens[2] = 4 * (idx + y * m->img->width);
-		x = (size_t) - 1;
-		while (++x <= m->valid_pixel_len && const_lens[1] + col + x + offset
-				< const_lens[0] && col + x + offset < m->img->width)
-		{
-			m->img->pixels[const_lens[2] + (x + offset) * 4 + 0] = 255 * clr.r;
-			m->img->pixels[const_lens[2] + (x + offset) * 4 + 1] = 255 * clr.g;
-			m->img->pixels[const_lens[2] + (x + offset) * 4 + 2] = 255 * clr.b;
-			m->img->pixels[const_lens[2] + (x + offset) * 4 + 3] = 255;
-		}
-	}
-}
-
-//TODO make sure window doesn't crash with under 32 pixels
-
-static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
-{
-	bool	cursor_in_range;
-
-	column = fmax(column - m->valid_pixel_len / 2, 0);
-	row = fmax(row - m->valid_pixel_len / 2, 0);
-	cursor_in_range = \
-		m->mouse_x >= (int) column
-		&& (size_t) m->mouse_x <= column + m->valid_pixel_len
-		&& (size_t) m->mouse_y >= row
-		&& (size_t) m->mouse_y <= row + m->valid_pixel_len;
-	m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
-		&& row < m->img->height - 10 && column != m->img->width - 10 \
-		&& cursor_in_range && m->valid_pixel_x == 0;
 }
 
 static void min_light_intersect_dist(t_ray *ray, const t_light *light)
@@ -462,80 +389,55 @@ static void	precalculate(t_minirt *m)
 			m->lights[i].color_value, m->lights[i].brightness);
 }
 
-void	cast_rays(t_minirt *m)
+t_ray	cast_ray(t_minirt *m, size_t column, size_t row)
+{
+	t_ray	ray;
+
+	ray = create_ray(m, column, row);
+	ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
+
+	get_shape_intersect_dist(m, &ray, NULL);
+	if (m->show_lights)
+		get_light_intersect_dist(m, &ray);
+	return (ray);
+}
+
+void	cast_rays(t_minirt *m, size_t tid)
 {
 	t_ray	ray;
 	size_t	column;
 	size_t	row;
-	size_t	i_pixel[2];
+	size_t	i_pixel;
 	t_vec3	color;
 
 	precalculate(m);
 	set_cam_rot_matrix(m);
 
 	row = (size_t) - 1;
-	i_pixel[0] = (size_t) - 1;
 	while (++row < m->img->height)
 	{
-		i_pixel[0] = (i_pixel[0] + 1) * (i_pixel[0] < m->valid_pixel_len);
-		if (m->valid_pixel_y == 0 && i_pixel[0] != m->valid_pixel_y)
-			continue ;
-		i_pixel[1] = (size_t) - 1;
+		#if !THREADS
+		(void)tid;
+		#else
+		if ((row & (THREADS - 1)) != tid)
+		 	continue ;
+		#endif
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
-			i_pixel[1] = (i_pixel[1] + 1) * (i_pixel[1] < m->valid_pixel_len);
-			if (i_pixel[1] != m->valid_pixel_x)
-				continue ;
-			set_cursor_pointing(m, column, row);
-			ray = create_ray(m, column, row);
-			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
+			i_pixel = row * m->img->width + column;
+			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
+				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
+				continue;
+			ray = cast_ray(m, column, row);
 
-			get_shape_intersect_dist(m, &ray, NULL);
-			if (m->show_lights)
-				get_light_intersect_dist(m, &ray);
-
-			if (m->double_clicked && m->cursor_pointing
-				&& ray.shape_type != SHAPE_NO_SHAPE)
-			{
-				if (ray.shape_type == SHAPE_DISC)
-				{
-					m->shape = (t_shape *) \
-						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
-					m->shape_type = SHAPE_CYLINDER;
-				}
-				else
-				{
-					m->shape = (t_shape *)ray.shape;
-					m->shape_type = ray.shape_type;
-				}
-				m->double_clicked = false;
-				return ;
-			}
-			if (m->clicked_world && m->cursor_pointing && !m->moving_shape
-				&& ray.shape != NULL)
-			{
-				m->moving_shape = (t_shape *)ray.shape;
-				if (ray.shape_type == SHAPE_DISC)
-					m->moving_shape = (t_shape *) \
-						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
-				m->moving_shape_start = ray.shape->coords;
-			}
-			if (!m->mouse_moved_this_frame && (m->clicked_world || m->double_clicked))
-				continue ;
 			if (isinf(ray.length))
 				color = get_skybox_color(m, ray.dir, 0);
 			else if (ray.shape_type != SHAPE_LIGHT)
-			{
-				color = surface_color(m, ray, false);
-				color.r = fmin(fmax(color.r, 0), 1);
-				color.g = fmin(fmax(color.g, 0), 1);
-				color.b = fmin(fmax(color.b, 0), 1);
-			}
+				color = vec3_clamp(surface_color(m, ray, false), 0, 1);
 			else
 				color = ((t_light *)ray.shape)->color_value;
 			draw_scaled_pixel(m, color, column, row);
 		}
 	}
-	fflush(stdout); // TODO get rid of this!
 }

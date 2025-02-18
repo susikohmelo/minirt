@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 19:34:14 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 15:07:03 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,9 +107,9 @@ void	mrt_init(t_minirt *m, const char *path)
 	int32_t max_w;
 	int32_t	max_h;
 	size_t	sizes[SHAPES_LENGTH];
+	size_t	i;
 
 	ft_memset(sizes, 0, sizeof sizes);
-	m->valid_pixel_len = DEFAULT_PIXEL_DIVISION;
 	get_shape_buf_sizes(m, sizes, path);
 	m->lights = ft_arena_calloc(&m->arena, sizes[0], sizeof m->lights[0]);
 	m->spheres = ft_arena_calloc( \
@@ -141,10 +141,27 @@ void	mrt_init(t_minirt *m, const char *path)
 	mlx_get_monitor_size(0, &max_w, &max_h);
 	mlx_set_window_limit( \
 		m->mlx, CHAR_WIDTH * LINE_LENGTH, CHAR_HEIGHT * 11, max_w, max_h);
+
+	#if !THREADS
+	(void)i;
+	#else
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		m->thrds_data[i] = (t_thread_data){ m, i, false };
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		pthread_create(&m->thrds[i], NULL, cast_some_rays, &m->thrds_data[i]);
+	#endif
 }
 
 void	mrt_destroy(t_minirt *m)
 {
+	size_t	i;
+
+	m->should_quit = true;
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		pthread_join(m->thrds[i], NULL);
 	if (m->mlx != NULL)
 	{
 		if (m->img != NULL)
