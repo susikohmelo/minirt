@@ -6,11 +6,12 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 11:03:27 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:17:33 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
+#include <stdio.h>
 #include <math.h>
 
 static void	render_slider(t_minirt *m, double value)
@@ -200,7 +201,9 @@ void	render_text(t_minirt *m)
 
 void	render_frame(void *minirt)
 {
-	t_minirt	*m;
+	t_minirt		*m;
+	static double	t1;
+	double			t;
 
 	m = minirt;
 
@@ -214,4 +217,8 @@ void	render_frame(void *minirt)
 	if (m->valid_pixel_y > 1)
 		m->resizing = false;
 	render_text(m);
+	t = mlx_get_time();
+	printf("                                                     \r" \
+		"FPS: %g\e[1A\n", 1 / (t - t1));
+	t1 = t;
 }

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:32:49 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/13 13:06:47 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:23:58 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,3 +88,13 @@ t_vec3  vec3_rotatez(t_vec3 v, double r)
 
     return (mat3_vec3(m, v));
 }
+
+t_vec3	vec3_clamp(t_vec3 v, double min, double max)
+{
+	return (vec4( \
+		fmin(fmax(v.r, min), max), \
+		fmin(fmax(v.g, min), max), \
+		fmin(fmax(v.b, min), max), \
+		fmin(fmax(v.a, min), max)));
+}
+

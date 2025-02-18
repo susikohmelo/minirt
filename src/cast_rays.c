@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 11:02:14 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:26:10 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,10 +270,7 @@ static inline t_vec3	skybox_color(t_minirt *m, t_ray data,
 	skybox_color = vec3_add(vec3_muls(skybox_diffuse, roughness), vec3_muls(skybox_color, 1 - roughness));
 	skybox_color = vec3_sub(skybox_color, vec3_mul(m->ambient_light, shape_color));
 
-	//TODO function for this, the same thing is used in cast_rays() too
-	skybox_color.r = fmin(fmax(skybox_color.r, 0), 1);
-	skybox_color.g = fmin(fmax(skybox_color.g, 0), 1);
-	skybox_color.b = fmin(fmax(skybox_color.b, 0), 1);
+	skybox_color = vec3_clamp(skybox_color, 0, 1);
 	return (skybox_color);
 }
 
@@ -506,12 +503,7 @@ void	cast_rays(t_minirt *m)
 			if (isinf(ray.length))
 				color = get_skybox_color(m, ray.dir, 0);
 			else if (ray.shape_type != SHAPE_LIGHT)
-			{
-				color = surface_color(m, ray, false);
-				color.r = fmin(fmax(color.r, 0), 1);
-				color.g = fmin(fmax(color.g, 0), 1);
-				color.b = fmin(fmax(color.b, 0), 1);
-			}
+				color = vec3_clamp(surface_color(m, ray, false), 0, 1);
 			else
 				color = ((t_light *)ray.shape)->color_value;
 			draw_scaled_pixel(m, color, column, row);
