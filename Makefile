@@ -18,7 +18,8 @@ SRCS = main.c minirt.c vec3.c vec3_2.c vec3_scalar.c hooks.c \
 	cast_rays.c render_frame.c intersect_dist.c texture_uv_functions.c \
 	parse_texture.c get_uv_coords.c free_textures.c parse_utils.c \
 	get_texture_color.c font.c edit_objects.c move_shape.c get_skybox_color.c \
-	load_skybox.c
+	edit_objects.c edit_shape_objects.c render_shape_text.c render_text.c \
+	slider.c cylinder_intersect_dist.c load_skybox.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
@@ -61,6 +62,7 @@ $(MLX):
 $(NAME): $(OBJS) libft/libft.a $(MLX)
 	@mkdir -p build
 	$(CC) -o $@ $^ $(CFLAGS) $(LFLAGS)
+	@echo "\e[32mBuild succeeded\e[0m"
 
 build/%.o: src/%.c src/minirt.h src/vec3.h
 	@mkdir -p build
