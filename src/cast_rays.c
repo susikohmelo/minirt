@@ -366,25 +366,36 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 {
 	size_t	x;
-	size_t	indx;
+	size_t	y;
+	size_t	idx;
+	size_t	const_lens[3];
+	int		offset;
 
-	indx = row * m->img->width + col;
-	if (m->valid_pixel_i > 0)
+	idx = row * m->img->width + col;
+	if (m->valid_pixel_y > 0 || m->valid_pixel_x > 0)
 	{
-		m->img->pixels[4 * indx + 0] = 255 * clr.r;
-		m->img->pixels[4 * indx + 1] = 255 * clr.g;
-		m->img->pixels[4 * indx + 2] = 255 * clr.b;
-		m->img->pixels[4 * indx + 3] = 255;
+		m->img->pixels[4 * idx + 0] = 255 * clr.r;
+		m->img->pixels[4 * idx + 1] = 255 * clr.g;
+		m->img->pixels[4 * idx + 2] = 255 * clr.b;
+		m->img->pixels[4 * idx + 3] = 255;
 		return ;
 	}
-	x = -1;
-	while (++x < sizeof(m->valid_pixel) && row * m->img->width + col + x < m->img->width *
-			m->img->height && col + x < m->img->width)
+	const_lens[0] = m->img->width * m->img->height;
+	y = (size_t) - 1;
+	while (++y <= m->valid_pixel_len)
 	{
-		m->img->pixels[4 * (indx + x) + 0] = 255 * clr.r;
-		m->img->pixels[4 * (indx + x) + 1] = 255 * clr.g;
-		m->img->pixels[4 * (indx + x) + 2] = 255 * clr.b;
-		m->img->pixels[4 * (indx + x) + 3] = 255;
+		offset = -1 * m->valid_pixel_len * (y % 2 != 0);
+		const_lens[1] = (row + y) * m->img->width;
+		const_lens[2] = 4 * (idx + y * m->img->width);
+		x = (size_t) - 1;
+		while (++x <= m->valid_pixel_len && const_lens[1] + col + x + offset
+				< const_lens[0] && col + x + offset < m->img->width)
+		{
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 0] = 255 * clr.r;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 1] = 255 * clr.g;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 2] = 255 * clr.b;
+			m->img->pixels[const_lens[2] + (x + offset) * 4 + 3] = 255;
+		}
 	}
 }
 
@@ -394,13 +405,16 @@ static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
 {
 	bool	cursor_in_range;
 
-	column = fmax(column - sizeof(m->valid_pixel) / 2, 0);
-	cursor_in_range = m->mouse_x >= (int)column
-		&& (size_t) m->mouse_x <= column + sizeof(m->valid_pixel)
-		&& m->mouse_y == (int)row;
+	column = fmax(column - m->valid_pixel_len / 2, 0);
+	row = fmax(row - m->valid_pixel_len / 2, 0);
+	cursor_in_range = \
+		m->mouse_x >= (int) column
+		&& (size_t) m->mouse_x <= column + m->valid_pixel_len
+		&& (size_t) m->mouse_y >= row
+		&& (size_t) m->mouse_y <= row + m->valid_pixel_len;
 	m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
 		&& row < m->img->height - 10 && column != m->img->width - 10 \
-		&& cursor_in_range && m->valid_pixel_i == 0;
+		&& cursor_in_range && m->valid_pixel_x == 0;
 }
 
 static void min_light_intersect_dist(t_ray *ray, const t_light *light)
@@ -453,22 +467,26 @@ void	cast_rays(t_minirt *m)
 	t_ray	ray;
 	size_t	column;
 	size_t	row;
-	size_t	i_pixel;
+	size_t	i_pixel[2];
 	t_vec3	color;
 
 	precalculate(m);
 	set_cam_rot_matrix(m);
 
 	row = (size_t) - 1;
+	i_pixel[0] = (size_t) - 1;
 	while (++row < m->img->height)
 	{
+		i_pixel[0] = (i_pixel[0] + 1) * (i_pixel[0] < m->valid_pixel_len);
+		if (m->valid_pixel_y == 0 && i_pixel[0] != m->valid_pixel_y)
+			continue ;
+		i_pixel[1] = (size_t) - 1;
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
-			i_pixel = row * m->img->width + column;
-			if (m->valid_pixel[i_pixel & (sizeof m->valid_pixel - 1)]
-				|| (i_pixel & (sizeof m->valid_pixel - 1)) != m->valid_pixel_i)
-				continue;
+			i_pixel[1] = (i_pixel[1] + 1) * (i_pixel[1] < m->valid_pixel_len);
+			if (i_pixel[1] != m->valid_pixel_x)
+				continue ;
 			set_cursor_pointing(m, column, row);
 			ray = create_ray(m, column, row);
 			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
