@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 17:09:32 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 17:52:40 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:16:19 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ static void	blend(uint8_t pixel_a[static 4], const uint8_t pixel_b[static 4])
 		ao);
 	color.a = ao;
 	color = vec3_muls(color, 255);
+	if (color.r != color.r || color.g != color.g
+			|| color.b != color.b || color.a != color.a)
+		color = (t_vec3) {};
 	pixel_a[0] = color.r;
 	pixel_a[1] = color.g;
 	pixel_a[2] = color.b;

@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 16:58:10 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/15 17:10:53 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 20:14:14 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,10 @@ t_vec3	get_texture_from_uv(mlx_image_t *img, double u, double v, double blur)
 	int		y;
 
 	v = 1 - v;
+	if (u != u)
+		u = 0;
+	if (v != v)
+		v = 0;
 	x = img->width - round(u * ((double) img->width - 2));
 	y = round(v * ((double) img->height - 2));
 	pos = (y * img->width + x) * 4;
