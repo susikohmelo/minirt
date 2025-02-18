@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/17 23:46:34 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 09:59:06 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -512,7 +512,8 @@ void	cast_rays(t_minirt *m)
 				m->double_clicked = false;
 				return ;
 			}
-			if (m->clicked_world && m->cursor_pointing && !m->moving_shape)
+			if (m->clicked_world && m->cursor_pointing && !m->moving_shape
+				&& ray.shape != NULL)
 			{
 				m->moving_shape = (t_shape *)ray.shape;
 				if (ray.shape_type == SHAPE_DISC)
