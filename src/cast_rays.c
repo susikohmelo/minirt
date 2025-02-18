@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 09:59:06 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:02:14 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -400,13 +400,13 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 }
 
 //TODO make sure window doesn't crash with under 32 pixels
-
+//TODO We don't actually need this, just cast a single ray in hooks!
 static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
 {
 	bool	cursor_in_range;
 
-	column = fmax(column - m->valid_pixel_len / 2, 0);
-	row = fmax(row - m->valid_pixel_len / 2, 0);
+	column = fmax(column - (double)m->valid_pixel_len / 2, 0);
+	row = fmax(row - (double)m->valid_pixel_len / 2, 0);
 	cursor_in_range = \
 		m->mouse_x >= (int) column
 		&& (size_t) m->mouse_x <= column + m->valid_pixel_len
@@ -462,6 +462,19 @@ static void	precalculate(t_minirt *m)
 			m->lights[i].color_value, m->lights[i].brightness);
 }
 
+t_ray	cast_ray(t_minirt *m, size_t column, size_t row)
+{
+	t_ray	ray;
+
+	ray = create_ray(m, column, row);
+	ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
+
+	get_shape_intersect_dist(m, &ray, NULL);
+	if (m->show_lights)
+		get_light_intersect_dist(m, &ray);
+	return (ray);
+}
+
 void	cast_rays(t_minirt *m)
 {
 	t_ray	ray;
@@ -488,41 +501,8 @@ void	cast_rays(t_minirt *m)
 			if (i_pixel[1] != m->valid_pixel_x)
 				continue ;
 			set_cursor_pointing(m, column, row);
-			ray = create_ray(m, column, row);
-			ray_to_cam_rot_pos(m->cam_rot_matrix, &ray);
+			ray = cast_ray(m, column, row);
 
-			get_shape_intersect_dist(m, &ray, NULL);
-			if (m->show_lights)
-				get_light_intersect_dist(m, &ray);
-
-			if (m->double_clicked && m->cursor_pointing
-				&& ray.shape_type != SHAPE_NO_SHAPE)
-			{
-				if (ray.shape_type == SHAPE_DISC)
-				{
-					m->shape = (t_shape *) \
-						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
-					m->shape_type = SHAPE_CYLINDER;
-				}
-				else
-				{
-					m->shape = (t_shape *)ray.shape;
-					m->shape_type = ray.shape_type;
-				}
-				m->double_clicked = false;
-				return ;
-			}
-			if (m->clicked_world && m->cursor_pointing && !m->moving_shape
-				&& ray.shape != NULL)
-			{
-				m->moving_shape = (t_shape *)ray.shape;
-				if (ray.shape_type == SHAPE_DISC)
-					m->moving_shape = (t_shape *) \
-						&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
-				m->moving_shape_start = ray.shape->coords;
-			}
-			if (!m->mouse_moved_this_frame && (m->clicked_world || m->double_clicked))
-				continue ;
 			if (isinf(ray.length))
 				color = get_skybox_color(m, ray.dir, 0);
 			else if (ray.shape_type != SHAPE_LIGHT)

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 21:28:04 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:03:10 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,34 +120,51 @@ void	mouse_hook(
 	t_minirt		*const m = minirt;
 	static double	last_click_time;
 	double			click_time;
+	bool			double_clicked;
 	const bool		clicked_slider = m->shape_type != SHAPE_NO_SHAPE
 		&& 0 <= m->mouse_x && m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
 		&& 2 * CHAR_HEIGHT <= m->mouse_y
 		&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT;
+	const bool		clicked_close_menu = (LINE_LENGTH - 1) * CHAR_WIDTH <= m->mouse_x
+		&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+		&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
+		&& m->shape_type != SHAPE_NO_SHAPE;
+	const bool		clicked_open_menu = 0 <= m->mouse_x && m->mouse_x <= CHAR_WIDTH
+		&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
+		&& m->shape_type == SHAPE_NO_SHAPE;
+	const bool		clicked_show_lights = (LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
+		&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
+		&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
+		&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT
+		&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES;
 
 	(void)mods;
 	if (button == MLX_MOUSE_BUTTON_LEFT && action == MLX_PRESS)
 	{
 		click_time = mlx_get_time();
-		if (!m->double_clicked && click_time - last_click_time < .2 && !clicked_slider)
+		double_clicked = click_time - last_click_time < .2 && !clicked_slider
+			&& 0 <= m->mouse_x && m->mouse_x < (int)m->img->width
+			&& 0 <= m->mouse_y && m->mouse_y < (int)m->img->height;
+		if (double_clicked)
 		{
-			m->double_clicked = true;
-			redraw(m, false);
+			t_ray ray = cast_ray(m, m->mouse_x, m->mouse_y);
+			if (ray.shape_type == SHAPE_DISC)
+			{
+				m->shape = (t_shape *) \
+					&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
+				m->shape_type = SHAPE_CYLINDER;
+			}
+			else
+			{
+				m->shape = (t_shape *)ray.shape;
+				m->shape_type = ray.shape_type;
+			}
 		}
-		else if ((LINE_LENGTH - 1) * CHAR_WIDTH <= m->mouse_x
-			&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
-			&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
-			&& m->shape_type != SHAPE_NO_SHAPE)
+		else if (clicked_close_menu)
 			m->shape_type = SHAPE_NO_SHAPE;
-		else if (0 <= m->mouse_x && m->mouse_x <= CHAR_WIDTH
-			&& 0 <= m->mouse_y && m->mouse_y <= CHAR_HEIGHT
-			&& m->shape_type == SHAPE_NO_SHAPE)
+		else if (clicked_open_menu)
 			m->shape_type = SHAPE_GLOBAL_ATTRIBUTES;
-		else if ((LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
-			&& m->mouse_x <= LINE_LENGTH * CHAR_WIDTH
-			&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
-			&& m->mouse_y <= (int)m->gui_line * CHAR_HEIGHT
-			&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
+		else if (clicked_show_lights)
 		{
 			m->show_lights = !m->show_lights;
 			redraw(m, false);
@@ -157,12 +174,18 @@ void	mouse_hook(
 			m->moving_slider = m->mouse_y / CHAR_HEIGHT - 1;
 			edit_objects(m, m->mouse_x);
 		}
-		else
+		else // clicked world
 		{
-			m->clicked_world = true;
 			m->click_x = 2. * m->mouse_x / m->img->width - 1;
 			m->click_y = 2. * m->mouse_y / m->img->height - 1;
 			m->click_x *= m->aspect_ratio;
+			t_ray ray = cast_ray(m, m->mouse_x, m->mouse_y);
+			m->moving_shape = (t_shape *)ray.shape;
+			if (ray.shape_type == SHAPE_DISC)
+				m->moving_shape = (t_shape *) \
+					&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
+			if (ray.shape != NULL)
+				m->moving_shape_start = ray.shape->coords;
 			redraw(m, false);
 		}
 		last_click_time = click_time;
@@ -176,7 +199,6 @@ void	mouse_hook(
 	{
 		m->moving_slider = false;
 		m->moving_shape = NULL;
-		m->clicked_world = false;
 	}
 }
 
@@ -189,7 +211,6 @@ void	scroll_hook(double x_delta, double y_delta, void *minirt)
 	{
 		m->moving_shape->coords = vec3_add(m->moving_shape->coords, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
 		m->moving_shape_start = vec3_add(m->moving_shape_start, vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
-		m->mouse_moved_this_frame = true;
 		redraw(m, true);
 		return ;
 	}
@@ -205,12 +226,12 @@ void	cursor_hook(double x, double y, void *minirt)
 	t_minirt		*m;
 	t_vec3			new_rot;
 	t_vec3			mouse_move_dir;
+	bool			mouse_moved_this_frame;
 
 	m = minirt;
 	mouse_move_dir = vec3(m->mouse_x - x, m->mouse_y - y, 0);
-	if (mouse_move_dir.x != 0 || mouse_move_dir.y != 0)
-		m->mouse_moved_this_frame = true;
-	if (m->mouse_r_down && m->mouse_moved_this_frame)
+	mouse_moved_this_frame = mouse_move_dir.x != 0 || mouse_move_dir.y != 0;
+	if (m->mouse_r_down && mouse_moved_this_frame)
 	{
 		mouse_move_dir = vec3_muls(mouse_move_dir, MOUSE_SENSITIVITY / 100);
 		new_rot = vec3(0,0,1);
@@ -224,7 +245,7 @@ void	cursor_hook(double x, double y, void *minirt)
 	}
 	if (m->moving_slider)
 		edit_objects(m, x);
-	if (m->moving_shape && m->mouse_moved_this_frame)
+	if (m->moving_shape && mouse_moved_this_frame)
 		move_shape(m, x, y);
 	m->mouse_x = x;
 	m->mouse_y = y;

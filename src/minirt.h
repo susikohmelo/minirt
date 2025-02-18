@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 22:15:21 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:02:53 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,10 +88,7 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	double			click_x;
 	double			click_y;
-	bool			mouse_moved_this_frame;
 	bool			cursor_pointing;
-	bool			double_clicked;
-	bool			clicked_world;
 	bool			mouse_r_down;
 	bool			show_lights;
 	bool			resizing;
@@ -99,7 +96,7 @@ typedef struct s_minirt
 
 	t_shape			*moving_shape;
 	t_vec3			moving_shape_start;
-  
+
 	int				max_ray_bounces;
 	bool			disable_skybox;
 
@@ -187,6 +184,7 @@ t_vec3	perpendiculary(t_vec3 v);
 t_vec3	perpendicularx(t_vec3 v);
 
 void	cast_rays(t_minirt *minirt);
+t_ray	cast_ray(t_minirt *m, size_t column, size_t row);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
 void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
