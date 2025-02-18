@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 13:21:09 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 17:06:01 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 /*
 	Odd INIT_WIDTH recommended for smooth (non-stripey) initial render
 */
-# define INIT_WIDTH 1440
+# define INIT_WIDTH 1447
 # define INIT_HEIGHT 1024
 
 # define DEFAULT_PIXEL_DIVISION 5
@@ -60,7 +60,7 @@
 // Max value for some attributes like sphere radius
 # define SCALE 8
 
-# define THREADS 8
+# define THREADS 16
 
 /*
 	Do not reorder these, the order:
@@ -108,15 +108,14 @@ typedef struct s_minirt
 
 	t_shape			*moving_shape;
 	t_vec3			moving_shape_start;
+	t_shape_type	shape_type;
+	t_shape			*shape;
 
 	int				max_ray_bounces;
 	bool			disable_skybox;
 
-	t_shape_type	shape_type;
-	t_shape			*shape;
-	size_t			valid_pixel_len;
-	size_t			valid_pixel_x;
-	size_t			valid_pixel_y;
+	bool			valid_pixel[16];
+	size_t			valid_pixel_i;
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
 
@@ -182,7 +181,6 @@ t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 			int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
-void	redraw(t_minirt *m, bool flush_black);
 void	key_hook(mlx_key_data_t key, void *minirt);
 void	resize_hook(int w, int h, void *minirt);
 void	cursor_hook(double x, double y, void *minirt);

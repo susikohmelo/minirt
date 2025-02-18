@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 13:26:48 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 15:08:52 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,12 +231,19 @@ void *cast_some_rays(void *thread_data)
 
 void	render_frame(void *minirt)
 {
+	static bool		trues[2048];
 	t_minirt		*m;
 	static double	t1;
 	double			t;
 	size_t			i;
 
+	if (trues[0] == false)
+		ft_memset(trues, true, sizeof trues);
 	m = minirt;
+	#if !THREADS
+	(void)i;
+	cast_rays(m, 0);
+	#else
 	i = (size_t) - 1;
 	while (++i < THREADS)
 		m->thrds_data[i].done = false;
@@ -244,13 +251,10 @@ void	render_frame(void *minirt)
 	while (++i < THREADS)
 		while (!m->thrds_data[i].done)
 			usleep(10);
-	m->valid_pixel_x += (m->valid_pixel_x <= m->valid_pixel_len);
-	if (m->valid_pixel_y <= 1 && m->valid_pixel_x > m->valid_pixel_len)
-	{
-		++m->valid_pixel_y;
-		m->valid_pixel_x = 0;
-	}
-	if (m->valid_pixel_y > 1)
+	#endif
+	m->valid_pixel[m->valid_pixel_i] = true;
+	m->valid_pixel_i = (m->valid_pixel_i + 5) & (sizeof m->valid_pixel - 1);
+	if (ft_memcmp(m->valid_pixel, trues, sizeof m->valid_pixel) == 0)
 		m->resizing = false;
 	render_text(m);
 	t = mlx_get_time();

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 10:44:57 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 17:45:34 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 16:07:34 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,5 +129,5 @@ void	edit_objects(t_minirt *m, double x)
 		edit_light(m, (t_light *)m->shape, x);
 	if (m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
 		edit_global_attributes(m, x);
-	redraw(m, false);
+	ft_memset(m->valid_pixel, false, sizeof m->valid_pixel);
 }
