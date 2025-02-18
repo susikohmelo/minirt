@@ -6,47 +6,13 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 11:26:10 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:30:28 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ray.h"
 #include "minirt.h"
 #include <math.h>
-
-
-
-#include <stdio.h>
-
-// Does nothing, works just as a placeholder to but breakpoints into.
-void	mrt_break(void)
-{
-	(void)0;
-}
-
-void	mrt_debug(t_minirt *mrt)
-{
-	if (mrt->cursor_pointing)
-		mrt_break();
-}
-
-void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v)
-{
-	if (!m->cursor_pointing)
-		return ;
-	printf("\r                                                                 "
-		"                                                                  \r");
-	printf("%s = {%g, %g, %g} ; ", name, v.x, v.y, v.z);
-}
-
-void	mrt_print_double(t_minirt *m, const char *name, double x)
-{
-	if (!m->cursor_pointing)
-		return ;
-	printf("\r                                                                 "
-		"                                                                  \r");
-	printf("%s = %g ; ", name, x);
-}
 
 static void	ray_to_cam_rot_pos(double m[3][3], t_ray *r)
 {
@@ -396,24 +362,6 @@ void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 	}
 }
 
-//TODO make sure window doesn't crash with under 32 pixels
-//TODO We don't actually need this, just cast a single ray in hooks!
-static inline void	set_cursor_pointing(t_minirt *m, size_t column, size_t row)
-{
-	bool	cursor_in_range;
-
-	column = fmax(column - (double)m->valid_pixel_len / 2, 0);
-	row = fmax(row - (double)m->valid_pixel_len / 2, 0);
-	cursor_in_range = \
-		m->mouse_x >= (int) column
-		&& (size_t) m->mouse_x <= column + m->valid_pixel_len
-		&& (size_t) m->mouse_y >= row
-		&& (size_t) m->mouse_y <= row + m->valid_pixel_len;
-	m->cursor_pointing = !m->resizing && row != 0 && column != 0 \
-		&& row < m->img->height - 10 && column != m->img->width - 10 \
-		&& cursor_in_range && m->valid_pixel_x == 0;
-}
-
 static void min_light_intersect_dist(t_ray *ray, const t_light *light)
 {
 	t_vec3	lstart;
@@ -497,7 +445,6 @@ void	cast_rays(t_minirt *m)
 			i_pixel[1] = (i_pixel[1] + 1) * (i_pixel[1] < m->valid_pixel_len);
 			if (i_pixel[1] != m->valid_pixel_x)
 				continue ;
-			set_cursor_pointing(m, column, row);
 			ray = cast_ray(m, column, row);
 
 			if (isinf(ray.length))
@@ -509,5 +456,4 @@ void	cast_rays(t_minirt *m)
 			draw_scaled_pixel(m, color, column, row);
 		}
 	}
-	fflush(stdout); // TODO get rid of this!
 }

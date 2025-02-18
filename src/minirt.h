@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 11:02:53 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:31:16 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ typedef struct s_minirt
 	int32_t			mouse_y;
 	double			click_x;
 	double			click_y;
-	bool			cursor_pointing;
 	bool			mouse_r_down;
 	bool			show_lights;
 	bool			resizing;
@@ -186,17 +185,5 @@ t_vec3	perpendicularx(t_vec3 v);
 void	cast_rays(t_minirt *minirt);
 t_ray	cast_ray(t_minirt *m, size_t column, size_t row);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
-
-void	mrt_print_vec3(t_minirt *m, const char *name, t_vec3 v);
-void	mrt_print_double(t_minirt *m, const char *name, double x);
-#define mrt_print(X) _Generic(X, \
-	t_vec3: mrt_print_vec3, \
-	double: mrt_print_double)(m, #X, X)
-
-// To debug a specific pixel with GDB, call `mrt_debug()` wherever you want to
-// debug. Then, put a breakpoint on `mrt_break()` and click the pixel you want
-// to debug.
-void	mrt_debug(t_minirt *m);
-void	mrt_break(void);
 
 #endif

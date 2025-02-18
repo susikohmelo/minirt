@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 11:17:33 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 11:30:49 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ static void	render_normalized_value(
 	char	line[LINE_LENGTH + 1];
 	char	fbuf[32];
 
-	mrt_debug(m);
 	render_slider2(m, value);
 	f_to_str(fbuf, value)[FLOAT_WIDTH] = '\0';
 	ft_memset(line, ' ', sizeof line);
