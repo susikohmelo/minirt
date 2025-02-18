@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:03:30 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/12 12:47:36 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 17:25:00 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ bool	parse_ambient_light(t_minirt *m, const char *line)
 {
 	line = trim_left(line);
 	line = parse_float(m, &m->ambient_light_ratio, line, ' ');
-	expect_range( \
+	expect_range(\
 		m, vec3(m->ambient_light_ratio, 0., 1.), "Ambient lighting ratio");
 	line = parse_float(m, &m->ambient_light_color.r, line, ',');
 	expect_range(m, vec3(m->ambient_light_color.r, 0, 255), \
@@ -28,7 +28,8 @@ bool	parse_ambient_light(t_minirt *m, const char *line)
 	expect_range(m, vec3(m->ambient_light_color.b, 0, 255), \
 		"Ambient light blue component");
 	m->ambient_light_color = vec3_divs(m->ambient_light_color, 255);
-	m->ambient_light = vec3_muls(m->ambient_light_color, m->ambient_light_ratio);
+	m->ambient_light = vec3_muls(\
+		m->ambient_light_color, m->ambient_light_ratio);
 	return (true);
 }
 
@@ -64,7 +65,7 @@ bool	parse_light(t_minirt *m, const char *line)
 	line = parse_float(m, &light.coords.y, line, ',');
 	line = parse_float(m, &light.coords.z, line, ' ');
 	line = parse_float(m, &light.brightness, line, ' ');
-	expect_range(m, vec3(light.brightness, 0., 1.), "Light brightness light.brightness");
+	expect_range(m, vec3(light.brightness, 0., 1.), "Light brightness");
 	line = parse_float(m, &light.color_value.r, line, ',');
 	expect_range(m, vec3(light.color_value.r, 0, 255), "Light red component");
 	line = parse_float(m, &light.color_value.g, line, ',');

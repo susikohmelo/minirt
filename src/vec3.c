@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:32:49 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 11:23:58 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:28:28 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,28 +51,28 @@ double	vec3_dot(t_vec3 v1, t_vec3 v2)
 // TODO ONE OF THESE IS WRONG!
 t_vec3  vec3_mat3(t_vec3 v, const double m[3][3])
 {
-    return ((t_vec3){
-       .x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0],
-       .y = v.x * m[0][1] + v.y * m[1][1] + v.z * m[2][1],
-       .z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2],
-    });
+	return ((t_vec3){
+	   .x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0],
+	   .y = v.x * m[0][1] + v.y * m[1][1] + v.z * m[2][1],
+	   .z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2],
+	});
 }
 
 // TODO ONE OF THESE IS WRONG!
 t_vec3  mat3_vec3(const double m[3][3], t_vec3 v)
 {
-    return ((t_vec3){
-       .x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0],
-       .y = v.x * m[0][1] + v.y * m[1][1] + v.z * m[2][1],
-       .z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2],
-    });
+	return ((t_vec3){
+	   .x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0],
+	   .y = v.x * m[0][1] + v.y * m[1][1] + v.z * m[2][1],
+	   .z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2],
+	});
 }
 
 t_vec3  vec3_rotatex(t_vec3 v, double r)
 {
-    const double    m[3][3] = {{1,0,0},{0,cos(r),-sin(r)},{0,sin(r),cos(r)}};
+	const double    m[3][3] = {{1,0,0},{0,cos(r),-sin(r)},{0,sin(r),cos(r)}};
 
-    return (mat3_vec3(m, v));
+	return (mat3_vec3(m, v));
 }
 
 t_vec3  vec3_rotatey(t_vec3 v, double r)

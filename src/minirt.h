@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 17:06:01 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:26:16 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@
 	left, front, right, up, back, down
 	is accessed via indexing in the get_skybox_color function
 */
-typedef union s_skybox
+typedef union u_skybox
 {
 	struct
 	{
@@ -119,7 +119,6 @@ typedef struct s_minirt
 	mlx_image_t		*gui_text;
 	size_t			gui_line;
 
-
 	double			ambient_light_ratio;
 	t_vec3			ambient_light_color;
 
@@ -144,6 +143,30 @@ typedef struct s_minirt
 	t_disc			*discs;
 	size_t			discs_length;
 }	t_minirt;
+
+typedef struct s_cylinder_intersect_data
+{
+	double	length;
+	double	a;
+	double	b;
+	double	c;
+	double	discriminant;
+	double	axis_dot_dir;
+	t_vec3	rl;
+	t_vec3	cap;
+	t_vec3	top;
+	t_vec3	bot;
+	double	axis_dot_rl;
+	double	b_term;
+	double	h1;
+	double	h2;
+	t_vec3	hitp1;
+	t_vec3	hitp2;
+	double	hoffset1;
+	double	hoffset2;
+	bool	valid1;
+	bool	valid2;
+}	t_cylinder_intersect_data;
 
 void		mrt_init(t_minirt *m, const char *path);
 void		mrt_destroy(t_minirt *m);
@@ -175,27 +198,47 @@ t_vec3		get_texture_from_uv(mlx_image_t *img, double u, double v,
 mlx_image_t	*load_texture(t_minirt *m, char *filename, int texture_type);
 t_vec3		get_texture_color(t_vec3 r, int texture_type,
 				const t_shape *shape, int shape_type);
-double	get_rough_value(t_vec3 r,
-			const t_shape *shape, int shape_type);
-t_vec3	get_albedo_blur(t_vec3 intersect, const t_shape *shape,
-			int shape_type, double blur);
+double		get_rough_value(t_vec3 r, const t_shape *shape, int shape_type);
+t_vec3		get_albedo_blur(t_vec3 intersect, const t_shape *shape,
+				int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
-void	key_hook(mlx_key_data_t key, void *minirt);
-void	resize_hook(int w, int h, void *minirt);
-void	cursor_hook(double x, double y, void *minirt);
-void	scroll_hook(double x_delta, double y_delta, void *minirt);
-void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
-void	render_frame(void *rt_voidptr);
-void	render_string(t_minirt *m, const char *str);
-void	edit_objects(t_minirt *m, double x);
-void	move_shape(t_minirt *m, double x, double y);
-t_vec3	perpendiculary(t_vec3 v);
-t_vec3	perpendicularx(t_vec3 v);
+void		key_hook(mlx_key_data_t key, void *minirt);
+void		resize_hook(int w, int h, void *minirt);
+void		cursor_hook(double x, double y, void *minirt);
+void		scroll_hook(double x_delta, double y_delta, void *minirt);
+void		mouse_hook(
+				mouse_key_t b, action_t a, modifier_key_t m, void *minirt);
 
-void	*cast_some_rays(void *thread_data);
-void	cast_rays(t_minirt *m, size_t thread_id);
-t_ray	cast_ray(t_minirt *m, size_t column, size_t row);
-void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
+void		render_frame(void *rt_voidptr);
+void		render_string(t_minirt *m, const char *str);
+void		render_text(t_minirt *m);
+void		render_header(t_minirt *m, const char *header);
+void		render_sphere_text(t_minirt *m);
+void		render_plane_text(t_minirt *m);
+void		render_cylinder_text(t_minirt *m);
+void		render_value(
+				t_minirt *m, const char *name, double value, double scale);
+void		render_normalized_vector_value(
+				t_minirt *m, const char *value_name, t_vec3 value);
+
+void		edit_objects(t_minirt *m, double x);
+void		edit_sphere(t_minirt *m, t_shape *s, double x);
+void		edit_plane(t_minirt *m, t_shape *plane, double val);
+void		edit_cylinder(t_minirt *m, t_shape *cylinder, double x);
+void		edit_common_shape_attributes(t_minirt *m, t_shape *s, double x);
+void		move_shape(t_minirt *m, double x, double y);
+t_vec3		perpendiculary(t_vec3 v);
+t_vec3		perpendicularx(t_vec3 v);
+
+void		*cast_some_rays(void *thread_data);
+void		cast_rays(t_minirt *m, size_t thread_id);
+t_ray		cast_ray(t_minirt *m, size_t column, size_t row);
+void		get_shape_intersect_dist(
+				t_minirt *m, t_ray *ray, const t_shape *skip);
+void		min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
+void		min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
+void		min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
+void		min_disc_intersect_dist(t_ray *ray, const t_disc *disc);
 
 #endif

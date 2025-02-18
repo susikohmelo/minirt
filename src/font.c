@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 17:09:32 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 18:56:58 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 17:52:40 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ static void	blend(uint8_t pixel_a[static 4], const uint8_t pixel_b[static 4])
 	b = vec3_divs(vec4(pixel_a[0], pixel_a[1], pixel_a[2], pixel_a[3]), 255);
 	a = vec3_divs(vec4(pixel_b[0], pixel_b[1], pixel_b[2], pixel_b[3]), 255);
 	ao = a.a + b.a * (1 - a.a);
-	color = vec3_divs( \
-		vec3_add( \
+	color = vec3_divs(\
+		vec3_add(\
 			vec3_muls(a, a.a), \
 			vec3_muls(b, b.a * (1 - a.a))), \
 		ao);
@@ -50,7 +50,7 @@ static void	draw_char(t_minirt *m, int32_t texoffset, int32_t imgoffset)
 	while (++y < CHAR_HEIGHT)
 	{
 		pixelx = &font->pixels[(y * font->width + texoffset) * 4];
-		pixeli = m->gui_text->pixels + ((y * m->gui_text->width + imgoffset) * 4);
+		pixeli = &m->gui_text->pixels[(y * m->gui_text->width + imgoffset) * 4];
 		x = (size_t) - 1;
 		while (++x < CHAR_WIDTH)
 			blend(pixeli + x * 4, pixelx + x * 4);
