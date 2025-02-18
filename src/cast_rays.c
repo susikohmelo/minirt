@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 17:12:07 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 17:48:12 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -326,21 +326,24 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	return (main_color);
 }
 
-void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
+static void inline	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
 {
 	size_t	i;
 	size_t	x;
+	size_t	ix;
 
+	clr = vec3_muls(clr, 255);
 	i = row * m->img->width + col;
 	x = (size_t) - 1;
 	while (++x < sizeof m->valid_pixel
 		&& !m->valid_pixel[(m->valid_pixel_i + x) & (sizeof m->valid_pixel - 1)]
 		&& col + x < m->img->width)
 	{
-		m->img->pixels[4 * (i + x) + 0] = 255 * clr.r;
-		m->img->pixels[4 * (i + x) + 1] = 255 * clr.g;
-		m->img->pixels[4 * (i + x) + 2] = 255 * clr.b;
-		m->img->pixels[4 * (i + x) + 3] = 255;
+		ix = (i + x) * 4;
+		m->img->pixels[ix + 0] = clr.r;
+		m->img->pixels[ix + 1] = clr.g;
+		m->img->pixels[ix + 2] = clr.b;
+		m->img->pixels[ix + 3] = 255;
 	}
 }
 
