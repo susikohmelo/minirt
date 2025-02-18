@@ -6,12 +6,26 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 11:37:09 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/17 18:17:15 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/18 09:56:55 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
+
+static void	move_cylinder_caps(t_minirt *m, t_cylinder *c, t_vec3 delta)
+{
+	size_t	i;
+	t_vec3	start;
+
+	if (!(m->cylinders <= c && c < m->cylinders + m->cylinders_length))
+		return ;
+	i = 2 * (c - m->cylinders);
+	start = vec3_add(m->moving_shape_start, vec3_muls(c->axis, c->height / 2));
+	m->discs[i + 0].coords = vec3_add(start, delta);
+	start = vec3_sub(m->moving_shape_start, vec3_muls(c->axis, c->height / 2));
+	m->discs[i + 1].coords = vec3_add(start, delta);
+}
 
 void	move_shape(t_minirt *m, double x, double y)
 {
@@ -19,7 +33,6 @@ void	move_shape(t_minirt *m, double x, double y)
 	t_vec3	delta_y;
 	t_vec3	delta;
 	double	length;
-	size_t	i;
 
 	x = 2 * x / m->img->width - 1;
 	y = 2 * y / m->img->height - 1;
@@ -30,12 +43,6 @@ void	move_shape(t_minirt *m, double x, double y)
 	length = vec3_length(vec3_sub(m->moving_shape_start, m->camera_coords));
 	delta = vec3_muls(delta, length / sqrt(2));
 	m->moving_shape->coords = vec3_add(m->moving_shape_start, delta);
-	if (m->cylinders <= (t_cylinder *)m->moving_shape
-		&& (t_cylinder *)m->moving_shape <= m->cylinders + m->cylinders_length)
-	{
-		i = 2 * ((t_cylinder *)m->moving_shape - m->cylinders);
-		m->discs[i + 0].coords = vec3_add(m->discs[i + 0].coords, delta);
-		m->discs[i + 1].coords = vec3_add(m->discs[i + 1].coords, delta);
-	}
+	move_cylinder_caps(m, (t_cylinder *)m->moving_shape, delta);
 	redraw(m, true);
 }
