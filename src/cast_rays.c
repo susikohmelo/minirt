@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 11:30:28 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:15:56 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -420,7 +420,7 @@ t_ray	cast_ray(t_minirt *m, size_t column, size_t row)
 	return (ray);
 }
 
-void	cast_rays(t_minirt *m)
+void	cast_rays(t_minirt *m, size_t tid)
 {
 	t_ray	ray;
 	size_t	column;
@@ -442,6 +442,8 @@ void	cast_rays(t_minirt *m)
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
+			if ((row * m->img->width + column & (THREADS - 1)) != tid)
+				continue ;
 			i_pixel[1] = (i_pixel[1] + 1) * (i_pixel[1] < m->valid_pixel_len);
 			if (i_pixel[1] != m->valid_pixel_x)
 				continue ;

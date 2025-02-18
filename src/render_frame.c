@@ -6,13 +6,14 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 21:06:44 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 11:30:49 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:26:48 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 
 static void	render_slider(t_minirt *m, double value)
 {
@@ -198,15 +199,51 @@ void	render_text(t_minirt *m)
 		render_string(m, "o");
 }
 
+static double	moving_average(double x)
+{
+	static double	xs[16];
+	static size_t	i;
+	static double	sum;
+
+	sum += x - xs[i];
+	xs[i++] = x;
+	if (i >= sizeof xs / sizeof xs[0])
+		i = 0;
+	return (sum / ((double)sizeof xs / sizeof xs[0]));
+}
+
+void *cast_some_rays(void *thread_data)
+{
+	t_thread_data	*td;
+
+	td = thread_data;
+	while (!td->minirt->should_quit)
+	{
+		if (!td->done)
+		{
+			cast_rays(td->minirt, td->id);
+			td->done = true;
+		}
+		usleep(10);
+	}
+	return (NULL);
+}
+
 void	render_frame(void *minirt)
 {
 	t_minirt		*m;
 	static double	t1;
 	double			t;
+	size_t			i;
 
 	m = minirt;
-
-	cast_rays(minirt);
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		m->thrds_data[i].done = false;
+	i = (size_t) - 1;
+	while (++i < THREADS)
+		while (!m->thrds_data[i].done)
+			usleep(10);
 	m->valid_pixel_x += (m->valid_pixel_x <= m->valid_pixel_len);
 	if (m->valid_pixel_y <= 1 && m->valid_pixel_x > m->valid_pixel_len)
 	{
@@ -218,6 +255,6 @@ void	render_frame(void *minirt)
 	render_text(m);
 	t = mlx_get_time();
 	printf("                                                     \r" \
-		"FPS: %g\e[1A\n", 1 / (t - t1));
+		"FPS: %g\e[1A\n", moving_average(1 / (t - t1)));
 	t1 = t;
 }

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 11:31:16 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:21:09 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <libft.h>
 # include <stdbool.h>
 # include <stdint.h>
+# include <pthread.h>
 
 # ifndef MRT_FATAL_EXPECT
 #  define MRT_FATAL_EXPECT 1
@@ -59,6 +60,8 @@
 // Max value for some attributes like sphere radius
 # define SCALE 8
 
+# define THREADS 8
+
 /*
 	Do not reorder these, the order:
 	left, front, right, up, back, down
@@ -78,6 +81,13 @@ typedef union s_skybox
 	mlx_image_t	*sky_array[6];
 }	t_skybox;
 
+typedef struct s_thread_data
+{
+	struct s_minirt	*minirt;
+	size_t			id;
+	_Atomic bool	done;
+}	t_thread_data;
+
 typedef struct s_minirt
 {
 	mlx_t			*mlx;
@@ -92,6 +102,9 @@ typedef struct s_minirt
 	bool			show_lights;
 	bool			resizing;
 	uint8_t			moving_slider;
+	pthread_t		thrds[THREADS];
+	t_thread_data	thrds_data[THREADS];
+	_Atomic bool	should_quit;
 
 	t_shape			*moving_shape;
 	t_vec3			moving_shape_start;
@@ -182,7 +195,8 @@ void	move_shape(t_minirt *m, double x, double y);
 t_vec3	perpendiculary(t_vec3 v);
 t_vec3	perpendicularx(t_vec3 v);
 
-void	cast_rays(t_minirt *minirt);
+void	*cast_some_rays(void *thread_data);
+void	cast_rays(t_minirt *m, size_t thread_id);
 t_ray	cast_ray(t_minirt *m, size_t column, size_t row);
 void	get_shape_intersect_dist(t_minirt *m, t_ray *ray, const t_shape *skip);
 
