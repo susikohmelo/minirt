@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:45:20 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 13:48:04 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:47:55 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ t_ray	cast_ray(t_minirt *m, size_t column, size_t row)
 	t_ray	ray;
 
 	ray = create_ray(m, column, row);
-	ray.dir = mat3_vec3(m->cam_rot_matrix, ray.dir);
+	ray.dir = vec3_mat3(ray.dir, m->cam_rot_matrix);
 	get_shape_intersect_dist(m, &ray, NULL);
 	if (m->show_lights)
 		get_light_intersect_dist(m, &ray);
