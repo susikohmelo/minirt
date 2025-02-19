@@ -6,7 +6,7 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/19 11:26:46 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/02/19 12:14:21 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,8 @@ SRCS = main.c minirt.c vec3.c vec3_dot_cross_clamp_length_normalize.c \
 	parse_texture.c get_uv_coords.c free_textures.c parse_utils.c \
 	get_texture_color.c font.c edit_objects.c move_shape.c get_skybox_color.c \
 	edit_objects.c edit_shape_objects.c render_shape_text.c render_text.c \
-	slider.c cylinder_intersect_dist.c shape_intersect_dist.c load_skybox.c
+	slider.c cylinder_intersect_dist.c shape_intersect_dist.c load_skybox.c \
+	phong.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a

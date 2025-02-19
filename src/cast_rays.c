@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/19 11:43:11 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 11:49:51 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,63 +74,6 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 	new_ray.length = INFINITY;
 	new_ray.is_reflect = INFINITY;
 	return (new_ray);
-}
-
-t_vec3	phong(
-	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
-{
-	double			diffuse_reflection;
-	double			shape_rough;
-	t_vec3			shape_color;
-	t_vec3			surface;
-	t_vec3			surface_speculars;
-	t_vec3			light_dir;
-	t_vec3			reflection;
-	size_t			i;
-	t_ray			light_ray;
-
-	shape_color = ray_data.shape->color;
-	shape_rough = ray_data.shape->default_rough;
-	if (ray_data.shape->roughness_map)
-		shape_rough = fmax(0, 2 * ray_data.shape->default_rough - 1) \
-			+ (1 - fabs(2 * ray_data.shape->default_rough - 1)) \
-				* get_rough_value(ray, ray_data.shape, ray_data.shape_type);
-	if (ray_data.shape->texture)
-	{
-		if (ray_data.is_reflect == INFINITY)
-			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, 0), shape_color);
-		else
-			shape_color = vec3_mul(get_albedo_blur(ray, ray_data.shape, ray_data.shape_type, ray_data.is_reflect), shape_color);
-	}
-	surface = (t_vec3){};
-	surface_speculars = (t_vec3){};
-	i = (size_t) - 1;
-	while (++i < m->lights_length)
-	{
-		t_vec3 light = vec3_sub(m->lights[i].coords, ray);
-		light_dir = vec3_normalize(light);
-		diffuse_reflection = fmax(0, vec3_dot(light_dir, normal));
-
-		light_ray = (t_ray){
-			.start = vec3_add(ray, vec3_muls(normal, .0001)),
-			.dir = light_dir,
-			.length = INFINITY};
-		if (!ray_data.inside_shape)
-			get_shape_intersect_dist(m, &light_ray, ray_data.shape);
-		else
-			get_shape_intersect_dist(m, &light_ray, NULL);
-		if (light_ray.length * light_ray.length <= vec3_dot(light, light))
-			continue ;
-
-		reflection = vec3_sub( \
-			vec3_muls(normal, 2 * vec3_dot(light_dir, normal)), \
-			light_dir);
-		surface = vec3_add(surface, vec3_muls(m->lights[i].color, diffuse_reflection));
-		surface_speculars = vec3_add(surface_speculars, \
-			vec3_muls(m->lights[i].color, (1 / pow(shape_rough + 0.88, 2) - 0.27) * \
-			pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), (1 / pow(shape_rough + 0.01, 2) + 0.02))));
-	}
-	return (vec3_add(vec3_mul(vec3_add(m->ambient_light, surface), shape_color), surface_speculars));
 }
 
 static inline void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t row)
