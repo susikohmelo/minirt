@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 11:28:14 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:23:17 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,6 @@ typedef struct s_cylinder_intersect_data
 }	t_cylinder_intersect_data;
 
 void		mrt_init(t_minirt *m, const char *exec_path, const char *path);
-void		mrt_destroy(t_minirt *m);
 void		mrt_exit(t_minirt *m, int status);
 bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
 bool		mrt_expect(t_minirt *m, bool condition, const char *msg);
@@ -209,7 +208,7 @@ t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 double		get_shape_roughness(t_ray *data, t_vec3 *ray);
 t_vec3		get_shape_color(t_ray *data, t_vec3 *ray);
 t_vec3		skybox_color(t_minirt *m, t_ray data, t_vec3 ray, double roughness);
-t_vec3		get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data);
+t_vec3		get_obj_normal(t_vec3 ray, t_ray *data);
 t_vec3		surface_color(t_minirt *m, t_ray data, bool is_reflection);
 t_vec3		phong(t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data);
 

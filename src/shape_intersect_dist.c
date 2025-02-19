@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:26:00 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 11:27:04 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 13:48:27 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,3 @@ void	min_disc_intersect_dist(t_ray *ray, const t_disc *disc)
 		ray->shape_type = SHAPE_DISC;
 	}
 }
-

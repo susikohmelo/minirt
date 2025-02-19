@@ -6,13 +6,13 @@
 #    By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/10 17:13:50 by lfiestas          #+#    #+#              #
-#    Updated: 2025/02/19 12:14:21 by lfiestas         ###   ########.fr        #
+#    Updated: 2025/02/19 14:27:53 by lfiestas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = miniRT
 
-SRCS = main.c minirt.c vec3.c vec3_dot_cross_clamp_length_normalize.c \
+SRCS = main.c minirt_init.c vec3.c vec3_dot_cross_clamp_length_normalize.c \
 	vec3_matrices.c vec3_scalar.c hooks.c surface_color.c get_object_normal.c \
 	surface_get_colors.c parser.c parse_attributes.c parse_shapes.c \
 	get_next_line.c get_next_line_utils.c \
@@ -21,7 +21,7 @@ SRCS = main.c minirt.c vec3.c vec3_dot_cross_clamp_length_normalize.c \
 	get_texture_color.c font.c edit_objects.c move_shape.c get_skybox_color.c \
 	edit_objects.c edit_shape_objects.c render_shape_text.c render_text.c \
 	slider.c cylinder_intersect_dist.c shape_intersect_dist.c load_skybox.c \
-	phong.c
+	phong.c cast_ray.c assert.c
 
 OBJS = $(patsubst %.c,build/%.o,$(SRCS))
 MLX = MLX42/build/libmlx42.a
