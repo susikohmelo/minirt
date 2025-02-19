@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:42:31 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/19 14:09:23 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 15:45:47 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ static t_vec3	cylinder_normal(t_vec3 ray, t_ray *data)
 
 t_vec3	get_obj_normal(t_vec3 ray, t_ray *data)
 {
-	const double	normal_strength = 1;
 	t_vec3			map_normal;
 	t_vec3			normal;
 
@@ -61,7 +60,5 @@ t_vec3	get_obj_normal(t_vec3 ray, t_ray *data)
 		return (normal);
 	map_normal = vec3_inverse_lookat(get_texture_color(\
 		ray, NORMAL_MAP, data->shape, data->shape_type), normal);
-	// TODO what is going on with the redundant normal calculation??
-	return (vec3_normalize(vec3_add(vec3_muls(normal, 1 - normal_strength), \
-		vec3_muls(map_normal, normal_strength))));
+	return (vec3_normalize(map_normal));
 }

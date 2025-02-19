@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 15:20:48 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 16:33:59 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,10 @@ void	resize_hook(int w, int h, void *minirt)
 void	scroll_hook(double x_delta, double y_delta, void *minirt)
 {
 	t_minirt	*m;
+	t_cylinder	*c;
 
 	m = minirt;
+	ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 	if (m->moving_shape)
 	{
 		m->moving_shape->coords = vec3_add(\
@@ -77,13 +79,17 @@ void	scroll_hook(double x_delta, double y_delta, void *minirt)
 		m->moving_shape_start = vec3_add(\
 			m->moving_shape_start, \
 			vec3_muls(m->camera_orientation, y_delta * SCROLL_SENSITIVITY));
-		ft_memset(m->valid_pixel, false, m->valid_pixel_len);
-		return ;
+		c = (t_cylinder *)m->moving_shape;
+		if (m->cylinders <= c && c < m->cylinders + m->cylinders_length)
+		{
+			m->discs[2 * (c - m->cylinders) + 0].coords = vec3_add(\
+				c->coords, vec3_muls(c->axis, c->height / 2));
+			m->discs[2 * (c - m->cylinders) + 1].coords = vec3_sub(\
+				c->coords, vec3_muls(c->axis, c->height / 2));
+		}
 	}
-	y_delta += x_delta;
-	m->camera_field_of_view -= y_delta;
-	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 179), 1);
-	ft_memset(m->valid_pixel, false, m->valid_pixel_len);
+	m->camera_field_of_view -= !m->moving_shape * (y_delta + x_delta);
+	m->camera_field_of_view = fmax(fmin(m->camera_field_of_view, 180), 0);
 }
 
 void	cursor_hook(double x, double y, void *minirt)
