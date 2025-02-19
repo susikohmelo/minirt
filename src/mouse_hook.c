@@ -22,6 +22,10 @@ static t_click	click_type(t_minirt *m, double click_time)
 
 	click_time1 = last_click_time;
 	last_click_time = click_time;
+	if (clicked_menu && (LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
+		&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
+		&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
+		return (CLICK_SHOW_LIGHTS);
 	if (m->shape_type != SHAPE_NO_SHAPE
 		&& clicked_menu && 2 * CHAR_HEIGHT <= m->mouse_y)
 		return (CLICK_SLIDER);
@@ -34,10 +38,6 @@ static t_click	click_type(t_minirt *m, double click_time)
 	if (clicked_menu && m->mouse_x <= CHAR_WIDTH && m->mouse_y <= CHAR_HEIGHT
 		&& m->shape_type == SHAPE_NO_SHAPE)
 		return (CLICK_OPEN_MENU);
-	if (clicked_menu && (LINE_LENGTH - 3) * CHAR_WIDTH <= m->mouse_x
-		&& (int)(m->gui_line - 1) * CHAR_HEIGHT <= m->mouse_y
-		&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
-		return (CLICK_SHOW_LIGHTS);
 	return (CLICK_WORLD);
 }
 
