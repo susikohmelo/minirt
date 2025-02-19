@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/19 13:57:14 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 22:51:17 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,15 @@
 #include "minirt.h"
 #include <math.h>
 
+//TODO
+static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
+							t_vec3 *intersect, double rough)
+{
+	shape_reflect.r += 0 * rough; // werror thingy
+	return (vec3_mul(shape_reflect, get_shape_color(data, intersect)));
+}
+
+/*
 static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
 							t_vec3 *intersect, double rough)
 {
@@ -23,6 +32,7 @@ static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
 	return (vec3_add(vec3_muls(shape_reflect, 1 - rough),
 			vec3_muls(shape_difus, rough)));
 }
+*/
 
 static inline void	shoot_reflection(t_minirt *m, t_ray *data, double *rough)
 {
