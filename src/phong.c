@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:49:38 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 13:28:27 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 21:57:50 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,7 @@ static void	get_material_attributes(
 	*shape_color = data.shape->color;
 	*shape_rough = data.shape->roughness;
 	if (data.shape->roughness_map)
-		*shape_rough = fmax(0, 2 * data.shape->roughness - 1) \
-			+ (1 - fabs(2 * data.shape->roughness - 1)) \
-				* get_rough_value(ray, data.shape, data.shape_type);
+		get_rough_value(ray, data.shape, data.shape_type);
 	if (data.shape->texture)
 	{
 		if (data.is_reflect == INFINITY)
