@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 14:29:13 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:54:52 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,17 @@ typedef struct s_cylinder_intersect_data
 	bool	valid1;
 	bool	valid2;
 }	t_cylinder_intersect_data;
+
+typedef enum e_click
+{
+	CLICK_NO_CLICK,
+	CLICK_DOUBLE,
+	CLICK_SLIDER,
+	CLICK_CLOSE_MENU,
+	CLICK_OPEN_MENU,
+	CLICK_SHOW_LIGHTS,
+	CLICK_WORLD,
+}	t_click;
 
 void		mrt_init(t_minirt *m, const char *exec_path, const char *path);
 void		mrt_exit(t_minirt *m, int status);
