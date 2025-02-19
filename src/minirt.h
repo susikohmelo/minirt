@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:45:13 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 11:28:14 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,9 +246,11 @@ void		cast_rays(t_minirt *m, size_t thread_id);
 t_ray		cast_ray(t_minirt *m, size_t column, size_t row);
 void		get_shape_intersect_dist(
 				t_minirt *m, t_ray *ray, const t_shape *skip);
+void		get_light_intersect_dist(t_minirt *m, t_ray *ray);
 void		min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
 void		min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
 void		min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
 void		min_disc_intersect_dist(t_ray *ray, const t_disc *disc);
+void		min_light_intersect_dist(t_ray *ray, const t_light *light);
 
 #endif

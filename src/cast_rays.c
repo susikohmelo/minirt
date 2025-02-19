@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 15:21:40 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 23:26:46 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 11:43:11 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void	set_cam_rot_matrix(t_minirt *minirt)
 	if (forward.y == 1 || forward.y == -1)
 		right = vec3(1, 0, 0);
 	else
-		right = vec3_normalize(vec3_cross(vec3(0, 1, 0 ), forward));
+		right = vec3_normalize(vec3_cross(vec3(0, 1, 0), forward));
 	up = vec3_cross(forward, right);
 	minirt->cam_rot_matrix[0][0] = right.x;
 	minirt->cam_rot_matrix[0][1] = right.y;
@@ -79,9 +79,7 @@ static t_ray	create_ray(t_minirt *minirt, int32_t x, int32_t y)
 t_vec3	phong(
 	t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data)
 {
-	const double	specular_reflection = 1;
 	double			diffuse_reflection;
-	const double	alpha = 1.0;
 	double			shape_rough;
 	t_vec3			shape_color;
 	t_vec3			surface;
@@ -93,11 +91,7 @@ t_vec3	phong(
 
 	shape_color = ray_data.shape->color;
 	shape_rough = ray_data.shape->default_rough;
-	// roughness is between 0 and 1. 0 is smooth, 1 is rough
-	//if (ray_data.is_reflect != INFINITY)
-	//	shape_rough = ray_data.is_reflect;
 	if (ray_data.shape->roughness_map)
-		// shape_rough = get_rough_value(ray, ray_data.shape, ray_data.shape_type);
 		shape_rough = fmax(0, 2 * ray_data.shape->default_rough - 1) \
 			+ (1 - fabs(2 * ray_data.shape->default_rough - 1)) \
 				* get_rough_value(ray, ray_data.shape, ray_data.shape_type);
@@ -133,8 +127,8 @@ t_vec3	phong(
 			light_dir);
 		surface = vec3_add(surface, vec3_muls(m->lights[i].color, diffuse_reflection));
 		surface_speculars = vec3_add(surface_speculars, \
-			vec3_muls(m->lights[i].color, specular_reflection * (1 / pow(shape_rough + 0.88, 2) - 0.27) * \
-			pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), alpha * (1 / pow(shape_rough + 0.01, 2) + 0.02))));
+			vec3_muls(m->lights[i].color, (1 / pow(shape_rough + 0.88, 2) - 0.27) * \
+			pow(fmax(-vec3_dot(reflection, ray_data.dir), 0), (1 / pow(shape_rough + 0.01, 2) + 0.02))));
 	}
 	return (vec3_add(vec3_mul(vec3_add(m->ambient_light, surface), shape_color), surface_speculars));
 }
@@ -158,39 +152,6 @@ static inline void	draw_scaled_pixel(t_minirt *m, t_vec3 clr, size_t col, size_t
 		m->img->pixels[ix + 2] = clr.b;
 		m->img->pixels[ix + 3] = 255;
 	}
-}
-
-static void min_light_intersect_dist(t_ray *ray, const t_light *light)
-{
-	t_vec3	lstart;
-	double	b;
-	double	c;
-	double	discriminant;
-	double	length;
-
-	lstart = vec3_sub(ray->start, light->coords);
-	b = 2 * vec3_dot(ray->dir, lstart);
-	c = vec3_dot(lstart, lstart) - (light->brightness + .5);
-	discriminant = b * b - 4 * 1 * c;
-	if (discriminant >= 0)
-	{
-		length = (-b - sqrt(discriminant)) / (2. * 1);
-		if (length < ray->length && length >= 0)
-		{
-			ray->length = length;
-			ray->shape = (t_shape *)light;
-			ray->shape_type = SHAPE_LIGHT;
-		}
-	}
-}
-
-void	get_light_intersect_dist(t_minirt *m, t_ray *ray)
-{
-	size_t	i;
-
-	i = (size_t) - 1;
-	while (++i < m->lights_length)
-		min_light_intersect_dist(ray, &m->lights[i]);
 }
 
 static void	precalculate(t_minirt *m)
@@ -218,42 +179,39 @@ t_ray	cast_ray(t_minirt *m, size_t column, size_t row)
 	return (ray);
 }
 
-void	cast_rays(t_minirt *m, size_t tid)
+static t_vec3	ray_color(t_minirt *m, size_t column, size_t row)
 {
 	t_ray	ray;
+
+	ray = cast_ray(m, column, row);
+	if (isinf(ray.length))
+		return (get_skybox_color(m, ray.dir, 0));
+	else if (ray.shape_type != SHAPE_LIGHT)
+		return (vec3_clamp(surface_color(m, ray, false), 0, 1));
+	return (((t_light *)ray.shape)->color_value);
+}
+
+void	cast_rays(t_minirt *m, size_t tid)
+{
 	size_t	column;
 	size_t	row;
 	size_t	i_pixel;
-	t_vec3	color;
 
 	precalculate(m);
 	set_cam_rot_matrix(m);
-
 	row = (size_t) - 1;
 	while (++row < m->img->height)
 	{
-		#if !THREADS
-		(void)tid;
-		#else
 		if ((row & (THREADS - 1)) != tid)
 		 	continue ;
-		#endif
 		column = (size_t) - 1;
 		while (++column < m->img->width)
 		{
 			i_pixel = row * m->img->width + column;
 			if (m->valid_pixel[i_pixel & (m->valid_pixel_len - 1)]
 				|| (i_pixel & (m->valid_pixel_len - 1)) != m->valid_pixel_i)
-				continue;
-			ray = cast_ray(m, column, row);
-
-			if (isinf(ray.length))
-				color = get_skybox_color(m, ray.dir, 0);
-			else if (ray.shape_type != SHAPE_LIGHT)
-				color = vec3_clamp(surface_color(m, ray, false), 0, 1);
-			else
-				color = ((t_light *)ray.shape)->color_value;
-			draw_scaled_pixel(m, color, column, row);
+				continue ;
+			draw_scaled_pixel(m, ray_color(m, column, row), column, row);
 		}
 	}
 }

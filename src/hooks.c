@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:07:34 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 11:46:17 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,6 @@ void	mouse_hook(
 					&m->cylinders[((t_disc *)ray.shape - m->discs) / 2];
 			if (ray.shape != NULL)
 				m->moving_shape_start = ray.shape->coords;
-			ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 		}
 		last_click_time = click_time;
 	}
