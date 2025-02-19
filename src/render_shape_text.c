@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:45:13 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 17:48:00 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:54:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static void	render_common_shape_text(t_minirt *m)
 	render_value(m, "Red", m->shape->color.r, 255);
 	render_value(m, "Green", m->shape->color.g, 255);
 	render_value(m, "Blue", m->shape->color.b, 255);
-	render_value(m, "Roughness", m->shape->default_rough, 1);
+	render_value(m, "Roughness", m->shape->roughness, 1);
 }
 
 void	render_sphere_text(t_minirt *m)

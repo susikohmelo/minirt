@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:02:27 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/14 13:36:34 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 13:26:19 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ typedef struct s_shape
 	mlx_image_t	*texture;
 	mlx_image_t	*normal_map;
 	mlx_image_t	*roughness_map;
-	double		default_rough;
+	double		roughness;
 }	t_shape;
 
 typedef struct s_sphere
@@ -52,7 +52,7 @@ typedef struct s_sphere
 	mlx_image_t	*texture;
 	mlx_image_t	*normal_map;
 	mlx_image_t	*roughness_map;
-	double		default_rough;
+	double		roughness;
 	double		radius;
 }	t_sphere;
 
@@ -63,7 +63,7 @@ typedef struct s_plane
 	mlx_image_t	*texture;
 	mlx_image_t	*normal_map;
 	mlx_image_t	*roughness_map;
-	double		default_rough;
+	double		roughness;
 	t_vec3		normal;
 }	t_plane;
 
@@ -74,7 +74,7 @@ typedef struct s_cylinder
 	mlx_image_t	*texture;
 	mlx_image_t	*normal_map;
 	mlx_image_t	*roughness_map;
-	double		default_rough;
+	double		roughness;
 	t_vec3		axis;
 	double		radius;
 	double		height;
@@ -87,7 +87,7 @@ typedef struct s_disc
 	mlx_image_t	*texture;
 	mlx_image_t	*normal_map;
 	mlx_image_t	*roughness_map;
-	double		default_rough;
+	double		roughness;
 	t_vec3		normal;
 	double		radius;
 }	t_disc;

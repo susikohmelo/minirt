@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 10:44:57 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 19:50:41 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:54:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	edit_common_shape_attributes(t_minirt *m, t_shape *s, double x)
 	if (m->moving_slider == 3)
 		s->color.b = x;
 	if (m->moving_slider == 4)
-		s->default_rough = x;
+		s->roughness = x;
 }
 
 static void	edit_light(t_minirt *m, t_light *light, double x)
