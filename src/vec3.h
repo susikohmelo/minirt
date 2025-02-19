@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 12:42:23 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:27:29 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:32:48 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,6 @@ t_vec3	mat3_vec3( \
 t_vec3	vec3_rotatex(t_vec3 v, double r)__attribute__((warn_unused_result));
 t_vec3	vec3_rotatey(t_vec3 v, double r)__attribute__((warn_unused_result));
 t_vec3	vec3_rotatez(t_vec3 v, double r)__attribute__((warn_unused_result));
+t_vec3	vec3_axis_rotation(t_vec3 v, t_vec3 axis, double r);
 
 #endif

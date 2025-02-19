@@ -6,11 +6,12 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:28:44 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 18:10:55 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:22:57 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
+#include <stdlib.h>
 
 int	main(int argc, char **argv)
 {
@@ -24,5 +25,5 @@ int	main(int argc, char **argv)
 	mlx_loop_hook(m.mlx, render_frame, &m);
 	mlx_scroll_hook(m.mlx, *scroll_hook, &m);
 	mlx_loop(m.mlx);
-	mrt_destroy(&m);
+	mrt_exit(&m, EXIT_SUCCESS);
 }

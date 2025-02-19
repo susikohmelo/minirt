@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:45:13 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:54:52 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,8 +169,18 @@ typedef struct s_cylinder_intersect_data
 	bool	valid2;
 }	t_cylinder_intersect_data;
 
+typedef enum e_click
+{
+	CLICK_NO_CLICK,
+	CLICK_DOUBLE,
+	CLICK_SLIDER,
+	CLICK_CLOSE_MENU,
+	CLICK_OPEN_MENU,
+	CLICK_SHOW_LIGHTS,
+	CLICK_WORLD,
+}	t_click;
+
 void		mrt_init(t_minirt *m, const char *exec_path, const char *path);
-void		mrt_destroy(t_minirt *m);
 void		mrt_exit(t_minirt *m, int status);
 bool		mrt_assert(t_minirt *m, bool condition, const char *msg);
 bool		mrt_expect(t_minirt *m, bool condition, const char *msg);
@@ -205,11 +215,10 @@ t_vec3		get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 				int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
 
-
 double		get_shape_roughness(t_ray *data, t_vec3 *ray);
 t_vec3		get_shape_color(t_ray *data, t_vec3 *ray);
 t_vec3		skybox_color(t_minirt *m, t_ray data, t_vec3 ray, double roughness);
-t_vec3		get_obj_normal(t_minirt *m, t_vec3 ray, t_ray *data);
+t_vec3		get_obj_normal(t_vec3 ray, t_ray *data);
 t_vec3		surface_color(t_minirt *m, t_ray data, bool is_reflection);
 t_vec3		phong(t_minirt *m, t_vec3 ray, t_vec3 normal, t_ray ray_data);
 
@@ -246,9 +255,11 @@ void		cast_rays(t_minirt *m, size_t thread_id);
 t_ray		cast_ray(t_minirt *m, size_t column, size_t row);
 void		get_shape_intersect_dist(
 				t_minirt *m, t_ray *ray, const t_shape *skip);
+void		get_light_intersect_dist(t_minirt *m, t_ray *ray);
 void		min_cylinder_intersect_dist(t_ray *ray, const t_cylinder *cylinder);
 void		min_sphere_intersect_dist(t_ray *ray, const t_sphere *sphere);
 void		min_plane_intersect_dist(t_ray *ray, const t_plane *plane);
 void		min_disc_intersect_dist(t_ray *ray, const t_disc *disc);
+void		min_light_intersect_dist(t_ray *ray, const t_light *light);
 
 #endif

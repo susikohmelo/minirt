@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 21:11:33 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/15 21:59:01 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:54:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ double	get_rough_value(t_vec3 intersect, const t_shape *shape, int shape_type)
 	else if (shape_type == SHAPE_CYLINDER)
 		uv = get_cylinder_uv(intersect, (t_cylinder *) shape);
 	if (uv.x > 1. || uv.x < 0. || uv.y > 1. || uv.y < 0.)
-		return (shape->default_rough);
+		return (shape->roughness);
 	img = shape->roughness_map;
 	vect = get_texture_from_uv(img, uv.x, uv.y, 0);
 	return ((vect.r + vect.g + vect.b) / 3);

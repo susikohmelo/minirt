@@ -6,12 +6,11 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:22:06 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 20:22:43 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:38:28 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vec3.h"
-#include <math.h>
 
 t_vec3	vec3_inverse_lookat(t_vec3 v1, t_vec3 v2)
 {
@@ -53,7 +52,6 @@ t_vec3	vec3_lookat(t_vec3 v1, t_vec3 v2)
 	return (v1);
 }
 
-// TODO ONE OF THESE IS WRONG!
 t_vec3	vec3_mat3(t_vec3 v, const double m[3][3])
 {
 	return ((t_vec3){
@@ -63,12 +61,11 @@ t_vec3	vec3_mat3(t_vec3 v, const double m[3][3])
 	});
 }
 
-// TODO ONE OF THESE IS WRONG!
 t_vec3	mat3_vec3(const double m[3][3], t_vec3 v)
 {
 	return ((t_vec3){
-		.x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0],
-		.y = v.x * m[0][1] + v.y * m[1][1] + v.z * m[2][1],
-		.z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2],
+		.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+		.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+		.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
 	});
 }

@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/19 16:43:21 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 13:57:14 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static inline void	shoot_reflection(t_minirt *m, t_ray *data, double *rough)
 	t_vec3			view_dir;
 
 	intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
-	normal = get_obj_normal(m, intersect, data);
+	normal = get_obj_normal(intersect, data);
 	*rough = fmin(*rough + get_shape_roughness(data, &intersect), 1);
 	data->start = vec3_add(intersect, vec3_muls(normal, 0.001));
 	view_dir = vec3_muls(data->dir, -1);
@@ -95,7 +95,7 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	double			rough;
 
 	intersect = vec3_add(vec3_muls(data.dir, data.length), data.start);
-	normal = get_obj_normal(m, intersect, &data);
+	normal = get_obj_normal(intersect, &data);
 	main_clr = phong(m, intersect, normal, data);
 	if (is_reflection || m->max_ray_bounces == 0)
 		return (main_clr);

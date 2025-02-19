@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:19:12 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:18:25 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 13:26:19 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,13 +63,13 @@ void	edit_cylinder(t_minirt *m, t_shape *cylinder, double x)
 	i = 2 * (c - m->cylinders);
 	m->discs[i].coords = vec3_add(c->coords, vec3_muls(c->axis, c->height / 2));
 	m->discs[i].color = c->color;
-	m->discs[i].default_rough = c->default_rough;
+	m->discs[i].roughness = c->roughness;
 	m->discs[i].normal = c->axis;
 	m->discs[i].radius = c->radius;
 	++i;
 	m->discs[i].coords = vec3_sub(c->coords, vec3_muls(c->axis, c->height / 2));
 	m->discs[i].color = c->color;
-	m->discs[i].default_rough = c->default_rough;
+	m->discs[i].roughness = c->roughness;
 	m->discs[i].normal = c->axis;
 	m->discs[i].radius = c->radius;
 }

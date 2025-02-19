@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:44:23 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/18 20:46:41 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 12:54:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ double	get_shape_roughness(t_ray *data, t_vec3 *ray)
 	if (data->shape->roughness_map)
 		return (get_rough_value(*ray, data->shape, data->shape_type));
 	else
-		return (data->shape->default_rough);
+		return (data->shape->roughness);
 }
 
 t_vec3	get_shape_color(t_ray *data, t_vec3 *ray)

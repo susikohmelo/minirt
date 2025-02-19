@@ -6,12 +6,28 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 11:37:09 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:29:17 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 15:14:10 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <math.h>
+
+t_vec3	perpendiculary(t_vec3 v)
+{
+	t_vec3	result;
+
+	result = vec3_cross(v, vec3(0, 1, 0));
+	return (vec3_normalize(result));
+}
+
+t_vec3	perpendicularx(t_vec3 v)
+{
+	t_vec3	result;
+
+	result = vec3_cross(v, vec3(1, 0, 0));
+	return (vec3_normalize(result));
+}
 
 static void	move_cylinder_caps(t_minirt *m, t_cylinder *c, t_vec3 delta)
 {

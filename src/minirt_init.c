@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:48:45 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 19:54:34 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:27:57 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 
 static void	get_shape_buf_sizes(
-	t_minirt *m, size_t sizes[static SHAPES_LENGTH], const char* path)
+	t_minirt *m, size_t sizes[static SHAPES_LENGTH], const char *path)
 {
 	int		fd;
 	char	*line;
@@ -83,26 +81,11 @@ static void	load_textures(t_minirt *m, const char *exec_path)
 	load_skybox(m, exec_path);
 }
 
-void	mrt_init(t_minirt *m, const char *exec_path, const char *path)
+static void	init_mlx(t_minirt *m, const char *exec_path)
 {
-	int32_t max_w;
+	int32_t	max_w;
 	int32_t	max_h;
-	size_t	sizes[SHAPES_LENGTH];
-	size_t	i;
 
-	ft_memset(sizes, 0, sizeof sizes);
-	m->valid_pixel_len = DEFAULT_VALID_PIXEL_LEN;
-	get_shape_buf_sizes(m, sizes, path);
-	m->lights = ft_arena_calloc(&m->arena, sizes[0], sizeof m->lights[0]);
-	m->spheres = ft_arena_calloc( \
-		&m->arena, sizes[SHAPE_SPHERE], sizeof m->spheres[0]);
-	m->planes = ft_arena_calloc( \
-		&m->arena, sizes[SHAPE_PLANE], sizeof m->planes[0]);
-	m->cylinders = ft_arena_calloc( \
-		&m->arena, sizes[SHAPE_CYLINDER], sizeof m->cylinders[0]);
-	m->discs = ft_arena_calloc( \
-		&m->arena, 2 * sizes[SHAPE_CYLINDER], sizeof m->discs[0]);
-	parse_input(m, path);
 	m->mlx = mlx_init(INIT_WIDTH, INIT_HEIGHT, "miniRT", true);
 	load_textures(m, exec_path);
 	mrt_assert(m, m->mlx != NULL, "mlx_init() failed");
@@ -110,7 +93,7 @@ void	mrt_init(t_minirt *m, const char *exec_path, const char *path)
 	mrt_assert(m, m->img != NULL, "mlx_new_image() failed");
 	mrt_assert(m, mlx_image_to_window(m->mlx, m->img, 0, 0) != -1, \
 		"mlx_image_to_window() failed");
-	m->gui_text = mlx_new_image( \
+	m->gui_text = mlx_new_image(\
 		m->mlx, CHAR_WIDTH * LINE_LENGTH, CHAR_HEIGHT * 32);
 	mrt_assert(m, m->gui_text != NULL, "mlx_new_image() failed");
 	mrt_assert(m, mlx_image_to_window(m->mlx, m->gui_text, 0, 0) != -1, \
@@ -119,94 +102,34 @@ void	mrt_init(t_minirt *m, const char *exec_path, const char *path)
 	mlx_resize_hook(m->mlx, resize_hook, m);
 	mlx_cursor_hook(m->mlx, cursor_hook, m);
 	mlx_mouse_hook(m->mlx, mouse_hook, m);
-
 	mlx_get_monitor_size(0, &max_w, &max_h);
-	mlx_set_window_limit( \
+	mlx_set_window_limit(\
 		m->mlx, CHAR_WIDTH * LINE_LENGTH, CHAR_HEIGHT * 11, max_w, max_h);
+}
 
-	#if !THREADS
-	(void)i;
-	#else
+void	mrt_init(t_minirt *m, const char *exec_path, const char *path)
+{
+	size_t	i;
+	size_t	sizes[SHAPES_LENGTH];
+
+	ft_memset(sizes, 0, sizeof sizes);
+	get_shape_buf_sizes(m, sizes, path);
+	m->lights = ft_arena_calloc(&m->arena, sizes[0], sizeof m->lights[0]);
+	m->spheres = ft_arena_calloc(\
+		&m->arena, sizes[SHAPE_SPHERE], sizeof m->spheres[0]);
+	m->planes = ft_arena_calloc(\
+		&m->arena, sizes[SHAPE_PLANE], sizeof m->planes[0]);
+	m->cylinders = ft_arena_calloc(\
+		&m->arena, sizes[SHAPE_CYLINDER], sizeof m->cylinders[0]);
+	m->discs = ft_arena_calloc(\
+		&m->arena, 2 * sizes[SHAPE_CYLINDER], sizeof m->discs[0]);
+	m->valid_pixel_len = DEFAULT_VALID_PIXEL_LEN;
+	parse_input(m, path);
+	init_mlx(m, exec_path);
 	i = (size_t) - 1;
 	while (++i < THREADS)
-		m->thrds_data[i] = (t_thread_data){ m, i, false };
+		m->thrds_data[i] = (t_thread_data){m, i, false};
 	i = (size_t) - 1;
 	while (++i < THREADS)
 		pthread_create(&m->thrds[i], NULL, cast_some_rays, &m->thrds_data[i]);
-	#endif
-}
-
-void	mrt_destroy(t_minirt *m)
-{
-	size_t	i;
-
-	m->should_quit = true;
-	i = (size_t) - 1;
-	while (++i < THREADS)
-		pthread_join(m->thrds[i], NULL);
-	if (m->mlx != NULL)
-	{
-		if (m->img != NULL)
-			mlx_delete_image(m->mlx, m->img);
-		if (m->gui_text != NULL)
-			mlx_delete_image(m->mlx, m->gui_text);
-	}
-	free_textures(m);
-	free(m->mlx);
-	free(m->line);
-	ft_arena_clear(&m->arena);
-}
-
-void	mrt_exit(t_minirt *m, int status)
-{
-	mrt_destroy(m);
-	exit(status);
-}
-
-bool	mrt_expect(t_minirt *m, bool condition, const char *msg)
-{
-	int	errno_value;
-
-	errno_value = errno;
-	if (condition == true)
-		return (true);
-	if (MRT_FATAL_EXPECT)
-		ft_putstr_fd("Error\n", STDERR_FILENO);
-	else
-		ft_putstr_fd("Warning\n", STDERR_FILENO);
-	if (msg != NULL || errno_value != 0)
-	{
-		if (errno_value != 0)
-			ft_putstr_fd(strerror(errno_value), STDERR_FILENO);
-		if (errno_value != 0 && msg != NULL)
-			ft_putstr_fd(": ", STDERR_FILENO);
-		if (msg != NULL)
-			ft_putstr_fd(msg, STDERR_FILENO);
-		ft_putstr_fd("\n", STDERR_FILENO);
-	}
-	if (MRT_FATAL_EXPECT)
-		mrt_exit(m, EXIT_FAILURE);
-	return (false);
-}
-
-bool	mrt_assert(t_minirt *m, bool condition, const char *msg)
-{
-	int	errno_value;
-
-	errno_value = errno;
-	if (condition == true)
-		return (true);
-	ft_putstr_fd("Error\n", STDERR_FILENO);
-	if (msg != NULL || errno_value != 0)
-	{
-		if (errno_value != 0)
-			ft_putstr_fd(strerror(errno_value), STDERR_FILENO);
-		if (errno_value != 0 && msg != NULL)
-			ft_putstr_fd(": ", STDERR_FILENO);
-		if (msg != NULL)
-			ft_putstr_fd(msg, STDERR_FILENO);
-		ft_putstr_fd("\n", STDERR_FILENO);
-	}
-	mrt_exit(m, EXIT_FAILURE);
-	return (false);
 }
