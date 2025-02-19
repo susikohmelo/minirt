@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 14:23:17 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:29:13 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,7 +203,6 @@ double		get_rough_value(t_vec3 r, const t_shape *shape, int shape_type);
 t_vec3		get_albedo_blur(t_vec3 intersect, const t_shape *shape,
 				int shape_type, double blur);
 t_vec3		get_skybox_color(t_minirt *m, t_vec3 dir, double blur);
-
 
 double		get_shape_roughness(t_ray *data, t_vec3 *ray);
 t_vec3		get_shape_color(t_ray *data, t_vec3 *ray);

@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:29:56 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 11:27:29 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:29:02 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "ray.h"
 #include <math.h>
 
-void min_light_intersect_dist(t_ray *ray, const t_light *light)
+void	min_light_intersect_dist(t_ray *ray, const t_light *light)
 {
 	t_vec3	lstart;
 	double	b;

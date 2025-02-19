@@ -6,33 +6,13 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:06:04 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 11:47:52 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:32:04 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 #include <stdlib.h>
 #include <math.h>
-
-//static // TODO maybe move this or something
-t_vec3   axis_rotation(t_vec3 v, t_vec3 axis, double r)
-{
-    const double    m[3][3] = {{
-            axis.x * axis.x * (1 - cos(r)) + cos(r),
-            axis.x * axis.y * (1 - cos(r)) - axis.z * sin(r),
-            axis.x * axis.z * (1 - cos(r)) + axis.y * sin(r)
-        },{
-            axis.x * axis.y * (1 - cos(r)) + axis.z * sin(r),
-            axis.y * axis.y * (1 - cos(r)) + cos(r),
-            axis.y * axis.z * (1 - cos(r)) - axis.x * sin(r)
-        },{
-            axis.x * axis.z * (1 - cos(r)) - axis.y * sin(r),
-            axis.y * axis.z * (1 - cos(r)) + axis.x * sin(r),
-            axis.z * axis.z * (1 - cos(r)) + cos(r)
-        }
-    };
-    return (mat3_vec3(m, v));
-}
 
 t_vec3	perpendiculary(t_vec3 v)
 {
