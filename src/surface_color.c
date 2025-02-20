@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/20 14:07:22 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 14:16:59 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static inline void	shoot_reflection(t_minirt *m, t_ray *data, double *rough)
 
 	intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
 	normal = get_obj_normal(intersect, data);
-	*rough = *rough; // fmin(*rough + get_shape_roughness(data, &intersect), 1);
+	*rough = fmin(*rough + get_shape_roughness(data, &intersect), 1);
 	data->start = vec3_add(intersect, vec3_muls(normal, 0.001));
 	view_dir = vec3_muls(data->dir, -1);
 	data->dir = vec3_sub(vec3_muls(\
