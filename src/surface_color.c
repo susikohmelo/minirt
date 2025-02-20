@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/20 14:16:59 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 14:18:30 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ static inline bool	reflect(t_minirt *m, t_vec3 *main_color, t_ray *data,
 		shape_color = vec3_muls(surface_color(m, *data, true),
 				(1 - new_rough) / (1 + new_rough * data->length * 16));
 		*main_color = vec3_add(*main_color, vec3_muls(shape_color, 1 - *rough));
+		*rough = fmin(*rough + new_rough, 1);
 		return (true);
 	}
 	return (false);
