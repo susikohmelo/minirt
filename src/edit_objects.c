@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 10:44:57 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 12:54:35 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:26:56 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,13 @@ static void	edit_global_attributes(t_minirt *m, double x)
 		m->ambient_light_color.g = x;
 	if (m->moving_slider == 4)
 		m->ambient_light_color.b = x;
-	if (m->moving_slider == 5)
-		m->camera_field_of_view = 180 * x;
 	if (1 <= m->moving_slider && m->moving_slider <= 4)
 		m->ambient_light = vec3_muls(\
 			m->ambient_light_color, m->ambient_light_ratio);
+	if (m->moving_slider == 5)
+		m->camera_field_of_view = 180 * x;
+	if (m->moving_slider == 8)
+		m->valid_pixel_len = pow(2, floor(7 * x + .5));
 }
 
 void	edit_objects(t_minirt *m, double x)

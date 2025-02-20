@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 15:15:06 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/20 12:04:32 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/20 12:37:35 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@ static t_click	click_type(t_minirt *m, double click_time, int x, int y)
 	last_click_time = click_time;
 	if (clicked_menu && LINE_LENGTH - 3 <= x && y == 7)
 		return (CLICK_SHOW_LIGHTS);
-	if (m->shape_type != SHAPE_NO_SHAPE
-		&& clicked_menu && 2 <= y)
+	if (clicked_menu && LINE_LENGTH - 3 <= x && y == 8)
+		return (CLICK_SHOW_SKYBOX);
+	if (m->shape_type != SHAPE_NO_SHAPE && clicked_menu && 2 <= y)
 		return (CLICK_SLIDER);
 	if (click_time - click_time1 < .2
 		&& m->mouse_x < (int)m->img->width && m->mouse_y < (int)m->img->height)
@@ -82,10 +83,9 @@ static void	handle_left_click(t_minirt *m)
 	else if (c == CLICK_OPEN_MENU)
 		m->shape_type = SHAPE_GLOBAL_ATTRIBUTES;
 	else if (c == CLICK_SHOW_LIGHTS)
-	{
 		m->show_lights = !m->show_lights;
-		ft_memset(m->valid_pixel, false, m->valid_pixel_len);
-	}
+	else if (c == CLICK_SHOW_SKYBOX)
+		m->disable_skybox = !m->disable_skybox;
 	else if (c == CLICK_SLIDER)
 	{
 		m->moving_slider = m->mouse_y / CHAR_HEIGHT - 1;
@@ -93,6 +93,8 @@ static void	handle_left_click(t_minirt *m)
 	}
 	else if (c == CLICK_WORLD)
 		handle_world_click(m);
+	if (c == CLICK_SHOW_LIGHTS || c == CLICK_SHOW_SKYBOX)
+		ft_memset(m->valid_pixel, false, m->valid_pixel_len);
 }
 
 void	mouse_hook(
