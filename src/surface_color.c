@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/20 13:44:57 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 14:07:22 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static inline void	shoot_reflection(t_minirt *m, t_ray *data, double *rough)
 
 	intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
 	normal = get_obj_normal(intersect, data);
-	*rough = fmin(*rough + get_shape_roughness(data, &intersect), 1);
+	*rough = *rough; // fmin(*rough + get_shape_roughness(data, &intersect), 1);
 	data->start = vec3_add(intersect, vec3_muls(normal, 0.001));
 	view_dir = vec3_muls(data->dir, -1);
 	data->dir = vec3_sub(vec3_muls(\
@@ -61,7 +61,6 @@ static inline bool	reflect(t_minirt *m, t_vec3 *main_color, t_ray *data,
 		shape_color = vec3_muls(surface_color(m, *data, true),
 				(1 - new_rough) / (1 + new_rough * data->length * 16));
 		*main_color = vec3_add(*main_color, vec3_muls(shape_color, 1 - *rough));
-		*rough = fmin(fmax(*rough + new_rough, 0), 1);
 		return (true);
 	}
 	return (false);
@@ -78,7 +77,6 @@ static inline t_vec3	reflections_reflections(t_minirt *m, t_vec3 main_color,
 	main_color = vec3_add(main_color, vec3_muls(surface_color(m, *data, true),
 				(1 - rough) / (1 + rough * data->length * 16)));
 	intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
-	rough = fmin(fmax(rough + get_shape_roughness(data, &intersect), 0), 1);
 	i = 0;
 	while (++i < m->max_ray_bounces && rough < 1)
 	{
@@ -90,7 +88,7 @@ static inline t_vec3	reflections_reflections(t_minirt *m, t_vec3 main_color,
 		shape_color.w = rough;
 		shape_color = mix_dif_reflect(\
 				data, shape_color, &intersect, vec3_muls(view_dir, -1));
-		return (vec3_add(main_color, shape_color));
+		return (vec3_add(main_color, vec3_muls(shape_color, 1 - rough)));
 	}
 	return (main_color);
 }
