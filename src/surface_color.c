@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/20 12:55:50 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:44:57 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "minirt.h"
 #include <math.h>
 
+/*	Shape W is used to store the roughness	*/
 static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
 							t_vec3 *intersect, t_vec3 view_dir)
 {
@@ -21,6 +22,7 @@ static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
 	double			ratio;
 
 	ratio = fmin(fmax(-vec3_dot(data->dir, view_dir), 0), 1);
+	ratio = (1 - shape_reflect.w) + ratio * shape_reflect.w;
 	shape_difus = vec3_mul(shape_reflect, get_shape_color(data, intersect));
 	return (vec3_add(vec3_muls(shape_reflect, ratio),
 			vec3_muls(shape_difus, 1 - ratio)));
@@ -85,6 +87,7 @@ static inline t_vec3	reflections_reflections(t_minirt *m, t_vec3 main_color,
 			continue ;
 		intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
 		shape_color = skybox_color(m, *data, intersect, rough);
+		shape_color.w = rough;
 		shape_color = mix_dif_reflect(\
 				data, shape_color, &intersect, vec3_muls(view_dir, -1));
 		return (vec3_add(main_color, shape_color));
@@ -113,8 +116,10 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	data.start = vec3_add(intersect, vec3_muls(normal, 0.001));
 	data.length = INFINITY;
 	get_shape_intersect_dist(m, &data, NULL);
-	if (isinf(data.length) || data.length < 0.0001)
-		return (vec3_add(main_clr, mix_dif_reflect(&data, skybox_color(\
-							m, data, intersect, rough), &intersect, view_dir)));
-	return (reflections_reflections(m, main_clr, &data, rough));
+	if (!isinf(data.length))
+		return (reflections_reflections(m, main_clr, &data, rough));
+	normal = skybox_color(m, data, intersect, rough);
+	normal.w = rough;
+	return (vec3_add(main_clr, mix_dif_reflect(\
+					&data, normal, &intersect, view_dir)));
 }
