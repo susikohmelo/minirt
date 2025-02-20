@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:38:19 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/19 22:51:17 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 12:55:50 by ljylhank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,17 @@
 #include "minirt.h"
 #include <math.h>
 
-//TODO
 static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
-							t_vec3 *intersect, double rough)
-{
-	shape_reflect.r += 0 * rough; // werror thingy
-	return (vec3_mul(shape_reflect, get_shape_color(data, intersect)));
-}
-
-/*
-static inline t_vec3	mix_dif_reflect(t_ray *data, t_vec3 shape_reflect,
-							t_vec3 *intersect, double rough)
+							t_vec3 *intersect, t_vec3 view_dir)
 {
 	t_vec3			shape_difus;
+	double			ratio;
 
+	ratio = fmin(fmax(-vec3_dot(data->dir, view_dir), 0), 1);
 	shape_difus = vec3_mul(shape_reflect, get_shape_color(data, intersect));
-	return (vec3_add(vec3_muls(shape_reflect, 1 - rough),
-			vec3_muls(shape_difus, rough)));
+	return (vec3_add(vec3_muls(shape_reflect, ratio),
+			vec3_muls(shape_difus, 1 - ratio)));
 }
-*/
 
 static inline void	shoot_reflection(t_minirt *m, t_ray *data, double *rough)
 {
@@ -66,31 +58,35 @@ static inline bool	reflect(t_minirt *m, t_vec3 *main_color, t_ray *data,
 		data->is_reflect = new_rough;
 		shape_color = vec3_muls(surface_color(m, *data, true),
 				(1 - new_rough) / (1 + new_rough * data->length * 16));
-		shape_color = mix_dif_reflect(data, shape_color, &intersect, *rough);
-		*main_color = vec3_add(*main_color,
-				vec3_muls(shape_color, 1 - *rough));
+		*main_color = vec3_add(*main_color, vec3_muls(shape_color, 1 - *rough));
+		*rough = fmin(fmax(*rough + new_rough, 0), 1);
 		return (true);
 	}
 	return (false);
 }
 
 static inline t_vec3	reflections_reflections(t_minirt *m, t_vec3 main_color,
-						t_ray *data, double roughness)
+						t_ray *data, double rough)
 {
 	t_vec3			shape_color;
 	t_vec3			intersect;
+	t_vec3			view_dir;
 	int				i;
 
 	main_color = vec3_add(main_color, vec3_muls(surface_color(m, *data, true),
-				(1 - roughness) / (1 + roughness * data->length * 16)));
+				(1 - rough) / (1 + rough * data->length * 16)));
+	intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
+	rough = fmin(fmax(rough + get_shape_roughness(data, &intersect), 0), 1);
 	i = 0;
-	while (++i < m->max_ray_bounces && roughness < 1)
+	while (++i < m->max_ray_bounces && rough < 1)
 	{
-		if (reflect(m, &main_color, data, &roughness))
+		view_dir = data->dir;
+		if (reflect(m, &main_color, data, &rough))
 			continue ;
 		intersect = vec3_add(vec3_muls(data->dir, data->length), data->start);
-		shape_color = skybox_color(m, *data, intersect, roughness);
-		shape_color = mix_dif_reflect(data, shape_color, &intersect, roughness);
+		shape_color = skybox_color(m, *data, intersect, rough);
+		shape_color = mix_dif_reflect(\
+				data, shape_color, &intersect, vec3_muls(view_dir, -1));
 		return (vec3_add(main_color, shape_color));
 	}
 	return (main_color);
@@ -119,6 +115,6 @@ t_vec3	surface_color(t_minirt *m, t_ray data, bool is_reflection)
 	get_shape_intersect_dist(m, &data, NULL);
 	if (isinf(data.length) || data.length < 0.0001)
 		return (vec3_add(main_clr, mix_dif_reflect(&data, skybox_color(\
-							m, data, intersect, rough), &intersect, rough)));
+							m, data, intersect, rough), &intersect, view_dir)));
 	return (reflections_reflections(m, main_clr, &data, rough));
 }
