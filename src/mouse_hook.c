@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 15:15:06 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/20 12:37:35 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/20 18:34:54 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,11 @@ static t_click	click_type(t_minirt *m, double click_time, int x, int y)
 
 	click_time1 = last_click_time;
 	last_click_time = click_time;
-	if (clicked_menu && LINE_LENGTH - 3 <= x && y == 7)
+	if (clicked_menu && LINE_LENGTH - 3 <= x && y == 7
+		&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
 		return (CLICK_SHOW_LIGHTS);
-	if (clicked_menu && LINE_LENGTH - 3 <= x && y == 8)
+	if (clicked_menu && LINE_LENGTH - 3 <= x && y == 8
+		&& m->shape_type == SHAPE_GLOBAL_ATTRIBUTES)
 		return (CLICK_SHOW_SKYBOX);
 	if (m->shape_type != SHAPE_NO_SHAPE && clicked_menu && 2 <= y)
 		return (CLICK_SLIDER);
