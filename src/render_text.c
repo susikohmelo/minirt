@@ -6,11 +6,12 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:43:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/18 20:27:52 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:34:25 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
+#include <math.h>
 
 void	render_header(t_minirt *m, const char *header)
 {
@@ -37,10 +38,18 @@ static void	render_attributes_text(t_minirt *m)
 	ft_memset(line, ' ', sizeof line);
 	ft_memcpy(line, "Show lights", ft_strlen("Show lights"));
 	if (m->show_lights)
-		ft_memcpy(line + LINE_LENGTH - ft_strlen("yes"), "yes", sizeof "yes");
+		ft_memcpy(line + LINE_LENGTH - ft_strlen("on"), "on", sizeof "on");
 	else
-		ft_memcpy(line + LINE_LENGTH - ft_strlen("no"), "no", sizeof "no");
+		ft_memcpy(line + LINE_LENGTH - ft_strlen("off"), "off", sizeof "off");
 	render_string(m, line);
+	ft_memset(line, ' ', sizeof line);
+	ft_memcpy(line, "Show skybox", ft_strlen("Show lights"));
+	if (!m->disable_skybox)
+		ft_memcpy(line + LINE_LENGTH - ft_strlen("on"), "on", sizeof "on");
+	else
+		ft_memcpy(line + LINE_LENGTH - ft_strlen("off"), "off", sizeof "off");
+	render_string(m, line);
+	render_value(m, "FPS optimization", floor(log2(m->valid_pixel_len)) / 7, 7);
 }
 
 static void	render_light_text(t_minirt *m)

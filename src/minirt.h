@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 10:27:22 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 17:54:52 by lfiestas         ###   ########.fr       */
+/*   Updated: 2025/02/20 12:34:02 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@ typedef enum e_click
 	CLICK_CLOSE_MENU,
 	CLICK_OPEN_MENU,
 	CLICK_SHOW_LIGHTS,
+	CLICK_SHOW_SKYBOX,
 	CLICK_WORLD,
 }	t_click;
 
