@@ -4,14 +4,64 @@ L    2.8,2,-5    1    255,255,255
 L    -2.8,2,-5    1    255,255,255
 
 sp    3,0,0    0.5    255,255,255    textures/granite.xpm42
-sp    3,-5,0    0.5    255,255,255    textures/granite.xpm42
+sp    3,8,0    0.5    255,255,255    textures/granite.xpm42
 cy    3,2,0    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
  
-sp    3,0,2    0.5    255,255,255    textures/granite.xpm42
-sp    3,-5,2    0.5    255,255,255    textures/granite.xpm42
-cy    3,2,2    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+sp    3,0,3    0.5    255,255,255    textures/granite.xpm42
+sp    3,5,3    0.5    255,255,255    textures/granite.xpm42
+cy    3,2,3    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
 
-pl    0,-5,0    0,-1,0    255,255,255 textures/granite.xpm42
+sp    3,0,6    0.5    255,255,255    textures/granite.xpm42
+sp    3,5,6    0.5    255,255,255    textures/granite.xpm42
+cy    3,2,6    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp    3,0,9    0.5    255,255,255    textures/granite.xpm42
+sp    3,5,9    0.5    255,255,255    textures/granite.xpm42
+cy    3,2,9    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp    3,0,12    0.5    255,255,255    textures/granite.xpm42
+sp    3,5,12    0.5    255,255,255    textures/granite.xpm42
+cy    3,2,12    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp    3,0,15    0.5    255,255,255    textures/granite.xpm42
+sp    3,5,15    0.5    255,255,255    textures/granite.xpm42
+cy    3,2,15    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp    3,0,18    0.5    255,255,255    textures/granite.xpm42
+sp    3,5,18    0.5    255,255,255    textures/granite.xpm42
+cy    3,2,18    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+
+
+sp   -3,0,0    0.5    255,255,255    textures/granite.xpm42
+sp   -3,8,0    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,0    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+ 
+sp   -3,0,3    0.5    255,255,255    textures/granite.xpm42
+sp   -3,5,3    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,3    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp   -3,0,6    0.5    255,255,255    textures/granite.xpm42
+sp   -3,5,6    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,6    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp   -3,0,9    0.5    255,255,255    textures/granite.xpm42
+sp   -3,5,9    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,9    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp   -3,0,12    0.5    255,255,255    textures/granite.xpm42
+sp   -3,5,12    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,12    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp   -3,0,15    0.5    255,255,255    textures/granite.xpm42
+sp   -3,5,15    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,15    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+sp   -3,0,18    0.5    255,255,255    textures/granite.xpm42
+sp   -3,5,18    0.5    255,255,255    textures/granite.xpm42
+cy   -3,2,18    0,1,0 0.45 20    255,255,255    textures/granite.xpm42
+
+pl    0,5,0    0,-1,0    255,255,255 textures/granite.xpm42
 pl    0,0,0    0,1,0    255,255,255  0.25 textures/tile.xpm42
 pl    -5,0,0    1,0,0    2,2,2 textures/granite.xpm42
 pl    5,0,0    -1,0,0    2,2,2 textures/granite.xpm42
