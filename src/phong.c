@@ -6,7 +6,7 @@
 /*   By: lfiestas <lfiestas@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:49:38 by lfiestas          #+#    #+#             */
-/*   Updated: 2025/02/19 21:57:50 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 11:44:39 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,11 @@ static void	add_light_contribution(
 		light_ray_dir);
 	*surface = vec3_add(*surface, vec3_muls(light.color, diffusion));
 	*surface_speculars = vec3_add(*surface_speculars, \
-		vec3_muls(light.color, (1 / pow(light.roughness + 0.88, 2) - 0.27) * \
-		pow(\
-			fmax(-vec3_dot(reflection, data.dir), 0), \
-			(1 / pow(light.roughness + 0.01, 2) + 0.02))));
+		vec3_muls(light.color, \
+			(1 / pow(light.roughness + 0.88, 2) - 0.27) * \
+			pow(\
+				fmax(-vec3_dot(reflection, data.dir), 0), \
+				(1 / (light.roughness * light.roughness)))));
 }
 
 t_vec3	phong(

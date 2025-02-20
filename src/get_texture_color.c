@@ -6,7 +6,7 @@
 /*   By: ljylhank <ljylhank@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 21:11:33 by ljylhank          #+#    #+#             */
-/*   Updated: 2025/02/19 22:10:08 by ljylhank         ###   ########.fr       */
+/*   Updated: 2025/02/20 11:48:36 by lfiestas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,6 @@ double	get_rough_value(t_vec3 intersect, const t_shape *shape, int shape_type)
 	img = shape->roughness_map;
 	vect = get_texture_from_uv(img, uv.x, uv.y, 0);
 	roughness = (vect.r + vect.g + vect.b) / 3;
-	roughness = fmin(fmax(roughness + (shape->roughness - 0.5) * 2, 0), 1);
-	return (roughness);
+	return (fmax(0, 2 * shape->roughness - 1) \
+		+ (1 - fabs(2 * shape->roughness - 1)) * roughness);
 }
