@@ -1,10 +1,34 @@
 ![](https://raw.githubusercontent.com/susikohmelo/minirt_dev/refs/heads/main/readme_files/ball.png)
 
+
 # MiniRT
 
-Real-time and interactive ray tracer for Hive Helsinki 42 coding school. Rendering is done on the CPU due to the project requirements, but is highly optimized using threads, vector registers, and an arena allocator, just to name a few techniques. See the [subject file](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/en.subject.pdf) for detailed description of the project requirements. 
+Real-time interactive ray tracer for Hive Helsinki 42 coding school - from (very nearly) scratch in C.
+
+Rendering is done on the CPU due to the project requirements, but is highly optimized using threads, vector registers, and an arena allocator, just to name a few techniques. See the [subject file](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/en.subject.pdf) for detailed description of the project requirements. 
+
 
 ![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/redblue.jpg?raw=true)
+
+## Features
+#### Lighting
+* Phong model ( ambient, diffuse & specular )
+* Reflections & reflections of reflections, adjustable amount
+* Hard shadows
+
+#### Texture/bump mapping
+* Albedo maps
+* Normal maps
+* Roughness maps
+* Cube maps ( skybox )
+
+#### Tools
+* In-program editor ( camera movement, moving objects, resizing, color, roughness, rotation etc ... )
+* Adjustable resolution scaling during camera movement for higher FPS
+* Multithreading
+
+
+![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/hall.png?raw=true)
 
 ## Build Instructions
 
@@ -29,9 +53,6 @@ make dev
 ```
 
 
-![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/hall.png?raw=true)
-
-![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/test.png?raw=true)
 
 ## Usage Instructions
 
@@ -52,4 +73,5 @@ You can also create your own scenes by writing your own scene description files 
 
 The scenes are interactive! You can move around pressing **WASD**, **space**, or **shift**, and move the camera by clicking the right mouse button and dragging. You can move objects by clicking the left mouse button and dragging or scrolling. Scrolling will zoom in and out, **3** enables skybox, **1** and **2** controls reflection count,  **Up** and **Down** controls FPS optimization. Double clicking objects opens menu for the given object. Pressing the `o` button on the top left corner opens menu for the environment. 
 
-![](https://github.com/susikohmelo/minirt_dev/blob/main/space.png?raw=true)
+
+![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/space.png?raw=true)
