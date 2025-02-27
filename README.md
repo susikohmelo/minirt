@@ -4,7 +4,7 @@
 
 Real-time and interactive ray tracer for Hive Helsinki 42 coding school. Rendering is done on the CPU due to the project requirements, but is highly optimized using threads, vector registers, and an arena allocator, just to name a few techniques. See the [subject file](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/en.subject.pdf) for detailed description of the project requirements. 
 
-![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/hall.png?raw=true)
+![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/redblue.jpg?raw=true)
 
 ## Build Instructions
 
@@ -27,6 +27,9 @@ git clone https://github.com/susikohmelo/minirt_dev.git
 cd minirt_dev
 make dev
 ```
+
+
+![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/hall.png?raw=true)
 
 ![](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/test.png?raw=true)
 
