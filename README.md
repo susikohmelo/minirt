@@ -1,7 +1,7 @@
 ![](https://raw.githubusercontent.com/susikohmelo/minirt_dev/refs/heads/main/readme_files/ball.png)
 
 
-# MiniRT
+# MiniRT <img align="left" src="https://github.com/susikohmelo/minirt/blob/main/readme_files/score.png" height="120"/>
 
 Real-time interactive ray tracer for Hive Helsinki 42 coding school - from (very nearly) scratch in C.
 
