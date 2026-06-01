@@ -1,8 +1,8 @@
 ![](https://raw.githubusercontent.com/susikohmelo/minirt/refs/heads/main/readme_files/ball.png)
 
-# MiniRT <img align="left" src="https://github.com/susikohmelo/minirt/blob/main/readme_files/score.png" height="120"/>
+# MiniRT<!-- <img align="left" src="https://github.com/susikohmelo/minirt/blob/main/readme_files/score.png" height="120"/> -->
 
-Real-time interactive ray tracer for Hive Helsinki 42 coding school - from (very nearly) scratch in C.
+Real-time interactive ray tracer for Hive Helsinki coding school - from (very nearly) scratch in C.
 
 Rendering is done on the CPU due to the project requirements, but is highly optimized using threads, vector registers, and an arena allocator, just to name a few techniques. See the [subject file](https://github.com/susikohmelo/minirt_dev/blob/main/readme_files/en.subject.pdf) for detailed description of the project requirements. 
 
